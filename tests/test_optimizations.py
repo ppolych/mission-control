@@ -51,7 +51,7 @@ assert 'mission_control.validation' not in sys.modules
         sys.path.insert(0,str(ROOT/'scripts'))
         from mission_control.contract import validate_allowed_paths
         with tempfile.TemporaryDirectory() as temporary:
-            root=Path(temporary);prefixes=['out','build']
+            root=Path(temporary).resolve();prefixes=['out','build']
             for name in prefixes:(root/name).mkdir()
             contract={'schema_version':3,'allowed_paths':prefixes,'steps':[{'watch':[],
                 'effects':{'reads':[],'writes':['out/result'+str(i) for i in range(20)]},'verify':[]}]}

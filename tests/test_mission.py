@@ -18,7 +18,7 @@ class Verification(unittest.TestCase):
 class Lifecycle(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
-        self.root=Path(self.tmp.name);self.mission=self.root/'mission'
+        self.root=Path(self.tmp.name).resolve();self.mission=self.root/'mission'
         self.contract=self.root/'contract.json'
         self.data={'schema_version':2,'mission':'test','steps':[{'id':'one','verify':[['exit0','true']]}]}
         self.save()

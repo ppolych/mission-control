@@ -88,6 +88,21 @@ class DocumentedFlows(ShellBase):
                 self.assert_completed()
 
 
+class SymlinkedPaths(ShellBase):
+    def test_lifecycle_through_a_symlinked_workspace_path(self):
+        # macOS temporary directories sit behind /var -> /private/var.
+        link = self.root / 'link'
+        link.symlink_to(self.workspace)
+        name = 'bash'
+        script = 'cd "$LINKED"\n' + readme_commands()
+        result = subprocess.run([self.shell(name), '--norc', '-c', 'set -e\n' + script], cwd=self.root,
+                                env={**os.environ, 'SKILL': str(self.skill), 'LINKED': str(link)},
+                                capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        state = json.loads((self.workspace / '.mission/state/progress.json').read_text(encoding='utf-8'))
+        self.assertEqual(state['workspace'], str(self.workspace))
+
+
 class Wrappers(ShellBase):
     def test_wrappers_run_directly_from_each_shell(self):
         for name in SHELLS:

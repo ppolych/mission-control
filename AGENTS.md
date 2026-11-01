@@ -39,7 +39,7 @@ bash -n scripts/verify.sh scripts/no_progress.sh
 shellcheck scripts/*.sh
 ```
 
-Run from the repository root. Focused example: `python3 -m unittest discover -s tests -k GoalReviewLifecycle -v`.
+There is no hosted CI: run `evals/check_all.sh` on each supported platform (it also repeats the suite with a symlinked `TMPDIR`, as macOS has). Tests must resolve temporary paths before comparing them. Run from the repository root. Focused example: `python3 -m unittest discover -s tests -k GoalReviewLifecycle -v`.
 
 ## Coding Style & Documentation
 

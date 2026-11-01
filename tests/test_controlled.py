@@ -13,7 +13,7 @@ class ControlledMode(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        self.root = Path(self.tmp.name)
+        self.root = Path(self.tmp.name).resolve()
         self.mission = self.root / 'mission'
         self.contract = self.root / 'input.json'
         self.data = {'schema_version': 2, 'mission': 'reviewed work',
