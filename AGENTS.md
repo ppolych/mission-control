@@ -1,5 +1,15 @@
 # Repository Guidelines
 
+## Working Rules
+
+These rules are the author's and apply to every agent working in this repository.
+
+- Commit only as `Panos Polychronis <ppolych@netcompany.com>`, for both author and committer. Add no `Co-Authored-By` or other attribution trailers: `git -c user.name='Panos Polychronis' -c user.email=ppolych@netcompany.com commit`.
+- Work directly on `main`, with no feature branches. Commit only after `evals/check_all.sh` passes.
+- Write everything in the project in English: code, comments, docs, tests and commit messages.
+- No god files: every tracked text file stays at or below 400 lines, with one responsibility per module.
+- There is no hosted CI, and none should be added.
+
 ## Project Structure & Module Organization
 
 Mission Control 0.3.3 is a Nestor orchestration skill with a Python core and Bash entrypoints.
