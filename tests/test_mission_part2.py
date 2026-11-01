@@ -105,7 +105,7 @@ class WslReleaseCompatibility(unittest.TestCase):
     init = original_fixtures.Lifecycle.init
 
     def test_windows_edited_bom_crlf_contract_and_checkpoint(self):
-        self.data['mission']='Report for Ελληνικά'
+        self.data['mission']='Report for résumé'
         raw=json.dumps(self.data,ensure_ascii=False,indent=2).replace('\n','\r\n')
         self.contract.write_bytes(b'\xef\xbb\xbf'+raw.encode('utf-8'))
         self.assertEqual(self.call('validate','--contract',str(self.contract)).returncode,0)
@@ -117,7 +117,7 @@ class WslReleaseCompatibility(unittest.TestCase):
         self.assertEqual(self.call('finish').returncode,0)
 
     def test_utf8_contract_independent_of_process_locale(self):
-        self.data['mission']='Δοκιμή'
+        self.data['mission']='Résumé'
         self.contract.write_text(json.dumps(self.data,ensure_ascii=False),encoding='utf-8')
         env=dict(os.environ,LC_ALL='C',PYTHONUTF8='0',PYTHONCOERCECLOCALE='0')
         result=subprocess.run(['python3',CLI,'validate','--contract',str(self.contract)],env=env,capture_output=True)
@@ -125,19 +125,19 @@ class WslReleaseCompatibility(unittest.TestCase):
 
     def test_wrappers_and_workspace_with_spaces_and_unicode(self):
         import shutil
-        skill=self.root/'skill copy Ελληνικά';(skill/'scripts').mkdir(parents=True)
+        skill=self.root/'skill copy résumé';(skill/'scripts').mkdir(parents=True)
         repo=Path(CLI).parent.parent
         for name in ('mission.py','verify.sh','no_progress.sh'):
             shutil.copyfile(repo/'scripts'/name,skill/'scripts'/name)
         shutil.copytree(repo/'scripts/mission_control',skill/'scripts/mission_control')
         # VERSION is part of a complete skill installation.
         if (repo/'VERSION').exists():shutil.copyfile(repo/'VERSION',skill/'VERSION')
-        workspace=self.root/'workspace with spaces Ελληνικά';workspace.mkdir()
-        (workspace/'result Ελληνικά.txt').touch()
-        self.data['steps'][0]['verify']=[['file','result Ελληνικά.txt']];self.save()
+        workspace=self.root/'workspace with spaces résumé';workspace.mkdir()
+        (workspace/'result résumé.txt').touch()
+        self.data['steps'][0]['verify']=[['file','result résumé.txt']];self.save()
         self.assertEqual(self.call('init','--contract',str(self.contract),'--workspace',str(workspace)).returncode,0)
         self.call('start','--step','one');self.assertEqual(self.call('verify','--step','one').returncode,0)
-        result=subprocess.run(['bash',str(skill/'scripts/verify.sh'),'file','result Ελληνικά.txt'],cwd=workspace,capture_output=True)
+        result=subprocess.run(['bash',str(skill/'scripts/verify.sh'),'file','result résumé.txt'],cwd=workspace,capture_output=True)
         self.assertEqual(result.returncode,0,result.stderr)
 
     def test_version_without_mission_or_valid_timeout(self):

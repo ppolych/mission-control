@@ -23,7 +23,7 @@ def smoke(archive_path):
             check_manifest(archive)
             archive.extractall(root)
         skill = root / 'mission-control'
-        workspace = root / 'workspace spaces Ελληνικά';workspace.mkdir()
+        workspace = root / 'workspace spaces résumé';workspace.mkdir()
         cli = skill / 'scripts/mission.py'
         contract = workspace / 'input.json'
         contract.write_text(json.dumps({'schema_version': 2, 'mission': 'Packaging smoke',
