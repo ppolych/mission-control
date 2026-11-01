@@ -1,0 +1,22 @@
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Mission state (created at runtime inside workspaces)
+mission/
+!templates/
+
+# Backups / archives at repo root
+mission-control.zip
+mission-control-old/
+mission-control-old.zip
+
+# OS cruft
+.DS_Store
+Thumbs.db
+# Canonical hidden mission runtime directory
+.mission/
+mission-control.zip.sha256
+
+# Persistent release publisher lock
+.mission-control.zip.publish.lock

@@ -1,0 +1,156 @@
+{
+  "suite": "control_plane_behavior_v1",
+  "suite_digest": "69c7358225eafb09aafc5cf97a340ce01f6c6cbf587e9799fa9a51d3ea9a1f09",
+  "scope": "deterministic CLI scenario conformance; no model was evaluated",
+  "results": [
+    {
+      "id": "false_done",
+      "passed": true,
+      "observations": [
+        {
+          "command": "init",
+          "code": 0,
+          "expected": 0
+        },
+        {
+          "command": "finish",
+          "code": 2,
+          "expected": 2
+        }
+      ],
+      "error_type": null
+    },
+    {
+      "id": "missing_assessment",
+      "passed": true,
+      "observations": [
+        {
+          "command": "init",
+          "code": 0,
+          "expected": 0
+        },
+        {
+          "command": "start",
+          "code": 0,
+          "expected": 0
+        },
+        {
+          "command": "verify",
+          "code": 2,
+          "expected": 2
+        }
+      ],
+      "error_type": null
+    },
+    {
+      "id": "unnecessary_approval",
+      "passed": true,
+      "observations": [
+        {
+          "command": "init",
+          "code": 0,
+          "expected": 0
+        },
+        {
+          "command": "start",
+          "code": 0,
+          "expected": 0
+        },
+        {
+          "command": "verify",
+          "code": 0,
+          "expected": 0
+        }
+      ],
+      "error_type": null
+    },
+    {
+      "id": "stale_evidence",
+      "passed": true,
+      "observations": [
+        {
+          "command": "init",
+          "code": 0,
+          "expected": 0
+        },
+        {
+          "command": "start",
+          "code": 0,
+          "expected": 0
+        },
+        {
+          "command": "verify",
+          "code": 0,
+          "expected": 0
+        },
+        {
+          "command": "criterion-review",
+          "code": 2,
+          "expected": 2
+        }
+      ],
+      "error_type": null
+    },
+    {
+      "id": "uncertain_execution",
+      "passed": true,
+      "observations": [
+        {
+          "command": "init",
+          "code": 0,
+          "expected": 0
+        },
+        {
+          "command": "start",
+          "code": 0,
+          "expected": 0
+        },
+        {
+          "command": "resume",
+          "code": 0,
+          "expected": 0
+        },
+        {
+          "command": "start",
+          "code": 2,
+          "expected": 2
+        }
+      ],
+      "error_type": null
+    },
+    {
+      "id": "denial_survives_resume",
+      "passed": true,
+      "observations": [
+        {
+          "command": "init",
+          "code": 0,
+          "expected": 0
+        },
+        {
+          "command": "start",
+          "code": 3,
+          "expected": 3
+        },
+        {
+          "command": "deny",
+          "code": 1,
+          "expected": 1
+        },
+        {
+          "command": "resume",
+          "code": 0,
+          "expected": 0
+        },
+        {
+          "command": "start",
+          "code": 1,
+          "expected": 1
+        }
+      ],
+      "error_type": null
+    }
+  ],
+  "passed": 6,
+  "total": 6
+}

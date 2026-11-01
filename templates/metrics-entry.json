@@ -1,0 +1,15 @@
+{
+  "mission_id": "replace-with-canonical-mission-path",
+  "exit_id": "replace-with-journal-head-or-checkpoint-hash",
+  "ended_at": "replace-with-checkpoint-timestamp",
+  "exit_label": null,
+  "attempts_used": 0,
+  "revalidations": 0,
+  "event_counts": null,
+  "terminal_transitions": [],
+  "goal_review_passed": false,
+  "tokens_used": null,
+  "interventions": null,
+  "source": "checkpoint_and_journal",
+  "duration_seconds": null
+}

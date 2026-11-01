@@ -1,0 +1,56 @@
+{
+  "schema_version": 3,
+  "mission": "Produce the requested artifact",
+  "constraints": [],
+  "budget": {
+    "max_attempts_per_step": 2,
+    "no_progress_threshold": 2
+  },
+  "steps": [
+    {
+      "id": "example-001",
+      "description": "Requested artifact exists and meets acceptance criteria",
+      "depends_on": [],
+      "verify": [
+        [
+          "file",
+          "report.txt"
+        ],
+        {
+          "manual": "Given the original goal, constraints and relevant sources, inspect the combined report end to end; assess whether every requested outcome is satisfied and cite content/integration evidence, naming any unsupported gap."
+        }
+      ],
+      "risk": "low",
+      "needs_approval": false,
+      "commands": [],
+      "acceptance_refs": [
+        "AC-1"
+      ],
+      "watch": [],
+      "retry": "inspect",
+      "effects": {
+        "reads": [],
+        "writes": [
+          "report.txt"
+        ],
+        "network": "none",
+        "external_actions": [],
+        "reversible": true
+      }
+    }
+  ],
+  "mode": "autonomous",
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "description": "Given the original request, constraints and relevant sources, when the combined report is reviewed end to end, then every requested outcome is satisfied with supported content.",
+      "evidence_kinds": [
+        "content"
+      ]
+    }
+  ],
+  "allowed_paths": [
+    "."
+  ],
+  "_comment_allowed_paths": "Optional schema-3 workspace-relative artifact prefixes, e.g. [\"out\", \"build\"]. Omit or use [\".\"] for the whole workspace; declarations only, not a shell sandbox."
+}

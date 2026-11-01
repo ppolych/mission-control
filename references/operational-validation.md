@@ -1,0 +1,183 @@
+# Release validation history
+
+Initial operational run: 2026-10-31, release **0.3.1**. Later release records
+are appended below; current release is **0.3.3**.
+No contract schema, default mode, approval, recovery or attempt-budget policy
+was changed. The additions are `metrics`, `handoff`, bounded `lessons-search`,
+and prompt guidance for progress/waits, safe polling and evidence-based review.
+The metrics example was corrected from an accidental schema-3 contract to an
+export event.
+
+Actual validation:
+
+- Full suite: **165 tests passed**, comprising the previous 154-test baseline
+  and 11 operational-helper regressions.
+- Skill frontmatter validation passed.
+- Schema-3 contract template validation passed.
+- Bash syntax and ShellCheck passed.
+- JSON templates parse; local Markdown links resolve.
+- A disposable combined-flow smoke test passed: initialization, start, manual
+  assessment, verification, supported acceptance review, finish, passing goal
+  review, metrics, handoff and lesson search. Exports left checkpoint bytes unchanged.
+
+New regressions cover the corrected template, deterministic read-only metrics,
+unknown schema-2 history, active and pending-approval handoffs, preserved digests,
+bounded/paginated selective search, symlink/FIFO/oversized-file exclusion,
+invalid queries, corrupt journal refusal, missing mission refusal and legacy
+empty optional journal compatibility.
+
+Limitations: token usage and human interventions are unknown without host data;
+metrics exports require explicit retention/deduplication; handoffs do not prove
+live approval/workspace identity. Lesson scans are bounded historical context.
+Polling/retry classifications and review quality are agent guidance, not an
+external process monitor, permission system or measured autonomy benchmark.
+
+## Reliability patterns — same version, 2026-10-31
+
+Author explicitly requested no release bump. VERSION and skill metadata remain
+0.3.1. Actual full result: **179 passing tests**, previous 165 plus 14 new
+regressions in `tests/test_grok_patterns.py`. They cover timeout/normal-exit
+process-group cleanup, shared-store conflicts/create/symlink/write failure,
+checkpoint read/write and journal append limits, deterministic diverse search
+and duplicate-limit reporting, half-open service probe leases and terminal HTTP
+responses, and bounded non-executing source impact analysis.
+
+Skill validation, contract template validation, Bash syntax, ShellCheck, JSON
+template parsing and local Markdown links passed. A disposable combined-flow
+smoke exercised store publication, diverse lessons, Python impact candidates,
+a synthetic failing-service hold, schema-3 verification/acceptance review,
+finish/goal review and unchanged checkpoint bytes after metrics/handoff.
+No external service calls or operator missions were exercised.
+
+Limits remain explicit: process-group cleanup is not a sandbox; shared-store
+CAS assumes cooperating locks and cannot isolate arbitrary external editors;
+large old histories need explicit preservation/inspection; service outcomes are
+advisory caller reports; impact is syntactic/lexical, not resolved bindings.
+
+## 0.3.2 — quality, evidence and learning
+
+Explicitly authorized release bump, implemented in order 3 → 1 → 2 → 4 → 5 → 6:
+behavioral baseline, optional proof kinds, recorded-fact diagnosis, lesson
+validity, scope-bound analysis reuse, and change-necessity drafting guidance.
+
+Actual checks on 2026-10-31:
+
+- **195 tests pass**: previous 179 plus 16 quality/evaluation regressions.
+- Original pre-change CLI behavioral baseline: **6/6** on 0.3.1.
+- Final 0.3.2 CLI comparison: **6/6**, zero pass-to-fail regressions. Artifacts:
+  `evals/baseline-control-plane-v031.json` and `evals/results-control-plane-v032.json`.
+- Skill validation, schema-3 template validation, version output, ShellCheck,
+  Bash syntax, template/evaluation JSON parsing and local Markdown links pass.
+- A disposable quality smoke exercised missing proof-kind refusal without
+  checkpoint mutation, typed supported review, evidence audit, finish/goal review,
+  diagnosis, lesson audit and analysis cache reuse followed by dirty-input refusal.
+  Read-only quality helpers preserved checkpoint bytes.
+
+Regressions also cover stale/contradicted lessons, policy drift, raw/lifecycle
+payload refusal, invalid max-age and missing-source publication, matching cache
+serialization/read caps, missing/malformed evaluation cases and real evidence-file
+requirements for imported agent grades. All fixtures were disposable; no external
+service/model call or operator mission was used.
+
+The two evaluation suites are intentionally distinct. CLI conformance does not
+measure autonomous contract quality, user interventions or actual agent success.
+Operator-provided model grades require review artifacts but remain judgments;
+the importer cannot establish reviewer independence or semantic truth. No LLM
+autonomy improvement is claimed without an actual paired model evaluation.
+
+## 0.3.2 — five-pass corrective review, unchanged release
+
+Actual final full suite: **206 tests pass** (195 previous plus 11 regressions in
+`tests/test_review032.py`). Each confirmed defect was reproduced with a failing
+regression before the correction. Review passes:
+
+1. **Lifecycle/evidence capacity:** a full journal let verification commands run
+   before commit failed. Added preflight to refuse checks at a known event limit,
+   preserving checkpoint bytes and avoiding an unrecordable command execution.
+2. **Analysis cache drift:** source changes during cache record read/preparation
+   could return a stale derived report or publish an already-stale binding. Save
+   and check now re-observe the full scope/input binding before publication/reuse.
+3. **Lesson metadata:** false, zero and empty containers as last_checked silently
+   became unknown dates. Present nonnull dates now undergo strict timestamp
+   validation; omitted/null dates remain unknown. Explicit empty as-of is invalid.
+4. **Evaluation invariants:** Python optimization disabled assertions that checked
+   attempt preservation/checkpoint immutability. Explicit functional failures now
+   remain active under -O; a synthetic faulty CLI is correctly marked failed.
+5. **Output preservation:** evaluator output could overwrite grade input/baseline
+   through direct paths or aliases, or clobber the runner. Output validation now
+   protects inputs and code and atomically replaces only separate report files.
+   Fault injection confirms old bytes survive replacement failure; existing
+   permission bits are preserved to avoid a publication compatibility regression.
+
+Normal and optimized CLI behavioral probes both pass **6/6**, with zero
+regressions against the observed 0.3.1 baseline. Skill validation, schema-3
+template validation, version output, ShellCheck, Bash syntax, JSON and local
+Markdown links pass. Version remains **0.3.2**; no actual model evaluation or
+operator mission was exercised.
+
+Limits: source checks/output preflights do not provide general filesystem race
+isolation. Byte-cap commit failure can still follow evidence generation; the
+known event-cap case is preflighted. Reports and semantic judgments remain
+advisory where documented. These were code-audit passes, not five fabricated
+completed missions or a claim of measured autonomous model improvement.
+
+
+## Post-split five-pass audit (unchanged 0.3.2)
+
+1. Import/dependency audit: every package module imports successfully; a symbol-table scan found no unresolved global references. No additional import fix was justified.
+2. Lifecycle/atomicity review: retained the single locked transition/commit path and existing budget, denial, recovery and journal regressions. No new transition change was justified.
+3. Cache publication: disposable reproductions showed cache-save could replace its declared input or report. Publication now rejects output/lock aliases of inputs, reports and installed Python/version files, before locking and before replacement. Tests cover direct paths, hardlinks, symlinks, lock collisions and disposable implementation files.
+4. Packaging/portability: retained the complete-package copy fixture, Unicode/space-path checks, engine fingerprint regression and 400-line cap. No new packaging change was justified.
+5. Test harness/introspection: nested legacy patches restored correctly, so the adapter was retained. Three helpers lost their runtime docstrings during splitting; docstrings now precede local imports, with a regression test.
+
+The new regressions reproduced four cache alias cases and missing docstrings before fixes. Alias preflights remain observations, not filesystem race isolation. The review adds no dependencies, approval gates or version bump.
+
+Final full suite: **212 tests passed** in 66.289 seconds. Normal and optimized behavioral probes: **6/6**, no baseline regression. Skill/template validation, JSON parsing, compilation, the 400-line cap, Bash syntax and ShellCheck passed. No real operator mission or model benchmark was run.
+
+
+## Optional allowed_paths at unchanged 0.3.2
+
+Schema-3 declared artifact containment was restored in the modular package. Regressions were added first: the initial nine-scenario development set exposed missing containment, including symlink-loop resolution and preservation of existing contracts. The final suite contains nine new tests covering omitted policy compatibility, restricted/whole-workspace prefixes, reads/writes, all three filesystem checks, watch, invalid prefixes, traversal/absolute paths, symlink escape/loop and rejected initialization preservation.
+
+Final full suite: **221 tests passed** in 73.364 seconds (212 preceding plus nine). Normal and optimized behavioral probes passed **6/6** with no baseline regression. Skill/template validation, JSON parsing, compilation, the 400-line cap, Bash syntax and ShellCheck passed. Version remains **0.3.2**. This validates declarations at validate/init; it is not shell sandboxing or continuous filesystem monitoring. No recovery, authorization or journal model was changed.
+
+
+## Five-pass containment compatibility review (unchanged 0.3.2)
+
+1. Prefix normalization: `./` was rejected although it normalizes to the documented whole-workspace `.` prefix. Explicit root-prefix validation now permits that equivalent form.
+2. Filesystem-check compatibility: `file .` was valid without containment but rejected by `["."]`. Checks now permit the workspace root before applying the same component/resolved containment tests; restricted prefixes still reject it.
+3. Filesystem resolution: `not_file out/file/child` was rejected when `out/file` was regular, despite not_file explicitly treating a non-directory parent as absence. Resolution now handles NotADirectoryError like a missing entry, while retaining loop and escape refusal.
+4. Boundary and symlink audit: existing traversal/absolute-path, sibling-prefix, symlink escape/loop and rejected-init preservation regressions remain required. No relaxation was justified. Effects/watch root-path validation remains unchanged.
+5. Integration audit: reviewed the unchanged locked lifecycle path, import bindings, package limits and documentation; verified with full lifecycle/portability tests and normal/optimized behavioral probes.
+
+Three new reproductions failed before fixes; four regression tests include the intentionally rejected restricted-root transition. This is declaration validation, not a filesystem sandbox or protection from later symlink changes. No release bump, approval, recovery or journal change was introduced.
+
+Containment compatibility review at unchanged 0.3.2: **225 tests passed** (221 preceding plus four regressions), full run 82.105 seconds. Normal/optimized behavioral probes passed 6/6 with no baseline regression. Skill/template validation, JSON, compilation, module-global scan, 400-line cap, Bash syntax and ShellCheck passed.
+
+
+## Release 0.3.3 verification
+
+The author explicitly authorized the release bump. VERSION, skill metadata, current documentation banners and version-output regression expectations were synchronized to 0.3.3. Historical 0.3.1/0.3.2 test and evaluation records remain labeled with their observed versions; no schema/checkpoint migration was introduced.
+
+Full suite: **225 tests passed** in 53.798 seconds. Normal and optimized behavioral probes passed **6/6**, with no baseline regression. CLI and both Bash wrappers report 0.3.3. Skill/template validation, compilation, the 400-line cap, Bash syntax, ShellCheck and local Markdown target checks passed. No actual model benchmark or operator mission was performed.
+
+Unified hidden runtime directory at unchanged 0.3.3: **228 tests passed** in 66.810 seconds (225 preceding plus three directory regressions). Normal/optimized probes passed 6/6 with no baseline regression. Skill/template validation, compilation, 400-line cap, Bash syntax, ShellCheck, JSON and local Markdown targets passed. Defaults now use `.mission/`; explicit legacy paths and existing data remain supported without automatic migration.
+
+
+## Earlier baseline records moved from AGENTS.md
+
+These are previously recorded results, not additional runs performed during optimization: 0.2.1 had 111 tests (76 original, 28 controlled-mode, seven review regressions); 0.3 had 143 after 32 schema-3 regressions; 0.3.1 had 154 after 11 receipt/recovery regressions. The modular refactor recorded 208 (206 prior plus line-limit and package-fingerprint tests). Later results and limits remain in the dated release sections above.
+
+
+## Six optimizations at unchanged 0.3.3
+
+- Existing handoff/diagnose exports add missing/unverified assessments, blocked dependencies and advisory next actions. Denial, stop, recovery and approval boundaries take precedence; reports grant no retry and change no checkpoint bytes.
+- Fresh installation identity includes version, absolute CLI path and full package engine fingerprint, alongside the selected mission directory. Host UI mode remains unknown; no mode is inferred from these reports.
+- Allowed-path prefixes resolve once within a validation call, with no cross-call cache. The same disposable 40-artifact/four-missing-prefix probe decreased from 401 to 89 Path.resolve calls. This measures call count, not latency or agent autonomy. A symlink-change regression confirms later calls re-resolve.
+- Historical baseline paragraphs moved from AGENTS.md into this reference. Operational guarantees remain in the contributor guide.
+- Repository-owned package_release.py/release_archive.py build deterministic ZIP metadata and an embedded manifest, verify content and extracted CLI/wrappers/lifecycle, and publish a checksum. Generated archives/checksums/caches are excluded; reproducibility is tested with repeated builds. ZIP/checksum publication is separate and consumers must verify the sidecar.
+- Version requests return before importing operational modules. Unused standard-library and constant imports were removed; the legacy nested patch regression now inspects its owning cache module.
+
+Regression tests failed before implementation. Final full suite: **236 tests passed** in 54.788 seconds (228 previous plus eight). Fresh evidence/approval/cache binding checks, single-active-step lifecycle, budgets, recovery and version 0.3.3 remain intact. No model-autonomy benchmark is claimed.
+
+Final optimization checks: normal and optimized behavioral probes passed **6/6**, no baseline regression. Skill/template validation, Bash syntax, ShellCheck, compilation, module-global scan, JSON and local Markdown targets passed. Maximum Python file length remains **331 lines**. Packaging manifest, deterministic repeated build and extracted lifecycle smoke regressions passed.
