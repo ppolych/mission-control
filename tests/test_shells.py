@@ -24,7 +24,7 @@ def section(text, title):
 
 
 def skill_commands():
-    block = bash_blocks(section((ROOT / 'SKILL.md').read_text(encoding='utf-8'), 'Command path'))[0]
+    block = '\n'.join(bash_blocks(section((ROOT / 'SKILL.md').read_text(encoding='utf-8'), 'Command path')))
     block = block.replace('check:STEP:INDEX', 'check:example-001:1')
     block = block.replace('--step STEP', '--step example-001').replace('--check INDEX', '--check 1')
     return block.replace('TEXT', "'Inspected the actual artifact'")
@@ -93,7 +93,7 @@ class Wrappers(ShellBase):
         for name in SHELLS:
             with self.subTest(shell=name):
                 result = self.run_script(name, '"$SKILL/scripts/verify.sh" file report.txt\n'
-                                               'NO_PROGRESS_STATE=history.json "$SKILL/scripts/no_progress.sh" record tool x\n')
+                                               f'NO_PROGRESS_STATE={name}.json "$SKILL/scripts/no_progress.sh" record tool x\n')
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_tracked_wrappers_are_executable(self):
