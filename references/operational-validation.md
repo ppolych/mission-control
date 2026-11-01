@@ -181,3 +181,21 @@ These are previously recorded results, not additional runs performed during opti
 Regression tests failed before implementation. Final full suite: **236 tests passed** in 54.788 seconds (228 previous plus eight). Fresh evidence/approval/cache binding checks, single-active-step lifecycle, budgets, recovery and version 0.3.3 remain intact. No model-autonomy benchmark is claimed.
 
 Final optimization checks: normal and optimized behavioral probes passed **6/6**, no baseline regression. Skill/template validation, Bash syntax, ShellCheck, compilation, module-global scan, JSON and local Markdown targets passed. Maximum Python file length remains **331 lines**. Packaging manifest, deterministic repeated build and extracted lifecycle smoke regressions passed.
+
+
+## Agent-usability review at unchanged 0.3.3
+
+Date: 2026-11-01. Version stays 0.3.3 because the author has not requested a bump, although
+these are behavior changes. Fixed: silently ignored contract fields, retry without a false
+`not_applied`, stuck steps on large or directory outputs, per-step check timeouts, unclear
+errors, read-only commands writing or blocking, invisible missing goal review, and unrecorded
+`human_abort` resumes. `cli.py` was split into `cli_parser.py`, `cli_aux.py` and `transitions.py`.
+
+Actual results: full suite **287 tests passed** (253 existing, 34 new in
+tests/test_review_fixes.py); behavioral probes **6/6** under normal and optimized Python with
+no baseline regression; template validation, Bash syntax and ShellCheck passed; packaging to a
+disposable path passed its manifest and extracted-install smoke checks. The original review
+reproductions were rerun against the fixed CLI.
+
+Limits: no real agent trial has been run, so this does not measure whether agents follow the
+workflow. Metadata receipts are weaker than SHA-256. macOS was not exercised.

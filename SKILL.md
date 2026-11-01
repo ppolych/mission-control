@@ -32,6 +32,28 @@ Follow [controller activation](references/controller-activation.md) for branchin
 return codes, failure handling and observable proof. These are agent rules, not a
 host enforcement hook.
 
+## Command path
+
+Set `SKILL` to this skill's absolute directory. Every command takes `--mission PATH`
+when the mission root is not `.mission`; `--help` lists all commands and flags.
+
+```bash
+python3 "$SKILL/scripts/mission.py" validate --contract contract.json
+python3 "$SKILL/scripts/mission.py" init --contract contract.json --workspace "$PWD"
+python3 "$SKILL/scripts/mission.py" start --step STEP
+# Do the step's work, then inspect the actual result.
+python3 "$SKILL/scripts/mission.py" assess --step STEP --check INDEX --verdict pass --rationale TEXT
+python3 "$SKILL/scripts/mission.py" verify --step STEP
+python3 "$SKILL/scripts/mission.py" criterion-review --criterion AC-1 --verdict supported \
+  --rationale TEXT --evidence-ref check:STEP:INDEX --evidence-kind content
+python3 "$SKILL/scripts/mission.py" finish
+python3 "$SKILL/scripts/mission.py" goal-review --verdict pass --rationale TEXT
+```
+
+Exit codes: 0 success; 1 refusal, check failure or exhausted work; 2 invalid input
+or transition; 3 waiting for a controlled-step decision. Failed checks report their
+index and exit status, not their output; rerun the check yourself to diagnose it.
+
 ## Phase 0 — Inspect and draft autonomously
 
 Inspect the workspace FIRST: relevant source, conventions, tests, existing
@@ -98,7 +120,11 @@ this gate; set it on EVERY step for full oversight. Autonomous adds no skill
 approval gates. Stop at verified completion or an explicit stop label. Details:
 [approval lifecycle and CLI](references/commands.md#controlled-mode-approval-policy).
 This is an agent workflow, not a scheduler or extra permission for external actions.
+`resume` from `human_abort` requires `--rationale`; use it only after the user explicitly
+asks to continue.
 
+Each check defaults to a 60-second limit (`VERIFY_TIMEOUT`). Set step `verify_timeout`
+in the contract for slower suites, because two timeouts stop the mission as `no_progress`.
 Checks must be safe to rerun and use the pinned mission workspace. JSON argv
 arrays remain exact. Deterministic checks fail fast and cannot be overridden
 by manual judgments. Verification runs in isolated process groups and cleans
@@ -125,7 +151,9 @@ Schema 3 records an atomic transition journal. Before retrying uncertain work,
 use `recovery`, inspect both files and external outcomes, then `recover` with
 the current report digest and an evidence-linked resolution. `completed` permits
 checks-only revalidation; `not_applied` permits a budgeted attempt; `partial` or
-`unknown` stays blocked. Never infer completion from a changed file hash.
+`unknown` stays blocked. After a failed verification of reversible work with no
+external actions, use `applied_incorrect` to spend a budgeted corrective attempt;
+do not record `not_applied` for work that did happen. Never infer completion from a changed file hash.
 
 After step verification, use `coverage` and `criterion-review` with evidence
 references and required `--evidence-kind` declarations. Use `evidence-audit` to
@@ -143,6 +171,8 @@ citing artifact/check evidence and any remaining gap. Step completion alone is
 insufficient. If the goal is unmet or uncertain, record `fail`, which changes
 the outcome to `blocked`; explain the gap and escalate with a recovery proposal.
 Do not silently report `done_verified`, weaken criteria, or override a stop.
+`finish` sets `done_verified` before this review; `goal_review_status: missing` in
+`status`, `handoff` and `diagnose` means the mission is not yet reportable as done.
 
 Report the final label, verified step count, goal-review evidence, and unresolved
 work. Existing labels remain unchanged. Manual review is an assessment, not an
@@ -177,9 +207,15 @@ The CLI scenario suite is not a model-autonomy benchmark. Actual agent runs need
 reviewed evidence. Reuse only scope/input/policy-bound derived analyses via the
 optional cache helpers; a cache hit never replaces current verification or consent.
 
+## Installation, paths and continuation
+
 Implementation: install the complete `scripts/` directory and root `VERSION`; the CLI requires the adjacent `mission_control/` Python package.
 
 Schema 3 may declare mission-level `allowed_paths` (e.g. `["out", "build"]`): when a contract declares allowed_paths, every step artifact path must stay inside it. Omitted or `["."]` permits the whole workspace. This validates declarations, not arbitrary commands; it does not create a sandbox. See `references/commands.md`.
+
+Declare exact output paths in `effects.writes`. Files up to 1 MiB get SHA-256 receipts; larger files
+and directories get weaker metadata receipts; a directory over 50,000 entries, a FIFO or a symlink cannot be
+observed and needs a contract revision. Watched inputs stay exact-hash only, so a watched file over 1 MiB refuses to start.
 
 Use one runtime root: `.mission/` by default. Keep contract/state, decision log, lessons and retained metrics together there. With an explicit `--mission PATH`, use PATH for every agent-written artifact and set `NO_PROGRESS_STATE=PATH/state/call_hashes.txt` for repeat history. Open legacy `mission/` only explicitly; do not automatically move or merge existing missions.
 

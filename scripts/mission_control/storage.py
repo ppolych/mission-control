@@ -14,6 +14,20 @@ def atomic(path,data):
         if os.path.exists(tmp):os.unlink(tmp)
 
 
+class LockBusy(OSError):
+    """Another cooperating command holds a persistent lock."""
+
+
+def require_regular_lock_entry(path):
+    """Refuse a suspicious lock entry without creating or acquiring the lock."""
+    try:
+        mode = os.lstat(path).st_mode
+    except FileNotFoundError:
+        return
+    if not stat.S_ISREG(mode):
+        raise ValueError('lock entry must be a regular file')
+
+
 @contextlib.contextmanager
 def persistent_lock(path):
     """Lock one regular persistent inode; never truncate or wait on a FIFO."""
@@ -21,6 +35,9 @@ def persistent_lock(path):
     with os.fdopen(os.open(path, flags, 0o600), 'r+') as lock:
         if not stat.S_ISREG(os.fstat(lock.fileno()).st_mode):
             raise ValueError('lock entry must be a regular file')
-        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError as error:
+            raise LockBusy('lock ' + str(path) + ' is held by another running command; retry after it finishes') from error
         yield lock
 

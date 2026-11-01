@@ -7,7 +7,8 @@ def impact_report(root,symbol):
     if not symbol or not symbol.isidentifier():raise ValueError('symbol must be an identifier')
     if root.is_symlink() or not root.is_dir():raise ValueError('source root must be an existing nonsymlink directory')
     result={'symbol':symbol,'definitions':[],'calls':[],'references':[],'tests':[],
-            'files_examined':0,'truncated':False,'warning':'Syntactic/lexical candidates, not resolved bindings or proof of behavior. Confirm using the project LSP and tests.'}
+            'files_examined':0,'truncated':False,
+            'warning':'Syntactic/lexical candidates, not resolved bindings or proof of behavior. Confirm using the project LSP and tests.'}
     directories=0
     for directory,dirs,files in os.walk(root,followlinks=False):
         directories+=1
@@ -30,7 +31,9 @@ def impact_report(root,symbol):
                     for node in ast.walk(tree):
                         kind=None
                         if isinstance(node,(ast.FunctionDef,ast.AsyncFunctionDef,ast.ClassDef)) and node.name==symbol:kind='definitions'
-                        if isinstance(node,ast.Call) and ((isinstance(node.func,ast.Name) and node.func.id==symbol) or (isinstance(node.func,ast.Attribute) and node.func.attr==symbol)):kind='calls'
+                        if isinstance(node,ast.Call) and ((isinstance(node.func,ast.Name) and node.func.id==symbol)
+                                                          or (isinstance(node.func,ast.Attribute) and node.func.attr==symbol)):
+                            kind='calls'
                         if kind:hits.append((kind,node.lineno))
             for number,line in enumerate(text.splitlines(),1):
                 if re.search(r'(?<!\w)'+re.escape(symbol)+r'(?!\w)',line):hits.append(('references',number))
@@ -38,7 +41,8 @@ def impact_report(root,symbol):
                 record={'path':str(relative),'line':number,'analysis':'python_ast' if kind!='references' else 'lexical'}
                 if len(result[kind])<256:result[kind].append(record)
                 else:result['truncated']=True
-                if ('test' in name.lower() or 'tests' in relative.parts) and record not in result['tests'] and len(result['tests'])<256:result['tests'].append(record)
+                if ('test' in name.lower() or 'tests' in relative.parts) and record not in result['tests'] and len(result['tests'])<256:
+                    result['tests'].append(record)
         if result['truncated']:break
     return result
 

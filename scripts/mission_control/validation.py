@@ -30,6 +30,9 @@ def validate(c):
         if not isinstance(step.get('description',''),str):raise ValueError('invalid description')
         deps=step.get('depends_on',[])
         if not isinstance(deps,list) or not all(isinstance(d,str) for d in deps):raise ValueError('dependencies must be string array')
+        if 'verify_timeout' in step:
+            limit=step['verify_timeout']
+            if type(limit) not in (int,float) or not 0<limit<=86400:raise ValueError('verify_timeout must be 1..86400 seconds')
         checks=step.get('verify')
         if not isinstance(checks,list) or not checks:raise ValueError('verify must be nonempty array')
         for check in checks:
@@ -56,7 +59,8 @@ def validate(c):
     if not isinstance(budget,dict) or set(budget)-{'max_attempts_per_step','max_iterations','no_progress_threshold'}:raise ValueError('invalid budget keys')
     for v in budget.values():
         if type(v)!=int or v<1:raise ValueError('budgets must be positive integers')
-    if 'constraints' in c and (not isinstance(c['constraints'],list) or not all(isinstance(x,str) for x in c['constraints'])):raise ValueError('constraints must be string array')
+    if 'constraints' in c and (not isinstance(c['constraints'],list) or not all(isinstance(x,str) for x in c['constraints'])):
+        raise ValueError('constraints must be string array')
     validate_advanced(c)
 
 
@@ -84,15 +88,20 @@ def validate_state(state,contract):
         for key in ('needs_revalidation','revalidating','budget_exhausted'):
             if key in entry and type(entry[key])!=bool:raise ValueError('invalid checkpoint flag')
         for assessment in entry.get('manual',{}).values():
-            if not isinstance(assessment,dict) or assessment.get('verdict') not in ('pass','fail','unverified') or not isinstance(assessment.get('rationale'),str) or not assessment['rationale'].strip():raise ValueError('invalid stored assessment')
+            if (not isinstance(assessment,dict) or assessment.get('verdict') not in ('pass','fail','unverified')
+                    or not isinstance(assessment.get('rationale'),str) or not assessment['rationale'].strip()):
+                raise ValueError('invalid stored assessment')
     if not isinstance(state.get('goal_review_history',[]),list):raise ValueError('invalid goal review history')
     reviews=state.get('goal_review_history',[])+([state['goal_review']] if 'goal_review' in state else [])
     for review in reviews:
-        if not isinstance(review,dict) or review.get('verdict') not in ('pass','fail') or not isinstance(review.get('rationale'),str) or not review['rationale'].strip():
+        if (not isinstance(review,dict) or review.get('verdict') not in ('pass','fail')
+                or not isinstance(review.get('rationale'),str) or not review['rationale'].strip()):
             raise ValueError('invalid goal review')
     if active>1:raise ValueError('multiple active steps in checkpoint')
-    if state.get('stop_reason') not in (None,'done_verified','blocked','human_paused','human_abort','no_progress','budget_exhausted','max_iterations'):raise ValueError('invalid stop reason')
-    if 'workspace' in state and (not isinstance(state['workspace'],str) or not Path(state['workspace']).is_absolute()):raise ValueError('invalid stored workspace')
+    if state.get('stop_reason') not in (None,'done_verified','blocked','human_paused','human_abort','no_progress','budget_exhausted','max_iterations'):
+        raise ValueError('invalid stop reason')
+    if 'workspace' in state and (not isinstance(state['workspace'],str) or not Path(state['workspace']).is_absolute()):
+        raise ValueError('invalid stored workspace')
     validate_approval_state(state,contract)
     validate_advanced_state(state,contract)
 

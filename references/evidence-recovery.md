@@ -88,6 +88,8 @@ Resolution is an explicit recorded judgment tied to the current report digest:
 
 - `completed`: allow checks-only revalidation, without marking the step complete.
 - `not_applied`: allow a normal execution attempt within the existing budget.
+- `applied_incorrect`: after a failed verification only, allow a budgeted corrective
+  attempt; refused when the step declares external actions or irreversible effects.
 - `partial` or `unknown`: remain blocked for recovery; return 1, without retry.
 
 Missing/stale digest or unavailable file observations reject resolved outcomes
@@ -123,6 +125,14 @@ must be relative, nonempty, and contain no parent traversal. Symlinks, FIFOs,
 directories, over-limit files and files observed changing during a read cannot
 serve as readable approval/recovery evidence. No file bytes are retained. These
 preflights do not provide filesystem race isolation or a sandbox.
+
+Declared writes and `file:` evidence refs are the exception for size and type. A larger
+regular file gets `kind: metadata` (size, mtime, ctime, mode). A directory gets
+`kind: directory`, a no-follow manifest of each entry's path, mode, size and mtime,
+limited to 50,000 entries and 64 levels. Both detect ordinary rebuilds but are weaker
+than SHA-256: an edit preserving all recorded metadata goes unnoticed. Symlinks, FIFOs
+and over-limit trees stay unavailable and need a contract revision. Watched inputs
+always use exact hashes because they bind approvals.
 
 All schema-3 verification and manual assessment checks validate the canonical
 workspace, including ungated/autonomous steps. Before committing a successful

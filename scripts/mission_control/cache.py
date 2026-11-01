@@ -8,7 +8,8 @@ def analysis_binding(args):
     from .observations import observations, readable_observations
     from .publication import digest
     from .store import read_bounded
-    if not args.source_root or not args.policy or not args.policy.strip() or len(args.policy)>256:raise ValueError('source-root and bounded nonblank policy required')
+    if not args.source_root or not args.policy or not args.policy.strip() or len(args.policy)>256:
+        raise ValueError('source-root and bounded nonblank policy required')
     queries=args.query or []
     if not queries or len(queries)>16 or not all(q.strip() and len(q)<=256 for q in queries):raise ValueError('bounded nonblank query required')
     names=args.input or []
@@ -66,11 +67,13 @@ def analysis_cache(args):
     if not isinstance(record,dict) or record.get('format')!=1 or record.get('advisory_only') is not True:raise ValueError('invalid cache record')
     safe_derived_report(record.get('report'))
     if record.get('report_digest')!=digest(record['report']):raise ValueError('cached report digest mismatch')
-    if not isinstance(record.get('binding'),dict) or record['binding'].get('digest')!=digest(record['binding'].get('scope')):raise ValueError('invalid cached binding')
+    if not isinstance(record.get('binding'),dict) or record['binding'].get('digest')!=digest(record['binding'].get('scope')):
+        raise ValueError('invalid cached binding')
     if not 1<=args.max_age<=604800:raise ValueError('max-age must be 1..604800 seconds')
     age=(datetime.datetime.now(datetime.timezone.utc)-aware_time(record.get('created_at'))).total_seconds()
     current_binding=analysis_binding(args)
-    reusable=current_binding==binding and record['binding']==binding and 0<=age<=args.max_age and all(value['status']=='present' for value in binding['scope']['inputs'].values())
+    reusable=(current_binding==binding and record['binding']==binding and 0<=age<=args.max_age
+              and all(value['status']=='present' for value in binding['scope']['inputs'].values()))
     result={'decision':'reuse_allowed' if reusable else 'refresh_required','advisory_only':True,
             'reason':'matching_scope_and_sources' if reusable else 'scope_sources_policy_engine_or_age_changed',
             'binding':binding['digest'],'approval_granted':False,'execution_enabled':False}

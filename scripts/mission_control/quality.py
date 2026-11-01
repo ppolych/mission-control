@@ -59,7 +59,8 @@ def diagnose_report(contract,state):
         rows.append({'step':step['id'],'kind':kind,'disposition':disposition,
                      'check':failure.get('check') if failure else None,'next_check':next_check,
                      'retry_authorized':False, **step_guidance(contract,state,step,active_step_present)})
-    return {'installation':installation_identity(), 'steps':rows,'advisory_only':True,'warning':'Classification uses recorded facts; no stderr parsing, automatic diagnosis, approval or retry.'}
+    return {'installation':installation_identity(), 'steps':rows,'advisory_only':True,
+            'warning':'Classification uses recorded facts; no stderr parsing, automatic diagnosis, approval or retry.'}
 
 
 def aware_time(value):
@@ -76,7 +77,9 @@ def lesson_audit(record,as_of=None):
     if not isinstance(entries,list) or len(entries)>256:raise ValueError('invalid lesson evidence')
     effects={'supports':0,'weakens':0,'contradicts':0,'stales':0};ids=set()
     for item in entries:
-        if not isinstance(item,dict) or item.get('effect') not in effects or not all(isinstance(item.get(k),str) and item[k].strip() for k in ('id','source_ref')):raise ValueError('invalid lesson evidence reference')
+        if (not isinstance(item,dict) or item.get('effect') not in effects
+                or not all(isinstance(item.get(k),str) and item[k].strip() for k in ('id','source_ref'))):
+            raise ValueError('invalid lesson evidence reference')
         if item['id'] in ids:raise ValueError('duplicate lesson evidence ID')
         ids.add(item['id']);effects[item['effect']]+=1
     stamp=aware_time(as_of) if as_of is not None else datetime.datetime.now(datetime.timezone.utc)

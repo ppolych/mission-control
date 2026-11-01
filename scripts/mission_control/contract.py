@@ -1,6 +1,23 @@
 from pathlib import Path
 
 
+CONTRACT_FIELDS = {'schema_version', 'mission', 'constraints', 'budget', 'steps', 'mode',
+                   'acceptance', 'allowed_paths', 'revision'}
+STEP_FIELDS = {'id', 'description', 'depends_on', 'verify', 'verify_timeout', 'risk', 'needs_approval',
+               'commands', 'acceptance_refs', 'watch', 'retry', 'effects', 'legacy_passes'}
+
+
+def validate_known_fields(contract):
+    """Refuse misspelled fields in new drafts; frozen contracts are not rechecked."""
+    def unknown(values, allowed):
+        return sorted(key for key in values if key not in allowed and not key.startswith('_'))
+    names = unknown(contract, CONTRACT_FIELDS)
+    for step in contract['steps']:
+        names.extend(step['id'] + '.' + key for key in unknown(step, STEP_FIELDS))
+    if names:
+        raise ValueError('unknown contract fields: ' + ', '.join(names) + '; check spelling or prefix comments with _')
+
+
 def relative_path(value, allow_workspace_root=False):
     if (not isinstance(value, str) or not value.strip() or '\x00' in value
             or '\\' in value or Path(value).is_absolute()

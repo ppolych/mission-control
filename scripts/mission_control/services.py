@@ -6,15 +6,18 @@ def service_operation(path,service,operation,outcome,retry_after,stamp=None):
     from .store import read_bounded
     stamp=time.time() if stamp is None else stamp
     if not re.fullmatch(r'[A-Za-z0-9_.-]{1,80}',service):raise ValueError('invalid service identifier')
-    if retry_after is not None and (not math.isfinite(retry_after) or retry_after<0 or not math.isfinite(stamp+retry_after)):raise ValueError('invalid retry-after seconds')
+    if retry_after is not None and (not math.isfinite(retry_after) or retry_after<0 or not math.isfinite(stamp+retry_after)):
+        raise ValueError('invalid retry-after seconds')
     def load():
         if not os.path.lexists(path):return {}
         values=json.loads(read_bounded(path,1048576)[0].decode('utf-8-sig'))
         if not isinstance(values,dict) or len(values)>128:raise ValueError('invalid health store')
         for record in values.values():
             if not isinstance(record,dict) or set(record)!={'failures','until','probe_until','terminal'}:raise ValueError('invalid health record')
-            if not isinstance(record['failures'],list) or len(record['failures'])>128 or type(record['terminal']) is not bool:raise ValueError('invalid health record')
-            if not all(type(n) in (int,float) and math.isfinite(n) and n>=0 for n in record['failures']+[record['until'],record['probe_until']]):raise ValueError('invalid health timing')
+            if not isinstance(record['failures'],list) or len(record['failures'])>128 or type(record['terminal']) is not bool:
+                raise ValueError('invalid health record')
+            if not all(type(n) in (int,float) and math.isfinite(n) and n>=0 for n in record['failures']+[record['until'],record['probe_until']]):
+                raise ValueError('invalid health timing')
         return values
     def report(record):
         state='terminal' if record['terminal'] else 'open' if stamp<record['until'] else 'half_open' if record['until'] else 'closed'

@@ -10,5 +10,5 @@ if __name__ == '__main__':
     try:
         sys.exit(main(sys.argv[1:]))
     except (ValueError, OSError, KeyError, StopIteration, TypeError, IndexError, subprocess.SubprocessError) as error:
-        print(str(error), file=sys.stderr)
+        print(str(error) or type(error).__name__, file=sys.stderr)
         sys.exit(2)

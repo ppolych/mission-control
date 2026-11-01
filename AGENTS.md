@@ -47,7 +47,7 @@ Use snake_case identifiers, quoted shell expansions, and two-space JSON indentat
 
 ## Testing & Workflow Guarantees
 
-Add regressions before fixing bugs or changing CLI behavior. Use temporary workspaces and isolated repeat history. Preserve the existing 76-test baseline (updating the release-version expectation), single-active-step design, frozen contracts, pinned workspace, exact argv boundaries, and execution budgets. Test migration faults/crash recovery; never unlink persistent locks or clean unrelated staging.
+Add regressions before fixing bugs or changing CLI behavior. Use temporary workspaces and isolated repeat history. Preserve the existing test suite, single-active-step design, frozen contracts, pinned workspace, exact argv boundaries, and execution budgets. Test migration faults/crash recovery; never unlink persistent locks or clean unrelated staging.
 
 Inspect workspace and relevant lessons before presenting a complete contract draft. Use the self-answered template instead of adding an unnecessary planning CLI. Preserve host authorization. Step count creates no gate. Autonomous keeps existing
 behavior; controlled pauses before high-risk or explicitly gated steps. Waiting
@@ -111,7 +111,7 @@ human interactions. Handoff and lessons are context, not live evidence or author
 
 ## Commits, Pull Requests & Security
 
-Git history is unavailable here. Use imperative subjects; describe behavior, validation, and limitations. Exclude secrets from recorded definitions and rationale. WSL uses Linux Python and quoted Linux paths; follow `references/wsl.md`. Do not claim untested mounted-drive compatibility.
+Use imperative subjects; describe behavior, validation, and limitations. Exclude secrets from recorded definitions and rationale. WSL uses Linux Python and quoted Linux paths; follow `references/wsl.md`. Do not claim untested mounted-drive compatibility.
 
 ## Current operational additions
 
@@ -165,7 +165,7 @@ preserve existing permission bits. Document observation-race limits honestly.
 
 ## Modular Python layout
 
-Keep modules focused on one responsibility and below 400 physical lines, including tests. CLI syntax and checkpoint formats remain stable. Legacy fault-injection tests use `tests/core_adapter.py`; new tests should patch the owning module directly. Cache engine identity covers the entrypoint and every package source file.
+Keep modules focused on one responsibility and below 400 physical lines, including tests. In `scripts/`, lines stay within 160 characters and functions within 120 lines (`tests/test_review_fixes.py`). CLI syntax and checkpoint formats remain stable. Legacy fault-injection tests use `tests/core_adapter.py`; new tests should patch the owning module directly. Cache engine identity covers the entrypoint and every package source file.
 
 ## Optional declared artifact containment
 
@@ -187,7 +187,7 @@ Cache publication must reject output/lock aliases of inputs, reports and install
 
 Build releases with `python3 scripts/package_release.py`. Keep archive construction in `scripts/release_archive.py`, including deterministic metadata and an embedded SHA-256 manifest. Exclude generated archives, checksums and caches. Packaging must pass extracted-install smoke checks before replacing the release archive.
 
-Current verification is 253 passing tests at 0.3.3 (241 previous plus twelve scaling, publication and trial-tool regressions). Historical counts and release evidence belong in [operational validation](references/operational-validation.md); do not duplicate that history here. Keep version 0.3.3 unless the author explicitly requests another bump.
+Test counts and release evidence belong only in [operational validation](references/operational-validation.md); do not duplicate them here. Keep version 0.3.3 unless the author explicitly requests another bump.
 
 
 ## Focused context and structural traceability
@@ -233,3 +233,15 @@ remain read-only. Bootstrap metadata is a limited exception, not project-write
 authority. Preserve counters, frozen contracts, interrupted initialization and
 existing permissions; do not add routine approval gates or auto-resume on context
 refresh. Details: references/controller-activation.md. No host hook is implied.
+
+
+## Agent-usability review rules
+
+Regressions live in tests/test_review_fixes.py. Strict field checks run only on new
+drafts (validate, init --contract, revise, revision-diff), never on frozen contracts.
+Read-only reports take no lock but still refuse a non-regular `.lock` entry. Lock
+contention raises `LockBusy`, an OSError. `applied_incorrect` requires a failed
+verification and refuses external or irreversible effects. Metadata receipts apply
+only to declared writes and file evidence refs; watched inputs stay exact-hash because
+they bind approvals. `done_verified` keeps its timing for compatibility: expose a
+missing review through `goal_review_status` instead of moving the label.

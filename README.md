@@ -72,9 +72,9 @@ Version 0.3 adds seven connected capabilities while retaining schema-2 missions:
 
 The new template uses schema 3. Existing schema-2 contracts remain valid and keep
 their original finish/resume behavior. No automatic schema migration or additional
-autonomous approval gate is introduced. The helper remains a single portable
-Python script and does not execute declared work commands, create a sandbox,
-prove semantic correctness, or guarantee exactly-once external effects.
+autonomous approval gate is introduced. The helper does not execute declared work
+commands, create a sandbox, prove semantic correctness, or guarantee exactly-once
+external effects.
 
 Read [the detailed schema-3 workflow](references/evidence-recovery.md) for the
 contract fields, commands, return codes, evidence freshness and recovery limits.
@@ -204,10 +204,6 @@ for progress versus live waits, bounded polling, safe retry limits and export
 semantics. Bug audits use [the evidence rubric](references/review-quality.md).
 The metrics template now describes a metrics event rather than a contract.
 
-Validation of these additions: **165 passing tests** including the previous
-154-test baseline, plus a disposable combined-flow smoke test. See
-[the validation record](references/operational-validation.md) for checks and limits.
-
 ## Reliability additions (introduced in 0.3.1)
 
 Verification subprocesses now clean up their process groups after timeout or exit.
@@ -217,10 +213,6 @@ Shared lessons can be published with digest-based conflict checks. Optional
 and read-only `impact` add selective memory, outage-aware safe observation and
 code/test candidates. No approvals, recovery rules or execution budgets are relaxed.
 See [the commands and limits](references/reliability-patterns.md).
-
-Reliability validation: **179 tests pass** (165 existing plus 14 new regressions),
-with the combined-flow smoke and static/template checks recorded in
-[the validation record](references/operational-validation.md).
 
 ## 0.3.2 — Quality, evidence and learning
 
@@ -242,18 +234,6 @@ semantic truth. Cache hits never transfer approvals or verification receipts.
 See [quality and learning](references/quality-and-learning.md) and
 [the agent evaluation protocol](evals/agent-scenarios.md).
 
-0.3.2 validation: **195 passing tests**, CLI behavioral baseline/comparison **6/6**
-with no regression, and the disposable quality smoke. See
-[the release validation history](references/operational-validation.md). Actual
-model behavior has not yet been benchmarked; imported agent grades remain
-evidence-linked reviewer judgments.
-
-The subsequent five-pass 0.3.2 review passed **206 tests**. It fixes full-journal
-verification, cache drift during lookup/publication, malformed lesson dates,
-optimized-Python evaluation checks and report output/input collisions. Both normal
-and optimized behavioral probes remain 6/6. That review retained release version **0.3.2**;
-see [the corrective review record](references/operational-validation.md).
-
 ### Python package layout
 
 Run `python3 scripts/mission.py` as before. Copy/install the complete `scripts/` directory and `VERSION`; copying only the entrypoint is insufficient. The adjacent `mission_control/` package uses only the standard library. Python source and test files are limited to 400 physical lines each.
@@ -271,7 +251,19 @@ This release packages the completed refactor and corrective reviews previously v
 
 Controlled/autonomous policy, recovery, checkpoint/journal formats and contract schema versions remain unchanged. Containment validates declarations; it does not sandbox commands or monitor later filesystem changes. See [validation history](references/operational-validation.md) for actual test results. Historical 0.3.1/0.3.2 evaluation files remain labeled with the versions they observed.
 
-0.3.3 verification: **253 passing tests**, behavioral probes **6/6** under normal and optimized Python, with no baseline regression.
+Current test results and their history are kept only in the [validation record](references/operational-validation.md).
+
+Actual model behavior has not been benchmarked; see [Nestor trials](evals/agent-scenarios.md).
+
+## Contract and retry behavior
+
+- `validate`, `init`, `revise` and `revision-diff` refuse unknown contract and step fields, so a misspelled `needs_approval` cannot silently remove a gate. Prefix comments with `_`. Already frozen contracts keep working.
+- Step `verify_timeout` (seconds, up to 86400) overrides `VERIFY_TIMEOUT`, whose default is 60. Timeouts are reported on stdout and count as failures.
+- `recover --resolution applied_incorrect` allows a budgeted corrective attempt after a failed verification of reversible work without external actions.
+- Declared writes over 1 MiB and directories get metadata receipts: size/mtime/ctime/mode, or a no-follow tree manifest up to 50,000 entries. These are weaker than SHA-256 and read no file bytes. Watched inputs remain exact-hash only.
+- Read-only reports take no lock, so they work during a running `verify`. No command except `init` creates a missing mission directory.
+- `finish` still sets `done_verified`, and `status`, `handoff` and `diagnose` report `goal_review_status` until the review is recorded.
+- `resume` from `human_abort` requires `--rationale`, kept in `resume_history`.
 
 
 ## Workspace runtime layout

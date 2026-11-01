@@ -567,3 +567,19 @@ project mutations; then assess actual output and verify. Skill loading, a writte
 plan and narrative success claims are not controller evidence. Read-only requests
 do not require state creation, and bootstrap metadata is a limited setup exception.
 No CLI behavior, permission rule, attempt budget or state schema changes here.
+
+
+## Contract strictness, timeouts and reports
+
+`validate`, `init --contract`, `revise` and `revision-diff` return 2 on unknown top-level
+or step fields, naming them; fields starting with `_` are comments. Frozen contracts are
+not rechecked. Step `verify_timeout` takes 0 < seconds <= 86400 and overrides
+`VERIFY_TIMEOUT`. `verify` prints `PASS|FAIL: KIND (check N, exit S)`, with a signal,
+`timeout after Ns` or error type in place of the exit status; check output stays discarded.
+
+Reports (`status`, `history`, `metrics`, `handoff`, `coverage`, `recovery`, `diagnose`,
+`evidence-audit`, `revision-diff`) read the atomically replaced checkpoint without taking
+the mission lock, and refuse a non-regular `.lock` entry. Other commands report a busy lock
+by name with exit 2. Only `init` creates a mission directory. `status`, `handoff` and
+`diagnose` include `goal_review_status`: `missing`, `pass`, `fail` or `not_applicable`.
+`resume` accepts `--rationale`, required from `human_abort`, recorded in `resume_history`.

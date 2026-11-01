@@ -1,6 +1,6 @@
-import hashlib, os, stat
+import hashlib, json, os, stat
 from pathlib import Path
-from .settings import MAX_OBSERVED_BYTES
+from .settings import MAX_OBSERVED_BYTES, MAX_TREE_DEPTH, MAX_TREE_ENTRIES
 
 
 def observe_file(workspace, name):
@@ -40,8 +40,73 @@ def observe_file(workspace, name):
         if directory is not None:os.close(directory)
 
 
+def observe_tree(directory, parent, name):
+    """Hash no-follow metadata for a declared output directory; never read file bytes."""
+    hasher = hashlib.sha256()
+    count = 0
+    def walk(fd, prefix, depth):
+        nonlocal count
+        if depth > MAX_TREE_DEPTH:
+            raise OverflowError('directory_too_deep')
+        with os.scandir(fd) as entries:
+            ordered = sorted(entries, key=lambda item: item.name)
+        for item in ordered:
+            info = item.stat(follow_symlinks=False)
+            count += 1
+            if count > MAX_TREE_ENTRIES:
+                raise OverflowError('directory_too_large')
+            path = prefix + item.name
+            hasher.update(json.dumps([path, info.st_mode, info.st_size, info.st_mtime_ns]).encode())
+            if stat.S_ISDIR(info.st_mode):
+                child = os.open(item.name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=fd)
+                try:
+                    walk(child, path + '/', depth + 1)
+                finally:
+                    os.close(child)
+    root = os.open(name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=directory)
+    try:
+        walk(root, '', 0)
+    finally:
+        os.close(root)
+    return {'status': 'present', 'kind': 'directory', 'entries': count,
+            'manifest': hasher.hexdigest(), 'mode': stat.S_IMODE(parent.st_mode)}
+
+
+def observe_artifact(workspace, name):
+    """Observe a declared output: exact hash when possible, else weaker metadata."""
+    value = observe_file(workspace, name)
+    if value.get('reason') not in ('not_regular_or_oversized', 'oversized'):
+        return value
+    parts = Path(name).parts
+    directory = None
+    try:
+        directory = os.open(workspace, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        for part in parts[:-1]:
+            child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=directory)
+            os.close(directory);directory = child
+        info = os.stat(parts[-1], dir_fd=directory, follow_symlinks=False)
+        if stat.S_ISDIR(info.st_mode):
+            return observe_tree(directory, info, parts[-1])
+        if stat.S_ISREG(info.st_mode):
+            return {'status': 'present', 'kind': 'metadata', 'size': info.st_size, 'mtime_ns': info.st_mtime_ns,
+                    'ctime_ns': info.st_ctime_ns, 'mode': stat.S_IMODE(info.st_mode)}
+        return value
+    except OverflowError as error:
+        return {'status': 'unavailable', 'reason': str(error)}
+    except FileNotFoundError:
+        return {'status': 'absent'}
+    except OSError as error:
+        return {'status': 'unavailable', 'reason': type(error).__name__}
+    finally:
+        if directory is not None:os.close(directory)
+
+
 def observations(workspace, names):
     return {name: observe_file(workspace, name) for name in names}
+
+
+def artifact_observations(workspace, names):
+    return {name: observe_artifact(workspace, name) for name in names}
 
 
 def watched_inputs(contract, step, workspace):
@@ -49,6 +114,8 @@ def watched_inputs(contract, step, workspace):
 
 
 def readable_observations(values):
-    if any(v.get('status') == 'unavailable' for v in values.values()):
-        raise ValueError('artifact observation unavailable; inspect before proceeding')
+    unavailable = [name + ' (' + str(v.get('reason')) + ')' for name, v in values.items() if v.get('status') == 'unavailable']
+    if unavailable:
+        raise ValueError('artifact observation unavailable: ' + ', '.join(sorted(unavailable))
+                         + '; inspect it, or publish a contract revision declaring observable paths')
 

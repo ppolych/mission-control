@@ -1,6 +1,13 @@
 import datetime
 
 
+def goal_review_status(state):
+    """Report whether the required combined-outcome review exists."""
+    review = state.get('goal_review')
+    if review:return review.get('verdict')
+    return 'missing' if state.get('stop_reason') == 'done_verified' else 'not_applicable'
+
+
 def metrics_report(contract, state, root):
     """Deterministic projection; never invent host usage or human interventions."""
     from .publication import digest
@@ -49,7 +56,7 @@ def handoff_report(contract, state, root):
             'lessons':str((root/'lessons.md').resolve()),
             'journal_head':(state.get('journal') or [{}])[-1].get('hash'),
             'active_steps':[key for key,value in steps.items() if value['status']=='in_progress'],
-            'steps':steps,'stop_reason':state.get('stop_reason'),
+            'steps':steps,'stop_reason':state.get('stop_reason'),'goal_review_status':goal_review_status(state),
             'pending_approvals':{key:entry['approval_request'] for key,entry in state['steps'].items() if entry.get('status')=='awaiting_approval'},
             'approved_digests':{key:record['digest'] for key,record in state.get('approved_steps',{}).items()},
             'evidence_refs':{key:[{'check':e.get('check'),'code':e.get('code')} for e in entry.get('evidence',[])] for key,entry in state['steps'].items()},

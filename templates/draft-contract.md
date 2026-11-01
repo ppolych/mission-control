@@ -27,6 +27,7 @@ a new CLI command, approval gate, or part of the frozen JSON schema.
 ## 4. Which observable criteria prove each step?
 
 - Complete step list, dependencies, and acceptance criteria:
+- Checks slower than 60 seconds and their step `verify_timeout`:
 - Stable acceptance IDs and the steps/checks/artifacts supporting each:
 - Combined-outcome criterion or final goal-check step:
 - Any genuinely consequential missing requirement, with proposed default:

@@ -1,15 +1,18 @@
 
 
 def coverage_basis(contract, state, criterion, evidence_refs, declared_steps=None):
-    from .observations import observations
+    from .observations import artifact_observations, observations
     if declared_steps is None:
         from .contract_index import requirement_steps
         declared_steps = requirement_steps(contract).get(criterion, [])
     steps = {step['id']: state['steps'].get(step['id'], {}) for step in declared_steps}
     names = {ref[5:] for ref in evidence_refs if ref.startswith('file:')}
+    watched = set()
     for step in declared_steps:
-        names.update(step['effects']['writes'] + step.get('watch', []))
-    artifacts = observations(state['workspace'], sorted(names))
+        names.update(step['effects']['writes'])
+        watched.update(step.get('watch', []))
+    artifacts = artifact_observations(state['workspace'], sorted(names - watched))
+    artifacts.update(observations(state['workspace'], sorted(watched)))
     return {'steps': steps, 'artifacts': artifacts}
 
 
@@ -19,8 +22,11 @@ def coverage_signature(contract, state, criterion, evidence_refs, declared_steps
 
 
 def verification_artifacts(step, workspace):
-    from .observations import observations
-    return observations(workspace, sorted(set(step['effects']['writes'] + step.get('watch', []))))
+    from .observations import artifact_observations, observations
+    watched = step.get('watch', [])
+    artifacts = artifact_observations(workspace, [name for name in step['effects']['writes'] if name not in watched])
+    artifacts.update(observations(workspace, watched))
+    return artifacts
 
 
 def verification_is_current(step, state):
@@ -42,7 +48,8 @@ def coverage_report(contract, state, index=None):
         declared_steps = index[criterion['id']]
         refs = [step['id'] for step in declared_steps]
         review = state.get('acceptance_reviews', {}).get(criterion['id'])
-        current = (review and not (set(criterion.get('evidence_kinds',[]))-set(review.get('evidence_kinds',[]))) and review['signature'] == coverage_signature(contract, state, criterion['id'], review['evidence_refs'], declared_steps)
+        current = (review and not (set(criterion.get('evidence_kinds',[]))-set(review.get('evidence_kinds',[])))
+                   and review['signature'] == coverage_signature(contract, state, criterion['id'], review['evidence_refs'], declared_steps)
                    and all(verification_is_current(step, state) for step in declared_steps))
         rows.append(dict(criterion, steps=refs, status=review['verdict'] if current else 'unverified',
                          review=review, stale=bool(review and not current)))
@@ -51,7 +58,7 @@ def coverage_report(contract, state, index=None):
 
 def record_criterion_review(contract, state, args):
     from .contract import text_list
-    from .observations import observe_file, readable_observations
+    from .observations import observe_artifact, readable_observations
     from .publication import digest, now
     from .quality import evidence_kinds
     if contract['schema_version'] != 3:raise ValueError('criterion-review requires schema 3')
@@ -72,7 +79,7 @@ def record_criterion_review(contract, state, args):
             raise ValueError('verification artifact evidence is missing or stale; resume and revalidate before supporting the criterion')
     for ref in refs:
         if ref.startswith('file:'):
-            value = observe_file(state['workspace'], ref[5:])
+            value = observe_artifact(state['workspace'], ref[5:])
             if value['status'] != 'present':raise ValueError('evidence file is not readable and present')
         elif ref.startswith('check:'):
             parts = ref[6:].rsplit(':', 1)

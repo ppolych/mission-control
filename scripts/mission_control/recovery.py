@@ -2,13 +2,13 @@
 
 def recovery_report(contract, state, step):
     from .approvals import validate_approval_workspace
-    from .observations import observations
+    from .observations import artifact_observations
     from .publication import digest
     if contract['schema_version'] != 3:raise ValueError('recovery reports require schema 3')
     validate_approval_workspace(state)
     entry = state['steps'].get(step['id'], {})
     baseline = entry.get('effect_baseline', {})
-    current = observations(state['workspace'], step['effects']['writes'])
+    current = artifact_observations(state['workspace'], step['effects']['writes'])
     files = {}
     for name, observed in current.items():
         old = baseline.get(name)
@@ -42,7 +42,13 @@ def reconcile_recovery(contract, state, step, args):
     report = recovery_report(contract, state, step)
     if args.digest != report['digest']:raise ValueError('recovery report changed; inspect and use the current digest')
     if not args.rationale or not args.rationale.strip():raise ValueError('recovery needs an evidence-linked rationale')
-    resolved = args.resolution in ('completed', 'not_applied')
+    if args.resolution == 'applied_incorrect':
+        if not any(result.get('code') for result in report['last_verification']):
+            raise ValueError('applied_incorrect requires a failed verification; inspect interrupted work and use another resolution')
+        effects = step['effects']
+        if effects['external_actions'] or not effects['reversible']:
+            raise ValueError('applied_incorrect refuses external or irreversible effects; a corrective attempt could repeat them')
+    resolved = args.resolution in ('completed', 'not_applied', 'applied_incorrect')
     if resolved and any(f['classification'] == 'unavailable' for f in report['files'].values()):
         raise ValueError('unavailable files require inspection; recovery cannot be declared resolved')
     entry.setdefault('recovery_history', []).append({
