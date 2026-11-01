@@ -18,7 +18,7 @@ checks observable results, and preserves evidence across sessions.
 
 ## Quick start
 
-Requires Python 3.10+, Bash, and Linux/WSL2/macOS. From your workspace, prepare a schema-3
+Requires Python 3.11+, Bash, and Linux/WSL2/macOS. From your workspace, prepare a schema-3
 contract using the supplied template, replacing the example criteria with your
 actual acceptance checks. Inspect the workspace and similar past lessons first;
 self-answer the [draft questions](templates/draft-contract.md), then present a
@@ -30,8 +30,11 @@ in addition to existing host authorization. Set `SKILL` to this skill's absolute
 python3 "$SKILL/scripts/mission.py" validate --contract contract.json
 python3 "$SKILL/scripts/mission.py" init --contract contract.json --workspace "$PWD"
 python3 "$SKILL/scripts/mission.py" start --step example-001
-# Perform the requested work here.
-# Inspect the actual artifact and record the template's manual criterion.
+```
+
+Perform the requested work, inspect the actual artifact and record the template's manual criterion:
+
+```bash
 python3 "$SKILL/scripts/mission.py" assess --step example-001 --check 1 \
   --verdict pass --rationale 'report.txt covers the original goal and constraints; source comparison confirms accuracy'
 python3 "$SKILL/scripts/mission.py" verify --step example-001
@@ -39,7 +42,11 @@ python3 "$SKILL/scripts/mission.py" criterion-review --criterion AC-1 \
   --verdict supported --rationale 'Inspected report against the original request' \
   --evidence-ref file:report.txt --evidence-ref check:example-001:1 --evidence-kind content
 python3 "$SKILL/scripts/mission.py" finish
-# Re-read the original request and inspect the combined output before reporting done.
+```
+
+Re-read the original request and inspect the combined output before reporting done:
+
+```bash
 python3 "$SKILL/scripts/mission.py" goal-review --verdict pass \
   --rationale 'Combined report.txt outcome answers the original request; cited source and integration evidence agree'
 ```
@@ -112,9 +119,10 @@ After an explicit reply, record one of:
 ```bash
 python3 "$SKILL/scripts/mission.py" approve --step example-001 \
   --digest DIGEST_FROM_REQUEST --rationale 'User explicitly approved the displayed step'
-# Or: deny with the same arguments after an explicit refusal (returns 1).
 python3 "$SKILL/scripts/mission.py" start --step example-001
 ```
+
+After an explicit refusal, run `deny` with the same arguments instead (returns 1).
 
 Approval persists across resume for the same contract and pinned workspace.
 Since 0.2.1 the CLI rejects missing or redirected reviewed workspaces, malformed pending
@@ -290,9 +298,9 @@ Use `handoff` or `diagnose` to identify the installed CLI/fingerprint, selected 
 
 ```bash
 python3 scripts/package_release.py
-# Or choose a separate archive location:
-python3 scripts/package_release.py --output /tmp/mission-control.zip
 ```
+
+Pass `--output PATH` to choose a separate archive location.
 
 The build emits `mission-control.zip` and its `.zip.sha256` sidecar, embeds `MANIFEST.sha256`, fixes ZIP metadata for reproducibility and excludes caches/generated archives/checksums. It verifies the manifest, extracted CLI/wrappers, contract validation and a disposable lifecycle using only `.mission/` before publication. Reproducibility assumes identical source bytes and file modes under the same compression implementation. A persistent nonblocking lock serializes cooperating publishers. Handled replacement errors restore the previous pair; failed restoration retains recovery files and reports their directory. Abrupt termination between replacements can still leave a mixed pair, so verify the checksum before distribution.
 

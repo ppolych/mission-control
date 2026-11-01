@@ -9,7 +9,7 @@ metadata:
 
 # Mission Control
 
-Version 0.3.3. Requires Python 3.10+, Bash, and Unix locking on Linux, WSL2,
+Version 0.3.3. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
 or macOS. For WSL paths and setup, read [WSL guidance](references/wsl.md).
 Preserve the user's scope, existing authorization, and host permissions.
 
@@ -41,7 +41,11 @@ when the mission root is not `.mission`; `--help` lists all commands and flags.
 python3 "$SKILL/scripts/mission.py" validate --contract contract.json
 python3 "$SKILL/scripts/mission.py" init --contract contract.json --workspace "$PWD"
 python3 "$SKILL/scripts/mission.py" start --step STEP
-# Do the step's work, then inspect the actual result.
+```
+
+Do the step's work and inspect the actual result, then continue:
+
+```bash
 python3 "$SKILL/scripts/mission.py" assess --step STEP --check INDEX --verdict pass --rationale TEXT
 python3 "$SKILL/scripts/mission.py" verify --step STEP
 python3 "$SKILL/scripts/mission.py" criterion-review --criterion AC-1 --verdict supported \

@@ -29,7 +29,7 @@ Runtime artifacts belong in the consuming workspace’s `.mission/` directory, o
 
 ## Build, Test, and Development Commands
 
-Requires Linux (including WSL2) or macOS, Python 3.10+, Bash, standard Unix tools, and Unix locking. No pip dependencies are required.
+Requires Linux (including WSL2) or macOS, Python 3.11+, Bash, standard Unix tools, and Unix locking. No pip dependencies are required.
 
 ```bash
 python3 scripts/mission.py --version

@@ -3,6 +3,11 @@
 import sys
 import subprocess
 from pathlib import Path
+
+if sys.version_info < (3, 11):
+    print('Mission Control requires Python 3.11 or newer', file=sys.stderr)
+    sys.exit(2)
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from mission_control.cli import main
 

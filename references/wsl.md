@@ -1,6 +1,6 @@
 # WSL2 setup — Mission Control 0.3.3
 
-Run Mission Control inside a WSL2 Linux distribution with Linux Python 3.10+,
+Run Mission Control inside a WSL2 Linux distribution with Linux Python 3.11+,
 Bash, and standard Unix utilities. Native Windows Python, PowerShell, and Git
 Bash are not supported runtimes: lifecycle locking requires Unix `fcntl`.
 The release number is independent of contract schema: new contracts use
