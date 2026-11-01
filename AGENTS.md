@@ -10,6 +10,39 @@ These rules are the author's and apply to every agent working in this repository
 - No god files: every tracked text file stays at or below 400 lines, with one responsibility per module.
 - There is no hosted CI, and none should be added.
 
+## What This Is
+
+Mission Control is an agent skill written for the Nestor host. It orchestrates multi-step goals with durable state and evidence-based verification. `SKILL.md` holds the instructions agents follow, and `scripts/mission.py` is the controller CLI they call. It records and checks work: it does not execute declared work commands or sandbox anything.
+
+## Architecture
+
+- **Entry point:** `scripts/mission.py` adds its own directory to `sys.path` and calls `mission_control.cli.main`. It maps every uncaught error to exit 2, because exit 1 means a controller refusal. `cli.py` dispatches commands, `cli_parser.py` defines the flags and `cli_aux.py` runs commands that need no checkpoint. `verify.sh` and `no_progress.sh` are thin wrappers for the `checks` and `repeat` subcommands.
+- **Install unit:** `scripts/` plus root `VERSION`. `settings.py` reads `VERSION` from two directories above the package, so moving either one breaks startup. The cache engine fingerprint hashes the entrypoint and every package source file, so any code change invalidates cached analyses.
+- **Lifecycle:** `validate → init → start → (work) → assess → verify → criterion-review → finish → goal-review`. `init` freezes the contract and pins the workspace. Requirement changes go through `revision-diff` and `revise` into a separate directory, never by editing the frozen contract.
+- **Runtime state:** everything lives in the consuming workspace's `.mission/`, never in this repo. The checkpoint is `.mission/state/progress.json`; for schema 3 it also embeds the hash-chained transition journal, so both commit atomically.
+- **Contract schemas:** 2 and 3 coexist and are versioned separately from the release. Schema 2 behavior must keep working, with no automatic upgrade. Schema 3 adds acceptance mapping, verification receipts, recovery reports, watches, effects and `allowed_paths`.
+- **Exit codes** are part of the agent contract: 0 success; 1 refusal, check failure or exhausted work; 2 invalid input or transition; 3 waiting for a controlled-step decision. CLI syntax and checkpoint formats must stay stable.
+
+Where the code lives in `scripts/mission_control/`:
+
+| Concern | Modules |
+| --- | --- |
+| Contract parsing and validation | `contract.py`, `validation.py`, `contract_index.py`, `revisions.py` |
+| Lifecycle transitions and rules | `transitions.py`, `lifecycle_start.py`, `lifecycle_verify.py`, `lifecycle_stop.py`, `lifecycle_rules.py` |
+| Persistence and locks | `fsio.py`, `storage.py`, `publication.py`, `journal.py`, `store.py` |
+| Controlled mode, recovery, budgets | `approvals.py`, `recovery.py`, `budgets.py` |
+| Running checks, file evidence | `checks.py`, `processes.py`, `observations.py`, `coverage.py` |
+| Read-only reports | `reports.py`, `compact_handoff.py`, `guidance.py`, `quality.py`, `traceability.py` |
+| Advisory helpers | `lessons.py`, `ranking.py`, `impact.py`, `services.py`, `cache.py` |
+
+## Enforced Constraints
+
+- **File size:** see Working Rules; `tests/test_platform.py` enforces it. In `scripts/`, lines also stay within 160 characters and functions within 120 lines (`tests/test_review_fixes.py`).
+- **Docs move with behavior:** update `README.md`, `references/commands.md` and `templates/` alongside CLI changes. Keep `SKILL.md` concise and put workflow detail in `references/`. Record test results in `references/operational-validation.md`, not in new historical counts elsewhere.
+- **Read-only commands:** reports and invalid requests must not append journal events or change checkpoint bytes. Reports take no lock but refuse a non-regular `.lock` entry.
+- **Locks:** regular persistent inodes opened no-follow. Never unlink or truncate them.
+- **Tests:** use temporary missions and never run failure paths against real operator state. New tests patch the owning module directly; `tests/core_adapter.py` exists only for legacy fault-injection tests, and `tests/v3_fixture.py` provides the schema-3 fixture.
+
 ## Project Structure & Module Organization
 
 Mission Control 0.3.3 is a Nestor orchestration skill with a Python core and Bash entrypoints.
@@ -42,12 +75,18 @@ Runtime artifacts belong in the consuming workspace’s `.mission/` directory, o
 Requires Linux (including WSL2) or macOS, Python 3.11+, Bash, standard Unix tools, and Unix locking. No pip dependencies are required.
 
 ```bash
+evals/check_all.sh
 python3 scripts/mission.py --version
 python3 -m unittest discover -s tests -v
+python3 evals/run_behavioral.py --baseline evals/baseline-control-plane.json
+python3 evals/mutation_check.py
 python3 scripts/mission.py validate --contract templates/contract.json
 bash -n scripts/verify.sh scripts/no_progress.sh
 shellcheck scripts/*.sh
+python3 scripts/package_release.py
 ```
+
+Run everything from the repository root, because tests resolve `scripts/mission.py` relative to the working directory. No formatter or build step exists. A change to the skill needs both the unit suite and the behavioral baseline. The baseline covers CLI conformance only, so do not claim autonomy gains without reviewed real agent runs (`evals/nestor_trials.py`, `evals/agent-scenarios.md`).
 
 There is no hosted CI: run `evals/check_all.sh` on each supported platform (it also repeats the suite with a symlinked `TMPDIR`, as macOS has). Tests must resolve temporary paths before comparing them. Run from the repository root. Focused example: `python3 -m unittest discover -s tests -k GoalReviewLifecycle -v`.
 

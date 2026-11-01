@@ -20,3 +20,6 @@ mission-control.zip.sha256
 
 # Persistent release publisher lock
 .mission-control.zip.publish.lock
+
+# Local pointer for Claude Code; the rules live in AGENTS.md
+CLAUDE.md
