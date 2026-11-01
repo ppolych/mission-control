@@ -1,5 +1,9 @@
-import hashlib, json, os, stat
+import hashlib
+import json
+import os
 from pathlib import Path
+import stat
+from .fsio import open_directory_chain
 from .settings import MAX_OBSERVED_BYTES, MAX_TREE_DEPTH, MAX_TREE_ENTRIES
 
 
@@ -10,11 +14,8 @@ def observe_file(workspace, name):
     directory = None
     fd = None
     try:
-        directory = os.open(workspace, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
         parts = Path(name).parts
-        for part in parts[:-1]:
-            child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=directory)
-            os.close(directory);directory = child
+        directory = open_directory_chain(workspace, parts[:-1])
         fd = os.open(parts[-1], os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=directory)
         before = os.fstat(fd)
         if not stat.S_ISREG(before.st_mode) or before.st_size > MAX_OBSERVED_BYTES:
@@ -23,9 +24,11 @@ def observe_file(workspace, name):
         size = 0
         while True:
             chunk = os.read(fd, min(65536, MAX_OBSERVED_BYTES + 1 - size))
-            if not chunk:break
+            if not chunk:
+                break
             size += len(chunk)
-            if size > MAX_OBSERVED_BYTES:return {'status': 'unavailable', 'reason': 'oversized'}
+            if size > MAX_OBSERVED_BYTES:
+                return {'status': 'unavailable', 'reason': 'oversized'}
             hasher.update(chunk)
         after = os.fstat(fd)
         if (before.st_size, before.st_mtime_ns, before.st_ctime_ns) != (after.st_size, after.st_mtime_ns, after.st_ctime_ns):
@@ -36,8 +39,10 @@ def observe_file(workspace, name):
     except OSError as error:
         return {'status': 'unavailable', 'reason': type(error).__name__}
     finally:
-        if fd is not None:os.close(fd)
-        if directory is not None:os.close(directory)
+        if fd is not None:
+            os.close(fd)
+        if directory is not None:
+            os.close(directory)
 
 
 def observe_tree(directory, parent, name):
@@ -80,10 +85,7 @@ def observe_artifact(workspace, name):
     parts = Path(name).parts
     directory = None
     try:
-        directory = os.open(workspace, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
-        for part in parts[:-1]:
-            child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=directory)
-            os.close(directory);directory = child
+        directory = open_directory_chain(workspace, parts[:-1])
         info = os.stat(parts[-1], dir_fd=directory, follow_symlinks=False)
         if stat.S_ISDIR(info.st_mode):
             return observe_tree(directory, info, parts[-1])
@@ -98,7 +100,8 @@ def observe_artifact(workspace, name):
     except OSError as error:
         return {'status': 'unavailable', 'reason': type(error).__name__}
     finally:
-        if directory is not None:os.close(directory)
+        if directory is not None:
+            os.close(directory)
 
 
 def observations(workspace, names):

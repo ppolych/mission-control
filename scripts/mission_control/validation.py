@@ -1,4 +1,5 @@
 from pathlib import Path
+from .lifecycle_rules import STEP_STATUSES, STOP_REASONS
 
 
 def check_args(check):
@@ -94,7 +95,7 @@ def validate_state(state,contract):
     active=0
     for entry in state['steps'].values():
         if not isinstance(entry,dict):raise ValueError('invalid checkpoint step')
-        if entry.get('status','pending') not in ('pending','in_progress','completed','blocked','awaiting_approval'):raise ValueError('invalid step status')
+        if entry.get('status','pending') not in STEP_STATUSES:raise ValueError('invalid step status')
         active+=entry.get('status')=='in_progress'
         for key in ('attempts','revalidations'):
             if not counter(entry.get(key,0)):raise ValueError('invalid step counter')
@@ -117,7 +118,7 @@ def validate_state(state,contract):
                 or not isinstance(review.get('rationale'),str) or not review['rationale'].strip()):
             raise ValueError('invalid goal review')
     if active>1:raise ValueError('multiple active steps in checkpoint')
-    if state.get('stop_reason') not in (None,'done_verified','blocked','human_paused','human_abort','no_progress','budget_exhausted','max_iterations'):
+    if state.get('stop_reason') not in (None,*STOP_REASONS):
         raise ValueError('invalid stop reason')
     if 'workspace' in state and (not isinstance(state['workspace'],str) or not Path(state['workspace']).is_absolute()):
         raise ValueError('invalid stored workspace')

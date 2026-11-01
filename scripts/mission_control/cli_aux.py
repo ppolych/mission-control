@@ -86,12 +86,13 @@ def run_helper(args, root):
     from .lessons import lessons_search
     from .quality import lesson_audit
     from .services import service_operation
+    from .settings import MAX_SMALL_FILE_BYTES
     from .store import publish_store, read_bounded, store_snapshot
     command = args.command
     if command == 'lesson-audit':
         if not args.record:
             raise ValueError('--record required')
-        record = json.loads(read_bounded(Path(args.record), 65536)[0].decode('utf-8-sig'))
+        record = json.loads(read_bounded(Path(args.record), MAX_SMALL_FILE_BYTES)[0].decode('utf-8-sig'))
         print(json.dumps(lesson_audit(record, args.as_of), indent=2))
         return 0
     if command in ('analysis-key', 'cache-save', 'cache-check'):

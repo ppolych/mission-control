@@ -11,6 +11,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from mission_control.cli import main  # noqa: E402
+from mission_control.lifecycle_rules import STATUS_TRANSITIONS  # noqa: E402
 from mission_control.validation import validate_state  # noqa: E402
 
 REPORTS = (('status',), ('history',), ('handoff',), ('handoff', '--compact'), ('metrics',), ('diagnose',))
@@ -153,6 +154,10 @@ class Mission:
         assert after['attempts'] >= before['attempts'], 'mission attempts decreased'
         for name, entry in after['steps'].items():
             old = before['steps'].get(name, {})
+            previous_status = old.get('status', 'pending')
+            status = entry.get('status', 'pending')
+            assert status == previous_status or status in STATUS_TRANSITIONS[previous_status], (
+                f'undeclared status change {previous_status} -> {status}')
             assert entry.get('attempts', 0) >= old.get('attempts', 0), 'step attempts decreased'
             if old.get('approval_denied'):
                 assert entry.get('approval_denied') and entry.get('status') == 'blocked', 'denial was cleared'

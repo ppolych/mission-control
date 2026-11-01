@@ -3,6 +3,7 @@ import json, math, os, re, time
 
 def service_operation(path,service,operation,outcome,retry_after,stamp=None):
     from .storage import atomic, persistent_lock
+    from .settings import MAX_HEALTH_BYTES
     from .store import read_bounded
     stamp=time.time() if stamp is None else stamp
     if not re.fullmatch(r'[A-Za-z0-9_.-]{1,80}',service):raise ValueError('invalid service identifier')
@@ -10,7 +11,7 @@ def service_operation(path,service,operation,outcome,retry_after,stamp=None):
         raise ValueError('invalid retry-after seconds')
     def load():
         if not os.path.lexists(path):return {}
-        values=json.loads(read_bounded(path,1048576)[0].decode('utf-8-sig'))
+        values=json.loads(read_bounded(path,MAX_HEALTH_BYTES)[0].decode('utf-8-sig'))
         if not isinstance(values,dict) or len(values)>128:raise ValueError('invalid health store')
         for record in values.values():
             if not isinstance(record,dict) or set(record)!={'failures','until','probe_until','terminal'}:raise ValueError('invalid health record')

@@ -1,6 +1,6 @@
 import datetime, hashlib, json, os
 from pathlib import Path
-from .settings import VERSION, MAX_CACHE_BYTES
+from .settings import VERSION, MAX_CACHE_BYTES, MAX_SMALL_FILE_BYTES
 
 
 def analysis_binding(args):
@@ -51,7 +51,7 @@ def analysis_cache(args):
     if args.command=='cache-save':
         if any(value['status']!='present' for value in binding['scope']['inputs'].values()):raise ValueError('cache-save requires present declared inputs')
         if not args.report or not args.redacted:raise ValueError('cache-save requires a derived --report and explicit --redacted assertion')
-        report=safe_derived_report(json.loads(read_bounded(Path(args.report),65536)[0].decode('utf-8-sig')))
+        report=safe_derived_report(json.loads(read_bounded(Path(args.report),MAX_SMALL_FILE_BYTES)[0].decode('utf-8-sig')))
         record={'format':1,'binding':binding,'report':report,'report_digest':digest(report),
                 'created_at':now(),'advisory_only':True}
         if len(json.dumps(record,indent=2).encode('utf-8'))>MAX_CACHE_BYTES:raise ValueError('cache record too large')

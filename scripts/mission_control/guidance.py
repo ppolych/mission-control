@@ -11,6 +11,7 @@ def installation_identity():
 
 
 def step_guidance(contract, state, step, active_step_present=None):
+    from .budgets import attempts_per_step, mission_attempts
     entry = state['steps'].get(step['id'], {})
     status = entry.get('status', 'pending')
     dependencies = [name for name in step.get('depends_on', [])
@@ -39,8 +40,8 @@ def step_guidance(contract, state, step, active_step_present=None):
     elif entry.get('needs_revalidation'):
         action = 'inspect_then_revalidate'
     elif (entry.get('budget_exhausted')
-          or entry.get('attempts', 0) >= contract.get('budget', {}).get('max_attempts_per_step', 2)
-          or state['attempts'] >= contract.get('budget', {}).get('max_iterations', max(10, 3 * len(contract['steps'])))):
+          or entry.get('attempts', 0) >= attempts_per_step(contract)
+          or state['attempts'] >= mission_attempts(contract)):
         action = 'inspect_budget'
     else:
         action = 'inspect_then_start'

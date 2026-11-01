@@ -65,7 +65,7 @@ def run_transition(contract, state, args, root, path):
     from .publication import now
     from .recovery import reconcile_recovery
     from .revisions import publish_revision
-    from . import transitions
+    from . import lifecycle_stop, transitions
     command = args.command
     if command == 'revise':
         publish_revision(root, contract, state, args)
@@ -79,13 +79,13 @@ def run_transition(contract, state, args, root, path):
     elif command == 'recover':
         reconcile_recovery(contract, state, transitions.find_step(contract, args.step), args)
     elif command == 'finish':
-        code = transitions.finish_mission(contract, state)
+        code = lifecycle_stop.finish_mission(contract, state)
     elif command == 'goal-review':
-        transitions.record_goal_review(contract, state, args)
+        lifecycle_stop.record_goal_review(contract, state, args)
     elif command == 'stop':
-        transitions.stop_mission(state, args)
+        lifecycle_stop.stop_mission(state, args)
     elif command == 'resume':
-        transitions.resume_mission(contract, state, args)
+        lifecycle_stop.resume_mission(contract, state, args)
     else:
         code = transitions.step_transition(contract, state, args, path)
     if code is not None:
@@ -97,7 +97,7 @@ def run_transition(contract, state, args, root, path):
     state['last_update'] = now()
     commit_state(path, state, contract, args)
     if command == 'finish':
-        transitions.print_goal_review_notice(state)
+        lifecycle_stop.print_goal_review_notice(state)
     if command == 'verify':
         return int(state['steps'][args.step]['status'] != 'completed')
     if command == 'goal-review':
