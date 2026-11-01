@@ -1,0 +1,69 @@
+{
+  "scope": "wall-clock medians on one machine; compare runs only from the same machine",
+  "platform": "Linux-7.0.0-34-generic-x86_64-with-glibc2.43",
+  "python": "3.14.4",
+  "cpus": 8,
+  "repeat": 15,
+  "rows": [
+    {
+      "events": 1,
+      "file_bytes": 1024,
+      "version": 30.6,
+      "status": 61.7,
+      "handoff": 62.9,
+      "coverage": 59.6,
+      "finish": 64.4,
+      "criterion_review": 62.9
+    },
+    {
+      "events": 1,
+      "file_bytes": 1048576,
+      "version": 29.6,
+      "status": 59.0,
+      "handoff": 62.5,
+      "coverage": 71.1,
+      "finish": 73.0,
+      "criterion_review": 64.5
+    },
+    {
+      "events": 100,
+      "file_bytes": 1024,
+      "version": 31.1,
+      "status": 63.3,
+      "handoff": 62.7,
+      "coverage": 63.4,
+      "finish": 68.1,
+      "criterion_review": 70.5
+    },
+    {
+      "events": 100,
+      "file_bytes": 1048576,
+      "version": 27.6,
+      "status": 64.8,
+      "handoff": 65.8,
+      "coverage": 68.8,
+      "finish": 74.3,
+      "criterion_review": 67.8
+    },
+    {
+      "events": 9990,
+      "file_bytes": 1024,
+      "version": 28.8,
+      "status": 263.8,
+      "handoff": 229.8,
+      "coverage": 228.3,
+      "finish": 263.0,
+      "criterion_review": 259.5
+    },
+    {
+      "events": 9990,
+      "file_bytes": 1048576,
+      "version": 28.5,
+      "status": 253.2,
+      "handoff": 231.8,
+      "coverage": 234.5,
+      "finish": 268.9,
+      "criterion_review": 258.0
+    }
+  ]
+}

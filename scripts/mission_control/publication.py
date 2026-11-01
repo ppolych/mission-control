@@ -1,4 +1,4 @@
-import datetime, hashlib, json, os, shutil
+import datetime, hashlib, json, os
 
 
 def now():
@@ -11,6 +11,7 @@ def digest(value):
 
 def publish_migration(destination,contract,backups,backup_dir='legacy'):
     """Recover helper-owned staging under a persistent destination lock."""
+    import shutil
     from .storage import atomic, persistent_lock
     destination=destination.absolute()
     destination.parent.mkdir(parents=True,exist_ok=True)

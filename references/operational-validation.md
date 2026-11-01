@@ -199,3 +199,22 @@ reproductions were rerun against the fixed CLI.
 
 Limits: no real agent trial has been run, so this does not measure whether agents follow the
 workflow. Metadata receipts are weaker than SHA-256. macOS was not exercised.
+
+
+## Performance measurement
+
+Date: 2026-11-01, Linux, Python 3.14. Medians over 15 runs of `evals/benchmark.py`, kept in
+`evals/benchmark-baseline.json`; compare only runs from the same machine. A bare interpreter
+takes about 15 ms, and Python 3.14 `argparse` itself takes about 16 ms.
+
+| Command | Before lazy imports | After |
+| --- | --- | --- |
+| `--version` | 54 ms | 30 ms |
+| `handoff --compact`, up to 100 events | 76 ms | 63 ms |
+| `status`, up to 100 events | 72 ms | 62 ms |
+| `finish`, up to 100 events | 72 ms | 68 ms |
+| `status`, 9990 events | 266 ms | 258 ms |
+
+Rejected as unmeasured gains: sharing file observations inside one report, a faster bounded
+read, and fingerprint changes. Hashing a 1 MiB artifact did not stand out from noise. Time near
+the journal limit is hash-chain validation, a safety guarantee that stays.

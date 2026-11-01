@@ -37,6 +37,7 @@ Where the code lives in `scripts/mission_control/`:
 
 ## Enforced Constraints
 
+- **Performance:** measure with `evals/benchmark.py` before optimizing, and change only what measurably matters. Keep imports inside the branch that needs them (`tests/test_performance.py`). Never weaken journal validation or freshness checks for speed.
 - **File size:** see Working Rules; `tests/test_platform.py` enforces it. In `scripts/`, lines also stay within 160 characters and functions within 120 lines (`tests/test_review_fixes.py`).
 - **Docs move with behavior:** update `README.md`, `references/commands.md` and `templates/` alongside CLI changes. Keep `SKILL.md` concise and put workflow detail in `references/`. Record test results in `references/operational-validation.md`, not in new historical counts elsewhere.
 - **Read-only commands:** reports and invalid requests must not append journal events or change checkpoint bytes. Reports take no lock but refuse a non-regular `.lock` entry.

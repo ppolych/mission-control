@@ -81,29 +81,28 @@ def run_migrate(args, root):
 
 def run_helper(args, root):
     """Run a command needing no mission checkpoint; None means not a helper."""
-    from .cache import analysis_cache
-    from .impact import impact_report
-    from .lessons import lessons_search
-    from .quality import lesson_audit
-    from .services import service_operation
-    from .settings import MAX_SMALL_FILE_BYTES
-    from .store import publish_store, read_bounded, store_snapshot
     command = args.command
     if command == 'lesson-audit':
+        from .quality import lesson_audit
+        from .settings import MAX_SMALL_FILE_BYTES
+        from .store import read_bounded
         if not args.record:
             raise ValueError('--record required')
         record = json.loads(read_bounded(Path(args.record), MAX_SMALL_FILE_BYTES)[0].decode('utf-8-sig'))
         print(json.dumps(lesson_audit(record, args.as_of), indent=2))
         return 0
     if command in ('analysis-key', 'cache-save', 'cache-check'):
+        from .cache import analysis_cache
         report, code = analysis_cache(args)
         print(json.dumps(report, indent=2))
         return code
     if command == 'lessons-search':
+        from .lessons import lessons_search
         lessons_root = Path(args.lessons_root) if args.lessons_root else root
         print(json.dumps(lessons_search(lessons_root, args.query, args.limit, args.offset, args.diverse)))
         return 0
     if command in ('store-read', 'store-publish'):
+        from .store import publish_store, store_snapshot
         if not args.store:
             raise ValueError('--store required')
         if command == 'store-read':
@@ -115,6 +114,7 @@ def run_helper(args, root):
         print(json.dumps(report))
         return 0
     if command.startswith('service-'):
+        from .services import service_operation
         if not args.health_file or not args.service:
             raise ValueError('--health-file and --service required')
         if args.http_status is not None:
@@ -127,6 +127,7 @@ def run_helper(args, root):
         print(json.dumps(report))
         return int(command == 'service-probe' and not report['allowed'])
     if command == 'impact':
+        from .impact import impact_report
         if not args.source_root:
             raise ValueError('--source-root required')
         print(json.dumps(impact_report(Path(args.source_root), args.symbol), indent=2))

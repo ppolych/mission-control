@@ -2,7 +2,6 @@
 import fcntl
 import os
 import stat
-import tempfile
 
 
 def open_directory_chain(root, parts):
@@ -68,6 +67,7 @@ def sync_directory(path):
 
 def replace_atomically(path, data, mode=None, before_replace=None):
     """Publish bytes through a synced temporary file, then sync the directory."""
+    import tempfile
     fd, temporary = tempfile.mkstemp(dir=path.parent)
     try:
         with os.fdopen(fd, 'wb') as stream:

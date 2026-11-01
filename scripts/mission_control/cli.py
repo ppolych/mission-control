@@ -12,26 +12,23 @@ STEP_COMMANDS = ('start', 'verify', 'block', 'assess', 'approve', 'deny', 'recov
 def run_report(contract, state, args, root):
     """Print one report that never mutates mission state."""
     from .approvals import validate_approval_workspace
-    from .contract import validate_known_fields
-    from .coverage import coverage_report
-    from .quality import diagnose_report, evidence_audit
-    from .recovery import recovery_report
-    from .reports import goal_review_status, handoff_report, metrics_report
-    from .revisions import revision_diff
-    from .transitions import find_step
-    from .validation import validate
+    from .reports import goal_review_status
     command = args.command
     if command == 'evidence-audit':
+        from .quality import evidence_audit
         validate_approval_workspace(state)
         report = evidence_audit(contract, state)
     elif command == 'diagnose':
+        from .quality import diagnose_report
         report = diagnose_report(contract, state)
         report['mission_directory'] = str(root.resolve())
         report['goal_review_status'] = goal_review_status(state)
     elif command == 'metrics':
+        from .reports import metrics_report
         print(json.dumps(metrics_report(contract, state, root)))
         return 0
     elif command == 'handoff':
+        from .reports import handoff_report
         report = handoff_report(contract, state, root)
         if args.compact:
             from .compact_handoff import compact_handoff
@@ -41,13 +38,19 @@ def run_report(contract, state, args, root):
     elif command == 'history':
         report = {'events': state.get('journal', [])}
     elif command == 'coverage':
+        from .coverage import coverage_report
         validate_approval_workspace(state)
         report = coverage_report(contract, state)
     elif command == 'recovery':
+        from .recovery import recovery_report
+        from .transitions import find_step
         report = recovery_report(contract, state, find_step(contract, args.step))
     else:
         if not args.contract:
             raise ValueError('revision-diff requires proposed --contract')
+        from .contract import validate_known_fields
+        from .revisions import revision_diff
+        from .validation import validate
         proposed = json.loads(Path(args.contract).read_text(encoding='utf-8-sig'))
         validate(proposed)
         validate_known_fields(proposed)
@@ -60,23 +63,23 @@ def run_transition(contract, state, args, root, path):
     """Apply one mutating command and return its exit code once committed."""
     from .approvals import exhaustion_reason, validate_approval_workspace
     from .budgets import step_budget_exhausted
-    from .coverage import record_criterion_review
     from .journal import commit_state
     from .publication import now
-    from .recovery import reconcile_recovery
-    from .revisions import publish_revision
     from . import lifecycle_stop, transitions
     command = args.command
     if command == 'revise':
+        from .revisions import publish_revision
         publish_revision(root, contract, state, args)
         return 0
     code = None
     if command == 'init':
         transitions.init_mission(contract, state, args, root)
     elif command == 'criterion-review':
+        from .coverage import record_criterion_review
         validate_approval_workspace(state)
         record_criterion_review(contract, state, args)
     elif command == 'recover':
+        from .recovery import reconcile_recovery
         reconcile_recovery(contract, state, transitions.find_step(contract, args.step), args)
     elif command == 'finish':
         code = lifecycle_stop.finish_mission(contract, state)
@@ -157,16 +160,16 @@ def main(argv):
     if argv == ['--version'] or (len(argv) == 2 and argv[0] in ('checks', 'repeat') and argv[1] == '--version'):
         print('Mission Control ' + VERSION)
         return 0
-    from .checks import verify
-    from .cli_aux import run_helper, run_repeat
     from .cli_parser import build_parser, reject_misplaced_flags
     timeout = float(os.environ.get('VERIFY_TIMEOUT', '60'))
     if not 0 < timeout < float('inf'):
         raise ValueError('VERIFY_TIMEOUT must be finite and positive')
     if argv and argv[0] == 'checks':
+        from .checks import verify
         if len(argv) > 1 and argv[1] == '--single':
             return verify(argv[2:])
         return verify(argv[1:], split=True)
+    from .cli_aux import run_helper, run_repeat
     if argv and argv[0] == 'repeat':
         return run_repeat(argv[1:])
     args = build_parser().parse_args(argv)
