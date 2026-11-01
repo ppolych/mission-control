@@ -127,8 +127,10 @@ def run_mission_command(args, root):
         require_regular_lock_entry(root / '.lock')
     guard = contextlib.nullcontext() if command in READ_ONLY_COMMANDS else persistent_lock(root / '.lock')
     with guard:
-        source = Path(args.contract) if command == 'init' and args.contract else root / 'contract.json'
-        contract = json.loads(source.read_text(encoding='utf-8-sig'))
+        if command == 'init' and args.contract:
+            contract = json.loads(Path(args.contract).read_text(encoding='utf-8-sig'))
+        else:
+            contract = json.loads(read_bounded(root / 'contract.json', MAX_STATE_BYTES)[0].decode('utf-8-sig'))
         validate(contract)
         if command == 'init' and args.contract:
             validate_known_fields(contract)

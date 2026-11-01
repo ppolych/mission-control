@@ -6,7 +6,7 @@ def impact_report(root,symbol):
     from .lessons import lesson_text
     if not symbol or not symbol.isidentifier():raise ValueError('symbol must be an identifier')
     if root.is_symlink() or not root.is_dir():raise ValueError('source root must be an existing nonsymlink directory')
-    result={'symbol':symbol,'definitions':[],'calls':[],'references':[],'tests':[],
+    result={'symbol':symbol,'definitions':[],'calls':[],'references':[],'tests':[],'skipped_files':[],
             'files_examined':0,'truncated':False,
             'warning':'Syntactic/lexical candidates, not resolved bindings or proof of behavior. Confirm using the project LSP and tests.'}
     directories=0
@@ -17,12 +17,17 @@ def impact_report(root,symbol):
         for name in sorted(files):
             path=Path(directory)/name
             if path.suffix not in ('.py','.rs','.js','.ts','.tsx','.go','.java','.cs'):continue
+            if result['files_examined']>=64:
+                result['truncated']=True
+                break
             result['files_examined']+=1
-            if result['files_examined']>64:result['truncated']=True;break
             relative=path.relative_to(root)
             try:text=lesson_text(root,relative)
-            except (OSError,UnicodeError):continue
-            if text is None:continue
+            except (OSError,UnicodeError):text=None
+            if text is None:
+                result['skipped_files'].append(str(relative))
+                result['truncated']=True
+                continue
             hits=[]
             if path.suffix=='.py':
                 try:tree=ast.parse(text)

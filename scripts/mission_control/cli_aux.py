@@ -4,9 +4,11 @@ import json
 import os
 from pathlib import Path
 
+REPEAT_LOCK_WAIT_SECONDS = 10
+
 
 def run_repeat(arguments):
-    from .storage import atomic
+    from .storage import atomic, persistent_lock
     if not arguments:
         raise ValueError('repeat requires a subcommand')
     command, *args = arguments
@@ -14,19 +16,26 @@ def run_repeat(arguments):
     threshold = int(os.environ.get('NO_PROGRESS_THRESHOLD', '2'))
     if threshold < 1:
         raise ValueError('threshold must be positive')
-    rows = json.loads(path.read_text(encoding='utf-8-sig')) if path.exists() and command != 'reset' else []
-    if not isinstance(rows, list):
-        raise ValueError('invalid repeat history')
-    if command == 'reset':
-        atomic(path, [])
-        return 0
+    def load():
+        rows = json.loads(path.read_text(encoding='utf-8-sig')) if path.exists() else []
+        if not isinstance(rows, list):
+            raise ValueError('invalid repeat history')
+        return rows
     if command == 'history':
-        print(json.dumps(rows, indent=2))
+        print(json.dumps(load(), indent=2))
         return 0
-    if command not in ('record', 'check') or not args:
+    if command not in ('record', 'check', 'reset') or (command != 'reset' and not args):
         raise ValueError('expected record/check tool args')
     key = hashlib.sha256(json.dumps(args).encode()).hexdigest()
-    if command == 'record':
+    if command == 'check':
+        return int(load().count(key) >= threshold)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    # Parallel tool calls record together, so wait briefly instead of losing an entry.
+    with persistent_lock(path.with_name(path.name + '.lock'), wait=REPEAT_LOCK_WAIT_SECONDS):
+        if command == 'reset':
+            atomic(path, [])
+            return 0
+        rows = load()
         rows.append(key)
         atomic(path, rows)
     return int(rows.count(key) >= threshold)

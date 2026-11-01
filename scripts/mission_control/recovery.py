@@ -43,7 +43,8 @@ def reconcile_recovery(contract, state, step, args):
     if args.digest != report['digest']:raise ValueError('recovery report changed; inspect and use the current digest')
     if not args.rationale or not args.rationale.strip():raise ValueError('recovery needs an evidence-linked rationale')
     if args.resolution == 'applied_incorrect':
-        if not any(result.get('code') for result in report['last_verification']):
+        # Only a failure of the latest attempt counts; older failures describe older work.
+        if not entry.get('failed_verification'):
             raise ValueError('applied_incorrect requires a failed verification; inspect interrupted work and use another resolution')
         effects = step['effects']
         if effects['external_actions'] or not effects['reversible']:

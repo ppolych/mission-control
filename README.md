@@ -230,7 +230,7 @@ derived-analysis caching, and a self-answered refactor-necessity template. Exist
 frozen contracts and approval/recovery/budget rules remain compatible.
 
 ```bash
-python3 evals/run_behavioral.py --baseline evals/baseline-control-plane-v031.json
+python3 evals/run_behavioral.py --baseline evals/baseline-control-plane.json
 python3 scripts/mission.py evidence-audit --mission .mission
 python3 scripts/mission.py diagnose --mission .mission
 ```

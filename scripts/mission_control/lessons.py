@@ -29,7 +29,7 @@ def lessons_search(root,queries,limit,offset,diverse=False):
     if not queries or any(not q.strip() for q in queries):raise ValueError('nonblank --query required')
     if not 1<=limit<=50 or not 0<=offset<=1000:raise ValueError('limit must be 1..50 and offset 0..1000')
     if root.is_symlink() or not root.is_dir():raise ValueError('lessons root must be an existing nonsymlink directory')
-    matches=[];scanned=0;visited=0;truncated=False
+    matches=[];scanned=0;visited=0;truncated=False;skipped=[]
     for directory,dirs,files in os.walk(root,followlinks=False):
         visited+=1
         if visited>64:truncated=True;break
@@ -40,8 +40,10 @@ def lessons_search(root,queries,limit,offset,diverse=False):
             if scanned>32:truncated=True;break
             relative=(Path(directory)/name).relative_to(root)
             try:text=lesson_text(root,relative)
-            except (OSError,UnicodeError):continue
-            if text is None:continue
+            except (OSError,UnicodeError):text=None
+            if text is None:
+                skipped.append(str(relative))
+                continue
             for line_number,line in enumerate(text.splitlines(),1):
                 if all(q.casefold() in line.casefold() for q in queries):
                     matches.append({'path':str(relative),'line':line_number,'text':line[:500]})
@@ -54,6 +56,7 @@ def lessons_search(root,queries,limit,offset,diverse=False):
     page=matches[offset:offset+limit]
     next_offset=offset+len(page) if offset+len(page)<len(matches) else None
     return {'root':str(root.resolve()),'queries':queries,'matches':page,
-            'next_offset':next_offset,'truncated':truncated or next_offset is not None,
+            'next_offset':next_offset,'truncated':truncated or bool(skipped) or next_offset is not None,
+            'skipped_files':skipped,
             'files_examined':min(scanned,32),'warning':'Historical context only; verify current sources before reuse.'}
 

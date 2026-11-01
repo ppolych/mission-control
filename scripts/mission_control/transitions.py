@@ -10,21 +10,37 @@ def find_step(contract, identifier):
     raise ValueError('unknown step: ' + str(identifier) + '; contract steps: ' + known)
 
 
+def require_mission_outside_outputs(contract, workspace, root):
+    """Checkpoint writes would otherwise change a declared artifact forever."""
+    if contract['schema_version'] != 3:
+        return
+    mission = root.resolve()
+    for step in contract['steps']:
+        for name in step['effects']['writes'] + step.get('watch', []):
+            target = (workspace / name).resolve()
+            if mission == target or mission.is_relative_to(target):
+                raise ValueError('mission directory ' + str(mission) + ' is inside declared path ' + name
+                                 + '; choose a mission directory outside declared outputs and watched inputs')
+
+
 def init_mission(contract, state, args, root):
     from .contract import validate_allowed_paths
     from .publication import digest
+    from .settings import MAX_STATE_BYTES
     from .storage import atomic
+    from .store import read_bounded
     import json
     import os
     workspace = Path(args.workspace or Path.cwd()).resolve(strict=True)
     if not workspace.is_dir():
         raise ValueError('workspace must be directory')
     validate_allowed_paths(contract, workspace)
+    require_mission_outside_outputs(contract, workspace, root)
     destination = root / 'contract.json'
     if os.path.lexists(destination):
         if destination.is_symlink():
             raise ValueError('destination contract must not be a symlink')
-        existing = json.loads(destination.read_text(encoding='utf-8-sig'))
+        existing = json.loads(read_bounded(destination, MAX_STATE_BYTES)[0].decode('utf-8-sig'))
         if existing != contract:
             raise ValueError('destination contract differs; use a new mission directory')
     else:
@@ -144,17 +160,16 @@ def start_step(contract, state, step, entry, args, path):
             raise ValueError('another step active')
         if dependency_open:
             raise ValueError('dependency incomplete')
+        # A repeated refusal changes nothing, so it must not grow the journal.
         if step_budget_exhausted(contract, state):
             state['stop_reason'] = 'blocked'
-        state['last_update'] = now()
-        commit_state(path, state, contract, args)
+            state['last_update'] = now()
+            commit_state(path, state, contract, args)
         return 1
     if args.revalidate and not entry.get('needs_revalidation'):
         raise ValueError('no interrupted or completed work to revalidate')
     if entry.get('needs_revalidation') and not args.revalidate:
         raise ValueError('inspect prior work and start --revalidate first')
-    if state.get('stop_reason'):
-        raise ValueError('resume mission first')
     if entry.get('status') == 'completed':
         raise ValueError('step already completed')
     if active:
@@ -165,14 +180,18 @@ def start_step(contract, state, step, entry, args, path):
     limit = budget.get('max_iterations', max(10, 3 * len(contract['steps'])))
     if not args.revalidate and state['attempts'] >= limit:
         state['stop_reason'] = 'max_iterations'
+        state['last_update'] = now()
         commit_state(path, state, contract, args)
         return 1
     if not args.revalidate and entry.get('attempts', 0) >= budget.get('max_attempts_per_step', 2):
+        changed = not entry.get('budget_exhausted')
         entry['budget_exhausted'] = True
         if step_budget_exhausted(contract, state):
             state['stop_reason'] = exhaustion_reason(state)
-        state['last_update'] = now()
-        commit_state(path, state, contract, args)
+            changed = True
+        if changed:
+            state['last_update'] = now()
+            commit_state(path, state, contract, args)
         return 1
     if schema3 or requires_approval(contract, step):
         validate_approval_workspace(state)
@@ -182,8 +201,10 @@ def start_step(contract, state, step, entry, args, path):
         commit_state(path, state, contract, args)
         print(json.dumps(request, indent=2))
         return 3
-    if entry.get('manual'):
-        entry.setdefault('history', []).append({'manual': entry['manual'], 'evidence': entry.get('evidence', []), 'timestamp': now()})
+    if entry.get('manual') or entry.get('evidence'):
+        entry.setdefault('history', []).append({'manual': entry.get('manual', {}), 'evidence': entry.get('evidence', []), 'timestamp': now()})
+    entry['evidence'] = []
+    entry.pop('failed_verification', None)
     if schema3 and not args.revalidate:
         entry['effect_baseline'] = artifact_observations(state['workspace'], step['effects']['writes'])
         readable_observations(entry['effect_baseline'])
@@ -274,6 +295,7 @@ def verify_step(contract, state, step, entry):
     entry.setdefault('history', []).append({'evidence': entry.get('evidence', []), 'timestamp': now()})
     entry['evidence'] = results
     entry['status'] = 'pending' if failed else 'completed'
+    entry['failed_verification'] = failed
     if schema3:
         if failed:
             entry.pop('verified_artifacts', None)

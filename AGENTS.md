@@ -139,7 +139,7 @@ source-linked candidates, not proof or resolved symbol bindings.
 `tests/test_quality032.py` covers optional evidence-kind requirements, read-only
 sufficiency/diagnosis, contradictory/stale lessons, analysis cache scope and raw
 payload refusal, invalid input preservation and behavioral report validation.
-Run `python3 evals/run_behavioral.py --baseline evals/baseline-control-plane-v031.json`
+Run `python3 evals/run_behavioral.py --baseline evals/baseline-control-plane.json`
 in addition to the full unittest suite. CLI scenario conformance and actual
 operator-reviewed agent runs are separate suites and cannot be compared together.
 Do not claim model-autonomy gains without actual runs and review artifacts.
@@ -237,7 +237,7 @@ refresh. Details: references/controller-activation.md. No host hook is implied.
 
 ## Agent-usability review rules
 
-Regressions live in tests/test_review_fixes.py. Strict field checks run only on new
+Regressions live in tests/test_review_fixes.py and tests/test_bug_fixes.py. Random lifecycle invariants live in tests/test_lifecycle_random.py, whose deep-state test keeps sequences from passing vacuously. `evals/mutation_check.py` breaks safety invariants one at a time and every mutant must be caught; run it after changing safety code. Refusals commit only when state changes, and `start` archives previous evidence. `applied_incorrect` depends on `failed_verification`, set by the latest attempt only. Strict field checks run only on new
 drafts (validate, init --contract, revise, revision-diff), never on frozen contracts.
 Read-only reports take no lock but still refuse a non-regular `.lock` entry. Lock
 contention raises `LockBusy`, an OSError. `applied_incorrect` requires a failed

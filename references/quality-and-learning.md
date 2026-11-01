@@ -8,7 +8,7 @@ truth. Existing schema-2/3 contracts remain compatible; new fields are opt-in.
 ## 1. Behavioral baseline and regression checks
 
 ```bash
-python3 evals/run_behavioral.py --baseline evals/baseline-control-plane-v031.json \
+python3 evals/run_behavioral.py --baseline evals/baseline-control-plane.json \
   --output /tmp/control-plane-result.json
 ```
 

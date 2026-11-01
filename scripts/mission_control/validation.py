@@ -64,6 +64,24 @@ def validate(c):
     validate_advanced(c)
 
 
+def validate_step_records(entry):
+    """Stored records reach reports, so their element types must be checked here."""
+    def records(values):
+        if not all(isinstance(item,dict) for item in values):raise ValueError('invalid checkpoint evidence record')
+    records(entry.get('evidence',[]))
+    records(entry.get('history',[]))
+    for record in entry.get('history',[]):
+        if not isinstance(record.get('evidence',[]),list) or not isinstance(record.get('manual',{}),dict):
+            raise ValueError('invalid checkpoint history record')
+        records(record.get('evidence',[]))
+    if not isinstance(entry.get('recovery_history',[]),list):raise ValueError('invalid recovery history')
+    records(entry['recovery_history'] if 'recovery_history' in entry else [])
+    for key in ('effect_baseline','input_baseline','verified_artifacts'):
+        values=entry.get(key,{})
+        if not isinstance(values,dict) or not all(isinstance(item,dict) for item in values.values()):
+            raise ValueError('invalid checkpoint observation record')
+
+
 def validate_state(state,contract):
     """Reject malformed local state before lifecycle operations can mutate it."""
     from .approvals import validate_approval_state
@@ -85,8 +103,9 @@ def validate_state(state,contract):
         if any(not counter(n) for n in entry.get('failures',{}).values()):raise ValueError('invalid failure count')
         for key in ('history','evidence'):
             if not isinstance(entry.get(key,[]),list):raise ValueError('invalid checkpoint evidence')
-        for key in ('needs_revalidation','revalidating','budget_exhausted'):
+        for key in ('needs_revalidation','revalidating','budget_exhausted','failed_verification'):
             if key in entry and type(entry[key])!=bool:raise ValueError('invalid checkpoint flag')
+        validate_step_records(entry)
         for assessment in entry.get('manual',{}).values():
             if (not isinstance(assessment,dict) or assessment.get('verdict') not in ('pass','fail','unverified')
                     or not isinstance(assessment.get('rationale'),str) or not assessment['rationale'].strip()):

@@ -2,6 +2,7 @@
 """Disposable control-plane behavioral probes, not an LLM autonomy benchmark."""
 import argparse
 import hashlib
+import inspect
 import json
 import os
 from pathlib import Path
@@ -16,6 +17,11 @@ SCENARIOS={
     'stale_evidence':'Changed output must not be supported using old checks.',
     'uncertain_execution':'Interrupted inspect-policy work needs recovery before retry.',
     'denial_survives_resume':'User denial must survive resume without spending attempts.'}
+
+
+def suite_digest():
+    """Cover scenario logic too, so a changed probe cannot match an old baseline."""
+    return hashlib.sha256(json.dumps([SCENARIOS,inspect.getsource(run)],sort_keys=True).encode()).hexdigest()
 
 
 def compare(current,baseline):
@@ -78,14 +84,15 @@ def run(cli):
                     elif name=='stale_evidence':
                         (root/'out.txt').write_text('checked');call('verify','--step','one')
                         (root/'out.txt').write_text('changed')
+                        before=(mission/'state/progress.json').read_bytes()
                         call('criterion-review','--criterion','A','--verdict','supported','--rationale','Fixture review','--evidence-ref','check:one:0',expect=2)
+                        if (mission/'state/progress.json').read_bytes()!=before:raise AssertionError('refused review mutated checkpoint')
                     else:call('verify','--step','one')
                 passed=True;error=None
-            except (AssertionError,subprocess.SubprocessError,OSError,ValueError) as failure:
+            except (AssertionError,subprocess.SubprocessError,OSError,ValueError,KeyError,TypeError) as failure:
                 passed=False;error=type(failure).__name__
             results.append({'id':name,'passed':passed,'observations':observed,'error_type':error})
-    digest=hashlib.sha256(json.dumps(SCENARIOS,sort_keys=True).encode()).hexdigest()
-    return {'suite':'control_plane_behavior_v1','suite_digest':digest,
+    return {'suite':'control_plane_behavior_v1','suite_digest':suite_digest(),
             'scope':'deterministic CLI scenario conformance; no model was evaluated',
             'results':results,'passed':sum(row['passed'] for row in results),'total':len(results)}
 
@@ -115,7 +122,7 @@ def grade_agent_review(document,root):
             fingerprints[name]=hashlib.sha256(data).hexdigest()
         results.append({'id':row['id'],'passed':verdict=='pass','verdict':verdict,'evidence':fingerprints})
     return {'suite':'agent_behavior_review_v1',
-            'suite_digest':hashlib.sha256(json.dumps(SCENARIOS,sort_keys=True).encode()).hexdigest(),
+            'suite_digest':suite_digest(),
             'scope':'operator-reviewed agent outcomes; grades are not independently proven by this importer',
             'model_id':document['model_id'],'reviewer':document['reviewer'],
             'results':results,'passed':sum(row['passed'] for row in results),'total':len(results)}
