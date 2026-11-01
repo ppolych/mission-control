@@ -1,5 +1,13 @@
 # Activate the controller before project changes
 
+## Contents
+
+- [1. Select and inspect](#1-select-and-inspect)
+- [2. Continue an existing mission](#2-continue-an-existing-mission)
+- [3. Bootstrap a new mission](#3-bootstrap-a-new-mission)
+- [4. Reserve work before changing artifacts](#4-reserve-work-before-changing-artifacts)
+- [5. Verify and retain observable controller evidence](#5-verify-and-retain-observable-controller-evidence)
+
 Loading mission-control supplies instructions. It does not initialize a mission,
 reserve an attempt or activate a step. For an authorized project-changing mission,
 use the controller and its actual tool results before changing project artifacts.

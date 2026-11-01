@@ -1,4 +1,14 @@
-# Quality and learning — Mission Control 0.3.3
+# Quality and learning
+
+## Contents
+
+- [1. Behavioral baseline and regression checks](#1-behavioral-baseline-and-regression-checks)
+- [2. Evidence kind requirements and sufficiency gaps](#2-evidence-kind-requirements-and-sufficiency-gaps)
+- [3. Recorded-fact failure diagnosis](#3-recorded-fact-failure-diagnosis)
+- [4. Lesson validity, contradictory evidence and age](#4-lesson-validity-contradictory-evidence-and-age)
+- [5. Scope-bound derived-analysis reuse](#5-scope-bound-derived-analysis-reuse)
+- [6. Justify refactors and added maintenance surface](#6-justify-refactors-and-added-maintenance-surface)
+- [Release validation](#release-validation)
 
 Implemented in order: behavioral baseline, evidence sufficiency, failure
 diagnosis, lesson validity, analysis reuse, and change-necessity guidance.
@@ -163,7 +173,7 @@ scope expansion, budget increase or numeric architecture threshold is introduced
 
 ## Release validation
 
-Actual full suite: 195 passing tests. Control-plane comparison: 6/6 with no
+Control-plane comparison: 6/6 with no
 regression against the pre-change 0.3.1 baseline. The separate agent-review
 importer was tested with synthetic artifacts; no actual LLM benchmark was run.
 See operational-validation.md for the combined quality smoke and all checks.

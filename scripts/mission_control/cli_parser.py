@@ -71,7 +71,7 @@ def build_parser():
               '2 invalid input or transition; 3 waiting for a controlled-step decision.\n'
               'Wrappers: verify.sh runs ad hoc checks; no_progress.sh records repeated calls.\n'
               'VERIFY_TIMEOUT sets the default check timeout (60 seconds); step verify_timeout overrides it.\n'
-              'See references/commands.md for complete behavior.')
+              'See references/commands-lifecycle.md and the other command references.')
     parser = argparse.ArgumentParser(prog='mission.py', epilog=epilog,
                                      formatter_class=argparse.RawDescriptionHelpFormatter,
                                      usage='%(prog)s COMMAND [options]')

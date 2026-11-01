@@ -4,7 +4,7 @@ from pathlib import Path
 import stat
 import zipfile
 
-ROOT_FILES = ('VERSION', 'SKILL.md', 'README.md', 'AGENTS.md', '.gitignore', '.gitattributes')
+ROOT_FILES = ('VERSION', 'SKILL.md', 'README.md', 'AGENTS.md', 'CHANGELOG.md', '.gitignore', '.gitattributes')
 DIRECTORIES = ('scripts', 'references', 'templates', 'tests', 'evals')
 
 

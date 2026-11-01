@@ -1,6 +1,17 @@
 # Schema 3: evidence, recovery, effects and revisions
 
-Mission Control 0.3 introduced schema 3; current release is 0.3.3. Schema-2 contracts/checkpoints remain
+## Contents
+
+- [1. Requirements mapped to evidence](#1-requirements-mapped-to-evidence)
+- [2. Unverified is distinct from failure and support](#2-unverified-is-distinct-from-failure-and-support)
+- [3. Recovery reports before uncertain retries](#3-recovery-reports-before-uncertain-retries)
+- [4. Watched input identity and safe observations](#4-watched-input-identity-and-safe-observations)
+- [5. Declared effects](#5-declared-effects)
+- [6. Explicit linked revisions](#6-explicit-linked-revisions)
+- [7. Transition journal committed with the checkpoint](#7-transition-journal-committed-with-the-checkpoint)
+- [Resource-bound persistence and process cleanup](#resource-bound-persistence-and-process-cleanup)
+
+Schema-2 contracts/checkpoints remain
 supported without migration or new default approval gates. Use the supplied
 schema-3 template for new missions. Never change the schema of a frozen mission
 in place; use an explicitly reviewed revision instead.
@@ -8,7 +19,7 @@ in place; use an explicitly reviewed revision instead.
 ## 1. Requirements mapped to evidence
 
 The contract declares a nonempty `acceptance` array with `id` and `description`
-items, plus optional `evidence_kinds` since 0.3.2.
+items, plus optional `evidence_kinds`.
 Each step's `acceptance_refs` names the requirements it serves. IDs are unique;
 unknown references and requirements with no mapped step fail validation.
 Housekeeping steps may have empty references. At most 128 requirements and 256
@@ -24,8 +35,8 @@ python3 "$SKILL/scripts/mission.py" coverage
 ```
 
 `check:STEP:INDEX` must refer to a passed check of a mapped step; indexes are
-zero-based. `file:PATH` must be a currently readable regular file beneath the
-pinned workspace. Multiple `--evidence-ref` arguments are allowed. References
+zero-based. `file:PATH` must currently exist and be observable beneath the pinned
+workspace, as a regular file, a larger file or a directory. Multiple `--evidence-ref` arguments are allowed. References
 and rationale must not contain secrets. File contents are never stored here.
 
 `supported` requires completed mapped steps and at least one valid evidence
@@ -45,7 +56,7 @@ every requirement currently supported; otherwise it returns 2 without changes.
 Reviews bind to the mapped steps' current evidence and observed declared outputs,
 watched inputs and explicit file references. Resume/reverification or changed
 artifacts invalidate that binding. Re-review after inspecting the new evidence.
-Since 0.3.1, successful verification also stores `verified_artifacts` receipts for
+Successful verification also stores `verified_artifacts` receipts for
 declared outputs and watched inputs. Supported review requires those receipts to
 match current observations: rerecording the judgment cannot re-bless old checks
 after a file changes. Resume, perform checks-only revalidation, and then review.
@@ -71,7 +82,11 @@ revalidation likewise reruns only the already-declared safe checks.
 ```bash
 python3 "$SKILL/scripts/mission.py" resume
 python3 "$SKILL/scripts/mission.py" recovery --step example-001
-# Inspect current files AND external systems; then record the observed outcome:
+```
+
+Inspect current files AND external systems; then record the observed outcome:
+
+```bash
 python3 "$SKILL/scripts/mission.py" recover --step example-001 \
   --digest DIGEST_FROM_CURRENT_REPORT --resolution completed \
   --rationale 'Inspected the resulting artifact and confirmed the external outcome'
@@ -88,7 +103,7 @@ Resolution is an explicit recorded judgment tied to the current report digest:
 
 - `completed`: allow checks-only revalidation, without marking the step complete.
 - `not_applied`: allow a normal execution attempt within the existing budget.
-- `applied_incorrect`: after a failed verification only, allow a budgeted corrective
+- `applied_incorrect`: only when the latest attempt failed verification, allow a budgeted corrective
   attempt; refused when the step declares external actions or irreversible effects.
 - `partial` or `unknown`: remain blocked for recovery; return 1, without retry.
 
@@ -158,9 +173,8 @@ Every schema-3 step requires exactly these `effects` fields:
 `network` is `none`, `self_hosted`, or `external`; `reversible` is a strict JSON
 boolean. Read/write paths are workspace-relative file paths; include created
 and deleted files in writes. An absent path is a valid observed state for those
-operations. Directory trees and large-file backup are outside this helper's
-observation scope. Explicitly review such work separately rather than inventing
-complete evidence. List external actions in plain, bounded, nonsecret descriptions.
+operations. Directories and files over 1 MiB get weaker metadata receipts, described
+above; nothing here backs them up. List external actions in plain, bounded, nonsecret descriptions.
 
 The full effects object appears in the approval step snapshot and revision diff.
 It describes intent; it does not restrict tools, detect every undeclared write,
@@ -173,10 +187,14 @@ Draft the proposed schema-3 contract outside the existing mission. Inspect:
 
 ```bash
 python3 "$SKILL/scripts/mission.py" revision-diff --contract revised-contract.json
-# After authorization for the changed scope:
+```
+
+After authorization for the changed scope:
+
+```bash
 python3 "$SKILL/scripts/mission.py" revise --contract revised-contract.json \
   --destination mission-r2 --reason 'User authorized the described scope change'
-python3 "$SKILL/scripts/mission.py" init --mission .mission-r2 --workspace "$PWD"
+python3 "$SKILL/scripts/mission.py" init --mission mission-r2 --workspace "$PWD"
 ```
 
 `revision-diff` reads the stored parent contract and shows top-level changes,
@@ -204,7 +222,8 @@ stops are included. State and event are written in the same atomic replacement;
 there is no separately appended log that can get ahead of the checkpoint.
 
 `history` prints committed events. Status, coverage, recovery and revision-diff are
-read-only. Rejected input/transition requests leave state and journal unchanged.
+read-only. Exit 2 and repeated refusals that change nothing leave state and journal
+unchanged; a refusal that records a new stop or exhausted budget commits one event.
 The chain and final state hash are checked before lifecycle operations; malformed
 state is not silently repaired. Preserve a corrupted checkpoint for explicit
 recovery. Atomic writes prevent partial JSON but do not promise protection from
@@ -230,9 +249,9 @@ original history before explicitly planning a linked revision; never truncate th
 journal or reset counters to evade limits. Verification commands run in their
 own process groups; normal exits and timeouts clean up remaining group members.
 Escaped sessions and external actions still require independent inspection.
-See [reliability patterns](reliability-patterns.md) for detailed limits and recovery.
+See reliability patterns (`references/reliability-patterns.md`) for detailed limits and recovery.
 
-Since 0.3.2, new acceptance items may optionally declare expected evidence_kinds.
+New acceptance items may optionally declare expected evidence_kinds.
 Supported review must declare them with --evidence-kind; legacy items with no
 requirements retain prior behavior. See quality-and-learning.md for sufficiency
 audit and the limits of reviewer-supplied semantic labels.

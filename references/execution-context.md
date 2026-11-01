@@ -3,7 +3,7 @@
 Use this workflow for substantial work or interrupted sessions. Existing host
 authorization, controlled-mode approvals, budgets and recovery rules still apply.
 
-Read [controller activation](controller-activation.md) before project mutations:
+Read controller activation (`references/controller-activation.md`) before project mutations:
 skill loading alone does not initialize or start the controller.
 
 ## Select and restore one mission

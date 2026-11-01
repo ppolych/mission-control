@@ -1,20 +1,20 @@
 # Mission Control
 
-Version **0.3.3** (`python3 scripts/mission.py --version`).
+Version: see `VERSION` (`python3 scripts/mission.py --version`). Release history is in [the changelog](CHANGELOG.md).
 
 Author: Panos Polychronis — [ppolych@netcompany.com](mailto:ppolych@netcompany.com)
 
-An orchestration skill for substantial controlled or autonomous goals. It coordinates work,
-checks observable results, and preserves evidence across sessions.
+An orchestration skill for substantial controlled or autonomous goals. It coordinates work, checks observable results and preserves evidence across sessions. It records and checks work: it does not execute declared work commands, create a sandbox, prove semantic correctness or guarantee exactly-once external effects.
 
 ## Layout
 
-- `SKILL.md`: activation and workflow.
-- `scripts/mission.py`: CLI entrypoint; install with the adjacent `scripts/mission_control/` package for state, validation, migration and verification.
-- `scripts/*.sh`: compatible verification and repeat-detection entrypoints.
-- `templates/`: contract, self-answered drafting questions, decision log, lessons, and metrics examples.
-- `references/`: CLI details and research.
-- `tests/`: executable regression tests.
+- `SKILL.md`: activation and workflow, with a map of every reference.
+- `scripts/mission.py`: CLI entrypoint. Install the complete `scripts/` directory with root `VERSION`; the CLI needs the adjacent `mission_control/` package, which uses only the standard library.
+- `scripts/*.sh`: verification and repeat-detection wrappers.
+- `templates/`: contract, drafting questions, decision log, lessons and metrics formats.
+- `references/`: detailed behavior, one file per topic.
+- `tests/` and `evals/`: regression tests, behavioral probes, benchmark and mutation check.
+- `AGENTS.md`: project rules and invariants for anyone changing this repository.
 
 ## Quick start
 
@@ -64,57 +64,14 @@ one. Retry a contract-only interrupted initialization with the same contract.
 An exhausted step leaves independent ready work available; dependent steps still
 wait for verified prerequisites.
 
-## Schema-3 evidence and recovery
-
-Version 0.3 adds seven connected capabilities while retaining schema-2 missions:
-
-1. Acceptance IDs map original requirements to steps and evidence references.
-2. Explicit supported/unmet/unverified reviews control schema-3 completion.
-3. Recovery reports require reconciliation before uncertain retries.
-4. Watched file hashes invalidate stale controlled approvals.
-5. Declared read/write, network, external-action and reversibility effects appear
-   in approval snapshots and revision comparisons.
-6. Separate linked revisions preserve parent contracts, state and budgets.
-7. A hash-linked transition journal is committed atomically with each checkpoint.
-
-The new template uses schema 3. Existing schema-2 contracts remain valid and keep
-their original finish/resume behavior. No automatic schema migration or additional
-autonomous approval gate is introduced. The helper does not execute declared work
-commands, create a sandbox, prove semantic correctness, or guarantee exactly-once
-external effects.
-
-Read [the detailed schema-3 workflow](references/evidence-recovery.md) for the
-contract fields, commands, return codes, evidence freshness and recovery limits.
-
-Patch 0.3.1 binds supported reviews to verification-time file receipts, invalidates
-old recovery reports after each reconciliation, validates ungated schema-3
-workspaces, hardens persistent lock opens and rejects completion if approval
-inputs change during checks. Old schema-3 declared-file evidence needs checks-only
-revalidation to establish receipts; schema-2 autonomous behavior remains compatible.
-
-## Execution modes and final review
-
-Choose the mission-level mode in the frozen contract:
+## Modes
 
 | Mode | Intended use | Skill approval policy |
 | --- | --- | --- |
 | `controlled` | Interactive or sensitive work | Pause before `risk: high` or `needs_approval: true` steps. |
-| `autonomous` (default) | Sandboxed/CI work | Existing execution loop; no additional skill approval gates. |
+| `autonomous` (default) | Sandboxed work | No additional skill approval gates. |
 
-Risk defaults to `low`; `needs_approval` defaults to `false`. Controlled is
-selective oversight: set `needs_approval: true` on every step for full oversight.
-Neither mode grants host permissions, bypasses approvals imposed by the host,
-or creates a sandbox. Configure isolation separately.
-
-A gated controlled step declares `description`, `commands` as exact argv arrays,
-and its normal `verify` criteria. `commands: []` explicitly means no shell work
-commands; describe intended manual/file operations in the step summary. The CLI
-does not execute these work commands. It runs verification checks only through
-the existing `verify` command.
-
-`start` returns **3** and prints an `awaiting_approval` JSON request before work.
-Show it to the user and wait; the digest is not a credential or user consent.
-After an explicit reply, record one of:
+Neither mode grants host permissions, bypasses host approvals or creates a sandbox. A gated `start` returns 3 and prints an `awaiting_approval` request. Show it to the user and wait; the digest is not a credential or consent. Then record the decision:
 
 ```bash
 python3 "$SKILL/scripts/mission.py" approve --step example-001 \
@@ -122,161 +79,24 @@ python3 "$SKILL/scripts/mission.py" approve --step example-001 \
 python3 "$SKILL/scripts/mission.py" start --step example-001
 ```
 
-After an explicit refusal, run `deny` with the same arguments instead (returns 1).
+After an explicit refusal, run `deny` with the same arguments instead (returns 1). See [approval and recovery](references/commands-approval-recovery.md).
 
-Approval persists across resume for the same contract and pinned workspace.
-Since 0.2.1 the CLI rejects missing or redirected reviewed workspaces, malformed pending
-requests, and manual assessments without current approval; invalid transitions
-leave checkpoint state intact.
-Changed commands/criteria/scope need a new mission revision. Waiting consumes
-no attempts. Denial blocks the step for the revision without spending an
-execution attempt or automatically retrying; independent ready work remains
-available. See [approval details](references/commands.md#controlled-mode-approval-policy).
+## Guarantees and limits
 
-Run start → work → assess/verify → recover → finish within the chosen mode,
-existing scope, and permissions. After finish, compare the combined artifacts
-with the original user goal, including anything omitted from the draft. Record
-`goal-review --verdict pass|fail --rationale TEXT`. A failure returns 1 and sets
-`blocked` while preserving step evidence and budgets; explain the gap and propose
-recovery. Never report success based solely on individually passing steps.
+- Schema-3 contracts map acceptance IDs to steps and require current supported reviews before `finish`. Schema-2 missions keep working, with no automatic migration.
+- Verification receipts go stale when declared outputs or watched inputs change. Files over 1 MiB and directories get metadata receipts, which are weaker than SHA-256. Watched inputs stay exact-hash.
+- `validate`, `init`, `revise` and `revision-diff` refuse unknown contract and step fields, so a misspelled `needs_approval` cannot remove a gate. Prefix comments with `_`.
+- Step `verify_timeout` (up to 86400 seconds) overrides `VERIFY_TIMEOUT`, whose default is 60. Timeouts count as failures.
+- After a failed verification of reversible work, `recover --resolution applied_incorrect` allows a budgeted corrective attempt. Uncertain outcomes stay blocked until reconciled.
+- `finish` sets `done_verified` before the required goal review. `status`, `handoff` and `diagnose` report `goal_review_status` until it is recorded.
+- A hash-linked transition journal commits atomically with each schema-3 checkpoint. It is unkeyed local evidence, not an authenticated audit log.
+- Everything depends on the agent following the workflow. These prompts install no host hook, and reviews are recorded judgments.
 
-Schema-2 `finish` remains compatible and sets step-level `done_verified`; agents
-following the skill also perform the final review before reporting success. The
-CLI records a judgment, not an automatic semantic evaluation. Schema 3 additionally
-requires current supported acceptance reviews before finish. An optional final
-`goal-check` contract step can strengthen integration coverage.
+Details: [evidence and recovery](references/evidence-recovery.md).
 
-Only verified steps can complete. Failures return a nonzero status. Default
-attempt budgets are bounded; use `status` to inspect saved evidence and `resume`
-to invalidate completion before rechecking interrupted work. Use `start --revalidate`
-for those checks: execution budgets remain intact and external actions must not
-be repeated. Deterministic checks fail fast; evidence records identity, result,
-time and pinned mission workspace. Lifecycle subprocess output is discarded; definitions
-and rationale are stored verbatim and must not contain secrets.
+## Runtime layout
 
-`block` parks only the active step; it cannot reopen completed work or change
-a different pending step. Use `resume` to reopen completed work so downstream
-completion is invalidated before revalidation.
-
-See [CLI reference](references/commands.md) for manual assessments, migration,
-configuration, and exit labels. Existing unversioned missions require explicit
-migration into a new destination; originals remain untouched. Migration stages
-the complete output before publishing it, so a failed write can be retried
-without a partial destination. After an abrupt exit, rerun migration to the same
-destination; it recovers stale staging under a destination lock.
-
-## Lessons and skill improvement
-
-Read relevant prior lessons before drafting, and turn them into observable
-criteria. Retain at most two reusable lessons per mission in `.mission/lessons.md`
-or an established shared store. Non-done exits receive a short retro identifying
-the failure, any weak criterion, and the next-time correction. Write an
-checkpoint/journal-derived exit snapshot using `metrics`; retain exports in
-`.mission/metrics.jsonl` deduplicated by exit_id. Host token usage and human
-interventions remain null when unavailable. Do not sum cumulative resumed snapshots.
-
-After each five distinct mission records, review recurring lessons in
-[skill learnings](references/skill-learnings.md). Promote supported corrections;
-future behavior-changing promotions require a new release and tests. Version
-0.3 adds evidence/recovery schema 3 on top of the 0.2 controlled-mode policy;
-existing schema-2 missions and autonomous approval defaults remain compatible. No mission histories or
-improvements have been fabricated. See [workflow details](references/agentic-workflow.md)
-for the templates, counting rules, and evidence requirements.
-
-## WSL2
-
-Run with Linux Python inside your WSL distribution. See [WSL setup](references/wsl.md)
-for installation, Windows path conversion, line endings, and filesystem guidance.
-JSON inputs accept UTF-8 with or without a BOM and Windows CRLF line endings.
-The release version is stored in `VERSION`; new contracts use schema 3; schema 2 remains supported.
-
-## Validation
-
-```bash
-python3 -m unittest discover -s tests -v
-bash -n scripts/verify.sh scripts/no_progress.sh
-shellcheck scripts/*.sh
-python3 -m json.tool templates/contract.json >/dev/null
-```
-
-## Operational helpers (introduced in 0.3.1)
-
-- `metrics`: deterministic JSONL-ready projection of committed state and journal.
-- `handoff`: structured goal, next-work and evidence pointers for another session.
-- `lessons-search --lessons-root PATH --query TEXT`: bounded historical matches
-  with source paths and line numbers, usable before initialization.
-
-All are read-only; they do not execute work, approve steps, or append journal
-events. See [continuation and observability](references/continuation-and-observability.md)
-for progress versus live waits, bounded polling, safe retry limits and export
-semantics. Bug audits use [the evidence rubric](references/review-quality.md).
-The metrics template now describes a metrics event rather than a contract.
-
-## Reliability additions (introduced in 0.3.1)
-
-Verification subprocesses now clean up their process groups after timeout or exit.
-Checkpoint/journal read and write limits prevent unbounded, unresumable state.
-Shared lessons can be published with digest-based conflict checks. Optional
-`lessons-search --diverse`, advisory `service-status`/`service-probe`/`service-record`,
-and read-only `impact` add selective memory, outage-aware safe observation and
-code/test candidates. No approvals, recovery rules or execution budgets are relaxed.
-See [the commands and limits](references/reliability-patterns.md).
-
-## 0.3.2 — Quality, evidence and learning
-
-Implemented in order: behavioral regression baseline, optional expected evidence
-kinds and `evidence-audit`, read-only `diagnose`, lesson validity audit, scope-bound
-derived-analysis caching, and a self-answered refactor-necessity template. Existing
-frozen contracts and approval/recovery/budget rules remain compatible.
-
-```bash
-python3 evals/run_behavioral.py --baseline evals/baseline-control-plane.json
-python3 scripts/mission.py evidence-audit --mission .mission
-python3 scripts/mission.py diagnose --mission .mission
-```
-
-The actual CLI baseline/comparison is 6/6 with no regression. It is not an LLM
-autonomy benchmark; actual agent runs require separate reviewed artifacts.
-Evidence kinds and lesson assessments are explicit judgments, not automatic
-semantic truth. Cache hits never transfer approvals or verification receipts.
-See [quality and learning](references/quality-and-learning.md) and
-[the agent evaluation protocol](evals/agent-scenarios.md).
-
-### Python package layout
-
-Run `python3 scripts/mission.py` as before. Copy/install the complete `scripts/` directory and `VERSION`; copying only the entrypoint is insufficient. The adjacent `mission_control/` package uses only the standard library. Python source and test files are limited to 400 physical lines each.
-
-Schema-3 contracts optionally restrict declared artifact paths with `allowed_paths`, for example `["out", "build"]`. Omit it or use `["."]` for the whole workspace. See [declared artifact containment](references/commands.md#declared-artifact-containment-schema-3); this policy does not sandbox commands.
-
-
-## 0.3.3 — Modular packaging and declared artifact containment
-
-This release packages the completed refactor and corrective reviews previously validated under 0.3.2:
-
-- The CLI requires the complete `scripts/` directory and root `VERSION`; every Python file stays within 400 physical lines.
-- Optional schema-3 `allowed_paths` constrains declared filesystem checks, effects and watch paths at validate/init. Omitted policy retains existing behavior; whole-workspace prefixes support `.` and `./`.
-- Cache publication protects inputs, reports and installed implementation files from output/lock aliases. Public helper docstrings and filesystem-check compatibility are preserved.
-
-Controlled/autonomous policy, recovery, checkpoint/journal formats and contract schema versions remain unchanged. Containment validates declarations; it does not sandbox commands or monitor later filesystem changes. See [validation history](references/operational-validation.md) for actual test results. Historical 0.3.1/0.3.2 evaluation files remain labeled with the versions they observed.
-
-Current test results and their history are kept only in the [validation record](references/operational-validation.md).
-
-Actual model behavior has not been benchmarked; see [Nestor trials](evals/agent-scenarios.md).
-
-## Contract and retry behavior
-
-- `validate`, `init`, `revise` and `revision-diff` refuse unknown contract and step fields, so a misspelled `needs_approval` cannot silently remove a gate. Prefix comments with `_`. Already frozen contracts keep working.
-- Step `verify_timeout` (seconds, up to 86400) overrides `VERIFY_TIMEOUT`, whose default is 60. Timeouts are reported on stdout and count as failures.
-- `recover --resolution applied_incorrect` allows a budgeted corrective attempt after a failed verification of reversible work without external actions.
-- Declared writes over 1 MiB and directories get metadata receipts: size/mtime/ctime/mode, or a no-follow tree manifest up to 50,000 entries. These are weaker than SHA-256 and read no file bytes. Watched inputs remain exact-hash only.
-- Read-only reports take no lock, so they work during a running `verify`. No command except `init` creates a missing mission directory.
-- `finish` still sets `done_verified`, and `status`, `handoff` and `diagnose` report `goal_review_status` until the review is recorded.
-- `resume` from `human_abort` requires `--rationale`, kept in `resume_history`.
-
-
-## Workspace runtime layout
-
-New missions use one hidden directory by default:
+New missions use one hidden directory in the workspace:
 
 ```text
 .mission/
@@ -289,78 +109,28 @@ New missions use one hidden directory by default:
   metrics.jsonl
 ```
 
-The CLI creates contract/checkpoint and repeat state; the agent writes decision logs, lessons and retained metrics only when needed. Use this same selected mission root for all auxiliary artifacts. Old `mission/` directories are not moved or merged automatically: open them explicitly with `--mission mission`. The repeat wrapper defaults to `.mission/state/call_hashes.txt`; for an explicitly selected alternate root, set `NO_PROGRESS_STATE` to that root's `state/call_hashes.txt`. Do not create a second runtime directory for notes or exports.
+The CLI creates the contract, checkpoint and repeat state; the agent writes the rest only when needed. Open an old `mission/` directory explicitly with `--mission mission`; nothing is moved automatically. For another mission root, set `NO_PROGRESS_STATE` to that root's `state/call_hashes.txt`.
 
+## Validation
 
-## Diagnostics and reproducible packaging
+There is no hosted CI. Run every check on each platform you use:
 
-Use `handoff` or `diagnose` to identify the installed CLI/fingerprint, selected mission root, missing manual assessment indices and dependency blockers. Continuation suggestions are advisory and never grant retry or approval. These reports do not identify Nestor's UI mode.
+```bash
+evals/check_all.sh
+```
+
+After changing safety code, also run `python3 evals/mutation_check.py`. Use `python3 evals/benchmark.py` before optimizing. Results are recorded in [the validation record](references/operational-validation.md).
+
+The CLI behavioral probes are not a model benchmark. Actual agent behavior has not been measured; prepare real sessions with `python3 evals/nestor_trials.py prepare --output PATH` and follow [the trial protocol](evals/agent-scenarios.md).
+
+## Packaging
 
 ```bash
 python3 scripts/package_release.py
 ```
 
-Pass `--output PATH` to choose a separate archive location.
+Pass `--output PATH` to choose another location. The build emits a reproducible ZIP with an embedded `MANIFEST.sha256` and a `.zip.sha256` sidecar, and runs extracted-install smoke checks before publishing. Verify the checksum before distribution, because an abrupt stop between replacements can leave a mixed pair.
 
-The build emits `mission-control.zip` and its `.zip.sha256` sidecar, embeds `MANIFEST.sha256`, fixes ZIP metadata for reproducibility and excludes caches/generated archives/checksums. It verifies the manifest, extracted CLI/wrappers, contract validation and a disposable lifecycle using only `.mission/` before publication. Reproducibility assumes identical source bytes and file modes under the same compression implementation. A persistent nonblocking lock serializes cooperating publishers. Handled replacement errors restore the previous pair; failed restoration retains recovery files and reports their directory. Abrupt termination between replacements can still leave a mixed pair, so verify the checksum before distribution.
+## WSL2
 
-
-## Focused execution context
-
-Pin one mission directory and restore its live checkpoint after interruption.
-Draft observable GIVEN/WHEN/THEN scenarios, map requirements to step/check evidence,
-and keep a small brief only for the active step when useful. Record consequential
-decisions with evidence, rationale, cost if wrong and a revisit trigger. The
-[workflow reference](references/execution-context.md),
-[execution brief](templates/execution-brief.md) and
-[acceptance scenarios](templates/acceptance-scenarios.md) provide the formats.
-
-`evidence-audit` adds structural traceability for acceptance IDs, contributing
-steps, zero-based check indices/kinds and declared outputs. Shared checks remain
-explicitly step-level links. Unmapped support steps are reported rather than
-rejected. Structural links are not behavioral proof or an additional approval
-gate; existing evidence freshness and goal review still determine outcomes.
-Store optional briefs and scenario notes under the same selected `.mission/`
-root. Neither notes nor a decision ledger can change a frozen contract or supply
-approval. Review the combined user outcome before reporting success.
-
-
-## Compact continuation and isolated Nestor trials
-
-`python3 scripts/mission.py handoff --compact` returns at most five step rows,
-status counts, the active step, an advisory next-ready identifier and omitted-row
-count. Use full `handoff` for complete dependencies/evidence/approval details.
-Compact output grants no authority and spends no attempts.
-
-Report-local active-step and requirement indexes avoid repeated structural scans.
-File observations, receipts, approvals and final freshness checks are not cached.
-
-Prepare independent UI trials with:
-
-```bash
-python3 evals/nestor_trials.py prepare --output /tmp/nestor-mission-trials
-python3 evals/nestor_trials.py summarize --review /tmp/nestor-mission-trials/review.json
-```
-
-Preparation creates six disposable case directories and claims zero actual runs.
-Open each case as a new Nestor session, explicitly choose Agent mode, follow its
-request/reviewer instructions and retain the actual trace/final state. Record
-model, session, independent verdict and observed metrics in review.json. Unknown
-interventions/attempts/outcomes stay null; fixture preparation and CLI tests are
-not model benchmarks. See [Nestor trials](evals/agent-scenarios.md).
-
-
-## Skill activation and controller use
-
-Loading mission-control supplies workflow instructions; it does not run its Python
-controller. For project-changing missions the agent must inspect the selected
-.mission root, restore a valid existing checkpoint or validate/init a new contract,
-and obtain a successful start/current active-attempt result before project
-mutations. It then assesses actual output and verifies the step. Read-only requests
-remain read-only, existing authorization avoids routine extra approval, and
-bootstrap writes are limited to mission metadata. See
-[controller activation](references/controller-activation.md).
-
-These prompt rules do not install a Nestor execution hook. Host enforcement is
-needed to guarantee tool-level compliance; actual agent behavior must be reviewed
-separately from controller tests. No live session is changed by this update.
+Run with Linux Python inside your distribution. See [WSL setup](references/wsl.md).

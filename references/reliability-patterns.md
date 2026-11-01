@@ -1,4 +1,13 @@
-# Reliability patterns — introduced in 0.3.1, retained in 0.3.3
+# Reliability patterns
+
+## Contents
+
+- [1. Verification process groups](#1-verification-process-groups)
+- [2. Conflict-aware shared lesson publication](#2-conflict-aware-shared-lesson-publication)
+- [3. Bounded checkpoints and journals](#3-bounded-checkpoints-and-journals)
+- [4. Optional diverse lesson results](#4-optional-diverse-lesson-results)
+- [5. Advisory circuit breaker for safe service observations](#5-advisory-circuit-breaker-for-safe-service-observations)
+- [6. Bounded code-impact candidates for contract drafting](#6-bounded-code-impact-candidates-for-contract-drafting)
 
 Implemented as a standard-library Python package plus agent guidance. Install the complete scripts directory with the root VERSION file.
 The current release is 0.3.3; these underlying policies are unchanged.
@@ -25,7 +34,11 @@ external execution. Interrupted/failed work still needs the normal recovery flow
 
 ```bash
 python3 "$SKILL/scripts/mission.py" store-read --store /known/shared/lessons.md
-# Read the actual text, prepare an independently reviewed merged proposal file.
+```
+
+Read the actual text, prepare an independently reviewed merged proposal file.
+
+```bash
 python3 "$SKILL/scripts/mission.py" store-publish \
   --store /known/shared/lessons.md --content /tmp/proposed-lessons.md \
   --base-hash HASH_FROM_STORE_READ
@@ -86,7 +99,11 @@ python3 "$SKILL/scripts/mission.py" service-status \
   --health-file /known/state/observations.json --service api
 python3 "$SKILL/scripts/mission.py" service-probe \
   --health-file /known/state/observations.json --service api
-# Perform at most the permitted safe observation using the owning tool.
+```
+
+Perform at most the permitted safe observation using the owning tool.
+
+```bash
 python3 "$SKILL/scripts/mission.py" service-record \
   --health-file /known/state/observations.json --service api --http-status 503
 ```

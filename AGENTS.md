@@ -39,7 +39,7 @@ Where the code lives in `scripts/mission_control/`:
 
 - **Performance:** measure with `evals/benchmark.py` before optimizing, and change only what measurably matters. Keep imports inside the branch that needs them (`tests/test_performance.py`). Never weaken journal validation or freshness checks for speed.
 - **File size:** see Working Rules; `tests/test_platform.py` enforces it. In `scripts/`, lines also stay within 160 characters and functions within 120 lines (`tests/test_review_fixes.py`).
-- **Docs move with behavior:** update `README.md`, `references/commands.md` and `templates/` alongside CLI changes. Keep `SKILL.md` concise and put workflow detail in `references/`. Record test results in `references/operational-validation.md`, not in new historical counts elsewhere.
+- **Docs move with behavior:** update `README.md`, `references/commands-*.md` and `templates/` alongside CLI changes. Keep `SKILL.md` concise and put workflow detail in `references/`. Record test results in `references/operational-validation.md`, not in new historical counts elsewhere.
 - **Read-only commands:** reports and invalid requests must not append journal events or change checkpoint bytes. Reports take no lock but refuse a non-regular `.lock` entry.
 - **Locks:** regular persistent inodes opened no-follow. Never unlink or truncate them.
 - **Tests:** use temporary missions and never run failure paths against real operator state. New tests patch the owning module directly; `tests/core_adapter.py` exists only for legacy fault-injection tests, and `tests/v3_fixture.py` provides the schema-3 fixture.
@@ -103,7 +103,7 @@ Inspect workspace and relevant lessons before presenting a complete contract dra
 behavior; controlled pauses before high-risk or explicitly gated steps. Waiting
 spends no attempts, approvals bind to contract/workspace digests, and denials
 block the step for that revision without retry. Test independent ready work and
-legacy checkpoints. See references/commands.md for lifecycle and return codes.
+legacy checkpoints. See references/commands-lifecycle.md for lifecycle and return codes.
 
 ## Controlled-Mode Regression Rules
 
@@ -163,7 +163,7 @@ human interactions. Handoff and lessons are context, not live evidence or author
 
 Use imperative subjects; describe behavior, validation, and limitations. Exclude secrets from recorded definitions and rationale. WSL uses Linux Python and quoted Linux paths; follow `references/wsl.md`. Do not claim untested mounted-drive compatibility.
 
-## Current operational additions
+## Operational Helpers
 
 Version is 0.3.3 by explicit author instruction. Keep VERSION, skill metadata
 and current documentation consistent; do not bump it again without permission. Keep metrics/handoff/search/impact read-only and all helpers dependency-free.
@@ -173,7 +173,7 @@ a known bounded lessons scope, with no-follow regular-file reads and source
 references. Preserve active jobs on polling timeouts; retries never override
 recovery, denials or budgets. Use the review rubric and disposable reproductions.
 
-## Reliability additions at unchanged version
+## Reliability
 
 `tests/test_grok_patterns.py` covers process-group cleanup, cooperative shared-store
 CAS, checkpoint/journal limits, optional diversity ranking, advisory circuit
@@ -184,7 +184,7 @@ and write caps before publishing a checkpoint, preserve the old file on refusal,
 and never truncate a journal to bypass limits. Treat impact/search results as
 source-linked candidates, not proof or resolved symbol bindings.
 
-## Quality additions in 0.3.2
+## Evidence Quality
 
 `tests/test_quality032.py` covers optional evidence-kind requirements, read-only
 sufficiency/diagnosis, contradictory/stale lessons, analysis cache scope and raw
@@ -201,7 +201,7 @@ receipts. Keep cache/redaction assertions and lesson age judgments explicitly
 advisory. Use change-necessity.md to justify refactors/new surface within the
 FULL original goal; no scoring-based scope reduction or new approval gate.
 
-## Five-pass 0.3.2 review rules
+## Capacity and Cache Safety
 
 `tests/test_review032.py` covers capacity preflight, cache input drift, strict
 lesson timestamps, optimized evaluator execution, and alias-safe output writes.
@@ -213,11 +213,11 @@ values are errors. Behavioral invariants must not depend on Python assert, which
 CLI or runner, including aliases; retain old report bytes on write failure and
 preserve existing permission bits. Document observation-race limits honestly.
 
-## Modular Python layout
+## Python Layout
 
 Keep modules focused on one responsibility and below 400 physical lines, including tests. In `scripts/`, lines stay within 160 characters and functions within 120 lines (`tests/test_review_fixes.py`). CLI syntax and checkpoint formats remain stable. Legacy fault-injection tests use `tests/core_adapter.py`; new tests should patch the owning module directly. Cache engine identity covers the entrypoint and every package source file.
 
-## Optional declared artifact containment
+## Declared Artifact Containment
 
 Schema-3 `allowed_paths` is optional; omission preserves legacy behavior and `["."]` permits the workspace. Validate every declared filesystem check path, read/write effect and watch against component-based prefixes; resolve against the caller workspace for validate and the selected pinned workspace before init publication. Reject traversal, absolute paths and symlink escapes/loops without overwriting an existing contract or publishing state. This is declaration policy, not command sandboxing or ongoing monitoring. Keep schema-2, modes, recovery and journal formats unchanged. Regressions live in tests/test_allowed_paths.py.
 
@@ -225,11 +225,11 @@ Containment compatibility regressions live in tests/test_allowed_paths_review.py
 
 
 
-## Unified runtime directory
+## Runtime Directory
 
 Use `.mission/` for new mission runtime artifacts, including contract, state, repeat history, lessons, decision log and retained metrics. Use the same explicitly selected mission root for agent-written auxiliary files; configure NO_PROGRESS_STATE accordingly for alternate roots. Never auto-move/merge legacy mission directories. Version remains 0.3.3 by current author instruction. Regressions: tests/test_mission_directory.py.
 
-## Agent guidance and release tooling
+## Agent Guidance and Release Tooling
 
 `handoff` and `diagnose` include advisory continuation hints and fresh installation identity. Missing/unverified assessment indices and blocked dependencies are context, not execution authority. Respect denials, stop reasons, recovery and budgets before any suggested work; never infer host mode or permission from these reports.
 
@@ -240,7 +240,7 @@ Build releases with `python3 scripts/package_release.py`. Keep archive construct
 Test counts and release evidence belong only in [operational validation](references/operational-validation.md); do not duplicate them here. Keep version 0.3.3 unless the author explicitly requests another bump.
 
 
-## Focused context and structural traceability
+## Focused Context and Traceability
 
 Pin one selected mission directory; restore that checkpoint before writing notes
 or continuing after interruption. Context refresh alone must not trigger resume.
@@ -256,7 +256,7 @@ links never establish behavioral completion; preserve existing receipt freshness
 acceptance reviews and combined-goal review. Tests: tests/test_execution_context.py.
 
 
-## Bounded reports, publication and real-agent evaluation
+## Reports, Publication and Agent Evaluation
 
 Collect active-work status once per report and share a call-local requirement
 index between coverage and traceability. Never memoize file observations,
@@ -273,7 +273,7 @@ as null, retain real session/model/evidence and independent operator grades.
 Never claim autonomy measurements from fixtures or CLI tests.
 
 
-## Controller activation workflow
+## Controller Activation
 
 Skill loading is not controller initialization or active-step proof. For authorized
 project mutations, inspect the selected root and restore a valid checkpoint or
@@ -285,7 +285,7 @@ existing permissions; do not add routine approval gates or auto-resume on contex
 refresh. Details: references/controller-activation.md. No host hook is implied.
 
 
-## Agent-usability review rules
+## Usability and Recovery Rules
 
 Regressions live in tests/test_review_fixes.py and tests/test_bug_fixes.py. Random lifecycle invariants live in tests/test_lifecycle_random.py, whose deep-state test keeps sequences from passing vacuously. `evals/mutation_check.py` breaks safety invariants one at a time and every mutant must be caught; run it after changing safety code. Refusals commit only when state changes, and `start` archives previous evidence. `applied_incorrect` depends on `failed_verification`, set by the latest attempt only. Strict field checks run only on new
 drafts (validate, init --contract, revise, revision-diff), never on frozen contracts.

@@ -24,7 +24,7 @@ actions require inspection before retrying. These are review scenarios rather
 than claims of independently measured agent performance.
 
 The 0.1 agentic enhancement adds workspace-first complete drafts, post-finish
-goal assessment, and episodic lessons. See [workflow details](agentic-workflow.md).
+goal assessment, and episodic lessons. See workflow details (`references/agentic-workflow.md`).
 The new CLI records goal-review verdicts; it cannot automatically prove that
 the original user goal has been met. Metrics and lessons are agent-authored,
 not automatically collected evaluation data. The skill-level register begins

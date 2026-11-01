@@ -1,4 +1,4 @@
-# WSL2 setup — Mission Control 0.3.3
+# WSL2 setup
 
 Run Mission Control inside a WSL2 Linux distribution with Linux Python 3.11+,
 Bash, and standard Unix utilities. Native Windows Python, PowerShell, and Git

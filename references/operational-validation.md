@@ -1,5 +1,19 @@
 # Release validation history
 
+## Contents
+
+- [Reliability patterns — same version, 2026-10-31](#reliability-patterns--same-version-2026-10-31)
+- [0.3.2 — quality, evidence and learning](#032--quality-evidence-and-learning)
+- [0.3.2 — five-pass corrective review, unchanged release](#032--five-pass-corrective-review-unchanged-release)
+- [Post-split five-pass audit (unchanged 0.3.2)](#post-split-five-pass-audit-unchanged-032)
+- [Optional allowed_paths at unchanged 0.3.2](#optional-allowed_paths-at-unchanged-032)
+- [Five-pass containment compatibility review (unchanged 0.3.2)](#five-pass-containment-compatibility-review-unchanged-032)
+- [Release 0.3.3 verification](#release-033-verification)
+- [Earlier baseline records moved from AGENTS.md](#earlier-baseline-records-moved-from-agentsmd)
+- [Six optimizations at unchanged 0.3.3](#six-optimizations-at-unchanged-033)
+- [Agent-usability review at unchanged 0.3.3](#agent-usability-review-at-unchanged-033)
+- [Performance measurement](#performance-measurement)
+
 Initial operational run: 2026-10-31, release **0.3.1**. Later release records
 are appended below; current release is **0.3.3**.
 No contract schema, default mode, approval, recovery or attempt-budget policy
@@ -218,3 +232,12 @@ takes about 15 ms, and Python 3.14 `argparse` itself takes about 16 ms.
 Rejected as unmeasured gains: sharing file observations inside one report, a faster bounded
 read, and fingerprint changes. Hashing a 1 MiB artifact did not stand out from noise. Time near
 the journal limit is hash-chain validation, a safety guarantee that stays.
+
+
+## Documentation rewrite
+
+Date: 2026-11-01. The command reference is split into four topic files, release history moved
+to `CHANGELOG.md`, every reference is linked directly from `SKILL.md`, and references over 100
+lines open with contents. `tests/test_docs.py` enforces these rules. The README dropped from
+366 to 136 lines. Total documentation fell only modestly, from 26,946 to about 26,100 words,
+because invariants were kept rather than summarized away.

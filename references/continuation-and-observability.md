@@ -1,5 +1,14 @@
 # Continuation, observability, and selective memory
 
+## Contents
+
+- [Progress, verified waits, and no progress](#progress-verified-waits-and-no-progress)
+- [Automatic metrics from committed state](#automatic-metrics-from-committed-state)
+- [Handoff for another session or agent](#handoff-for-another-session-or-agent)
+- [Search lessons selectively](#search-lessons-selectively)
+- [Bounded recovery from transient observations](#bounded-recovery-from-transient-observations)
+- [Origin and adaptation](#origin-and-adaptation)
+
 These additions were introduced in 0.3.1 and remain available in 0.3.3. Contract schemas,
 approval policy, attempt budgets and recovery transitions are unchanged. All
 three helpers below are read-only: they do not execute checks, add journal events,
@@ -81,7 +90,11 @@ The exporter itself does not assert that the workspace or approvals remain live.
 ```bash
 python3 "$SKILL/scripts/mission.py" lessons-search \
   --lessons-root /known/mission-history --query deployment --limit 5
-# Follow next_offset if present:
+```
+
+Follow next_offset if present:
+
+```bash
 python3 "$SKILL/scripts/mission.py" lessons-search \
   --lessons-root /known/mission-history --query deployment --limit 5 --offset 5
 ```
@@ -114,7 +127,7 @@ commands through this rule. An execution timeout is not "not applied". Schema-3
 `retry: inspect` still needs a current report-bound recovery decision; `safe`
 remains the author's constrained safety assertion. There are no implicit CLI
 retries, transport switches, or budget resets in this release. Optional advisory
-service circuit helpers are documented in [reliability patterns](reliability-patterns.md).
+service circuit helpers are documented in reliability patterns (`references/reliability-patterns.md`).
 
 ## Origin and adaptation
 

@@ -1,0 +1,42 @@
+# Changelog
+
+Test results for each release are in [the validation record](references/operational-validation.md).
+
+## Unreleased
+
+Changes on `main` since 0.3.3, pending the 0.4.0 release:
+
+- Require Python 3.11. Refuse older versions with a clear message.
+- Refuse unknown contract and step fields in new drafts.
+- Add the `applied_incorrect` recovery resolution, based on the latest attempt only.
+- Give larger declared outputs and directories metadata receipts instead of leaving steps stuck.
+- Add step `verify_timeout`, and report the check index, exit status or timeout.
+- Keep reports read-only and usable during `verify`. Only `init` creates a mission directory.
+- Report `goal_review_status`, and require a rationale to resume `human_abort`.
+- Report files skipped by `impact` and `lessons-search`. Serialize repeat records.
+- Map unexpected exceptions to exit 2. Validate stored evidence and observation records.
+- Refuse a mission root inside a declared output, and bound the stored contract read.
+- Commit refusals only when state changes, and archive evidence at `start`.
+- Sync directories after renames, and load modules only when needed.
+- Make the shell wrappers executable. Split the command reference by topic.
+- Add random lifecycle tests, a mutation check, a benchmark and `evals/check_all.sh`.
+
+## 0.3.3
+
+Modular packaging and declared artifact containment. The CLI requires the complete `scripts/` directory and root `VERSION`. Optional schema-3 `allowed_paths` constrains declared paths at validate and init. Cache publication protects inputs, reports and installed files from output or lock aliases. Added compact handoff, structural traceability, continuation hints, reproducible packaging and Nestor trial preparation.
+
+## 0.3.2
+
+Quality, evidence and learning: a behavioral regression baseline, optional evidence kinds and `evidence-audit`, read-only `diagnose`, lesson validity audit, scope-bound analysis caching and a refactor-necessity template. A corrective review fixed full-journal verification, cache drift, malformed lesson dates, optimized-Python evaluation checks and report output collisions.
+
+## 0.3.1
+
+Bound supported reviews to verification-time receipts, invalidated old recovery reports after each reconciliation, validated ungated schema-3 workspaces and hardened lock opens. Added `metrics`, `handoff`, `lessons-search`, shared-store publication, process-group cleanup, state limits, optional diverse search, service circuit helpers and `impact`.
+
+## 0.3
+
+Schema 3: acceptance IDs mapped to steps, supported/unmet/unverified reviews, recovery reports before uncertain retries, watched inputs bound to approvals, declared effects, linked revisions and an atomic hash-linked journal. Schema 2 stayed supported.
+
+## 0.2
+
+Opt-in controlled mode with risk and approval flags, reviewable command declarations, digest-bound approvals and nonretrying denials. Autonomous stayed the default, on schema 2.

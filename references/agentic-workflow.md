@@ -1,5 +1,14 @@
 # Risk-aware execution, autonomous drafting, final review, and learning
 
+## Contents
+
+- [Select and honor the execution mode](#select-and-honor-the-execution-mode)
+- [Workspace-first contract drafting](#workspace-first-contract-drafting)
+- [Goal checks at contract time and after finish](#goal-checks-at-contract-time-and-after-finish)
+- [Episodic lessons and light retrospectives](#episodic-lessons-and-light-retrospectives)
+- [Exit metrics and handoff](#exit-metrics-and-handoff)
+- [Skill-level improvement cycle](#skill-level-improvement-cycle)
+
 ## Select and honor the execution mode
 
 Draft `mode: controlled` for interactive/sensitive work when the user wants
@@ -27,7 +36,7 @@ do not reset counters, relabel risk, remove gates, or use resume to override a
 refusal. Changed commands/scope/criteria require a new user-reviewed mission
 revision. Revalidation runs only acceptance checks against prior work. Full
 state transitions, return codes and the policy/enforcement boundary are in
-[the approval CLI reference](commands.md#controlled-mode-approval-policy).
+the approval CLI reference (`references/commands-lifecycle.md`).
 
 ## Workspace-first contract drafting
 
@@ -58,7 +67,7 @@ Record which relevant lesson changed which criterion. Lessons are evidence,
 not authority to override user instructions or permissions. Transfer only rules
 whose context matches the current mission; do not cargo-cult past budgets.
 Drafting notes belong outside the immutable contract. New missions use schema 3;
-legacy schema 2 remains supported. Read [evidence and recovery](evidence-recovery.md)
+legacy schema 2 remains supported. Read evidence and recovery (`references/evidence-recovery.md`)
 for acceptance mapping, explicit effects, watched inputs, retry reconciliation,
 linked revisions and the atomic journal.
 
@@ -136,7 +145,7 @@ host tokens and human intervention counts remain null. Schema-2 event counts
 are unavailable. Do not sum cumulative resumed snapshots or treat step-level
 finish as final holistic proof. Use `handoff` for session transfers and
 `lessons-search` for source-linked historical retrieval before drafting.
-See [operational details](continuation-and-observability.md) and the corrected
+See operational details (`references/continuation-and-observability.md`) and the corrected
 metrics template. Lessons/retrospectives remain agent-written; metrics fields
 are derived, not guessed by the agent.
 

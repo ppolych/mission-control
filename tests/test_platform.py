@@ -7,8 +7,6 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 LINE_LIMIT = 400
 TEXT_SUFFIXES = {'.py', '.md', '.sh', '.json', '.yml', '.yaml', '.toml', '.txt'}
-# Temporary: the topic rewrite splits this file, then this entry must be removed.
-OVERSIZED_UNTIL_DOCS_REWRITE = {'references/commands.md': 585}
 
 
 def tracked_text_files():
@@ -43,8 +41,7 @@ class FileSizeLimit(unittest.TestCase):
             self.skipTest('needs a git checkout to list tracked files')
         for name in tracked_text_files():
             lines = len((ROOT / name).read_text(encoding='utf-8').splitlines())
-            allowed = OVERSIZED_UNTIL_DOCS_REWRITE.get(name, LINE_LIMIT)
-            self.assertLessEqual(lines, allowed, name)
+            self.assertLessEqual(lines, LINE_LIMIT, name)
 
 
 if __name__ == '__main__':

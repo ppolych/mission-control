@@ -98,7 +98,7 @@ For that new mission run `validate`, then `init`; existing contracts must not be
 weakened. New requirements need an explicit new mission revision (`revision-diff`, then
 `revise` into a separate destination). Existing schema-2 missions stay compatible. Use helper
 paths relative to this skill. Details: [workflow](references/agentic-workflow.md)
-and [CLI](references/commands.md).
+and [CLI](references/commands-lifecycle.md).
 
 ## Execution modes
 
@@ -122,7 +122,7 @@ steps remain blocked without automatic retry, including after resume; independen
 ready work may continue. Low/medium steps without `needs_approval` run without
 this gate; set it on EVERY step for full oversight. Autonomous adds no skill
 approval gates. Stop at verified completion or an explicit stop label. Details:
-[approval lifecycle and CLI](references/commands.md#controlled-mode-approval-policy).
+[approval lifecycle and CLI](references/commands-approval-recovery.md#controlled-mode-approval-policy).
 This is an agent workflow, not a scheduler or extra permission for external actions.
 `resume` from `human_abort` requires `--rationale`; use it only after the user explicitly
 asks to continue.
@@ -215,7 +215,7 @@ optional cache helpers; a cache hit never replaces current verification or conse
 
 Implementation: install the complete `scripts/` directory and root `VERSION`; the CLI requires the adjacent `mission_control/` Python package.
 
-Schema 3 may declare mission-level `allowed_paths` (e.g. `["out", "build"]`): when a contract declares allowed_paths, every step artifact path must stay inside it. Omitted or `["."]` permits the whole workspace. This validates declarations, not arbitrary commands; it does not create a sandbox. See `references/commands.md`.
+Schema 3 may declare mission-level `allowed_paths` (e.g. `["out", "build"]`): when a contract declares allowed_paths, every step artifact path must stay inside it. Omitted or `["."]` permits the whole workspace. This validates declarations, not arbitrary commands; it does not create a sandbox. See [declared artifact containment](references/commands-helpers.md#declared-artifact-containment-schema-3).
 
 Declare exact output paths in `effects.writes`. Files up to 1 MiB get SHA-256 receipts; larger files
 and directories get weaker metadata receipts; a directory over 50,000 entries, a FIFO or a symlink cannot be
@@ -226,3 +226,26 @@ Use one runtime root: `.mission/` by default. Keep contract/state, decision log,
 When continuation is unclear, read `handoff` or `diagnose`: inspect missing/unverified assessments, dependency blockers, selected mission directory and installation fingerprint. Suggestions grant no permission; respect stops, denials, recovery and budgets. A reported CLI path/fingerprint identifies the installed skill, not the Nestor UI mode.
 
 Use `handoff --compact` for a small continuation summary; request the full report when omitted steps or approval/evidence details matter. Structural indexes are report-local; re-read live evidence and authorization before work.
+
+## Reference map
+
+Read only the file a task needs. Each one is linked from here directly.
+
+| Need | Reference |
+| --- | --- |
+| Commands, contract format, checks, goal review | [lifecycle commands](references/commands-lifecycle.md) |
+| Approvals, transitions, evidence, budgets | [approval and recovery commands](references/commands-approval-recovery.md) |
+| Status, handoff, metrics, audits | [report commands](references/commands-reports.md) |
+| Stores, service health, impact, cache, containment | [helper commands](references/commands-helpers.md) |
+| Schema-3 evidence, recovery, effects, revisions | [evidence and recovery](references/evidence-recovery.md) |
+| Starting safely before project changes | [controller activation](references/controller-activation.md) |
+| Drafting, final review, lessons | [agent workflow](references/agentic-workflow.md) |
+| Mission selection, briefs, decisions | [execution context](references/execution-context.md) |
+| Progress, polling, retries | [continuation and observability](references/continuation-and-observability.md) |
+| Limits, process cleanup, circuit breakers | [reliability patterns](references/reliability-patterns.md) |
+| Evidence kinds, baselines, lesson audits | [quality and learning](references/quality-and-learning.md) |
+| Bug audits | [review rubric](references/review-quality.md) |
+| Promoting recurring lessons | [skill learnings](references/skill-learnings.md) |
+| WSL paths and setup | [WSL guidance](references/wsl.md) |
+| Design sources and limits | [research](references/research.md) |
+| Recorded test results | [operational validation](references/operational-validation.md) |
