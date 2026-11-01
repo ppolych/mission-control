@@ -53,13 +53,16 @@ def observe_tree(directory, parent, name):
         nonlocal count
         if depth > MAX_TREE_DEPTH:
             raise OverflowError('directory_too_deep')
+        items = []
         with os.scandir(fd) as entries:
-            ordered = sorted(entries, key=lambda item: item.name)
-        for item in ordered:
+            for item in entries:
+                # Apply the limit while reading, so a huge directory is never loaded whole.
+                count += 1
+                if count > MAX_TREE_ENTRIES:
+                    raise OverflowError('directory_too_large')
+                items.append(item)
+        for item in sorted(items, key=lambda entry: entry.name):
             info = item.stat(follow_symlinks=False)
-            count += 1
-            if count > MAX_TREE_ENTRIES:
-                raise OverflowError('directory_too_large')
             path = prefix + item.name
             hasher.update(json.dumps([path, info.st_mode, info.st_size, info.st_mtime_ns]).encode())
             if stat.S_ISDIR(info.st_mode):

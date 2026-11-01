@@ -28,6 +28,8 @@ MUTANTS = (
     ('circuit_never_opens', 'services.py', "if len(record['failures'])>=3 or record['until'] or retry_after:", 'if False:'),
     ('unknown_fields_allowed', 'contract.py', "    if names:\n        raise ValueError('unknown contract fields", "    if False:\n        raise ValueError('unknown contract fields"),
     ('stale_failure_accepted', 'recovery.py', "if not entry.get('failed_verification'):", 'if False:'),
+    ('corrective_retry_ignores_network', 'recovery.py', "if report['external_result'] != 'not_declared' or not step['effects']['reversible']:", "if step['effects']['external_actions'] or not step['effects']['reversible']:"),
+    ('tree_limit_after_full_read', 'observations.py', "                if count > MAX_TREE_ENTRIES:\n                    raise OverflowError('directory_too_large')\n                items.append(item)", "                items.append(item)\n        if count > MAX_TREE_ENTRIES:\n            raise OverflowError('directory_too_large')"),
     ('repeat_without_lock', 'cli_aux.py', "with persistent_lock(path.with_name(path.name + '.lock'), wait=REPEAT_LOCK_WAIT_SECONDS):", 'if True:'),
 )
 # A second identical check guards these, so one removal changes no behavior.
@@ -71,6 +73,10 @@ def main():
     parser.add_argument('--jobs', type=int, default=min(4, os.cpu_count() or 1))
     parser.add_argument('--only', action='append', help='run only this mutant; repeatable')
     args = parser.parse_args()
+    known = {mutant[0] for mutant in MUTANTS}
+    unknown = sorted(set(args.only or ()) - known)
+    if unknown:
+        parser.error('unknown mutant: ' + ', '.join(unknown))
     selected = [mutant for mutant in MUTANTS if not args.only or mutant[0] in args.only]
     names = tracked_files()
     with ThreadPoolExecutor(args.jobs) as pool:

@@ -291,7 +291,7 @@ Regressions live in tests/test_review_fixes.py and tests/test_bug_fixes.py. Rand
 drafts (validate, init --contract, revise, revision-diff), never on frozen contracts.
 Read-only reports take no lock but still refuse a non-regular `.lock` entry. Lock
 contention raises `LockBusy`, an OSError. `applied_incorrect` requires a failed
-verification and refuses external or irreversible effects. Metadata receipts apply
+verification and refuses network, external or irreversible effects. Metadata receipts apply
 only to declared writes and file evidence refs; watched inputs stay exact-hash because
 they bind approvals. `done_verified` keeps its timing for compatibility: expose a
 missing review through `goal_review_status` instead of moving the label.

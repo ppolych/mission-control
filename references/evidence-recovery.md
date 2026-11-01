@@ -104,7 +104,8 @@ Resolution is an explicit recorded judgment tied to the current report digest:
 - `completed`: allow checks-only revalidation, without marking the step complete.
 - `not_applied`: allow a normal execution attempt within the existing budget.
 - `applied_incorrect`: only when the latest attempt failed verification, allow a budgeted corrective
-  attempt; refused when the step declares external actions or irreversible effects.
+  attempt; refused when the step declares network access, external actions or
+  irreversible effects, because the external result is unknown.
 - `partial` or `unknown`: remain blocked for recovery; return 1, without retry.
 
 Missing/stale digest or unavailable file observations reject resolved outcomes
@@ -144,7 +145,7 @@ preflights do not provide filesystem race isolation or a sandbox.
 Declared writes and `file:` evidence refs are the exception for size and type. A larger
 regular file gets `kind: metadata` (size, mtime, ctime, mode). A directory gets
 `kind: directory`, a no-follow manifest of each entry's path, mode, size and mtime,
-limited to 50,000 entries and 64 levels. Both detect ordinary rebuilds but are weaker
+limited to 50,000 entries and 64 levels; reading stops at the limit. Both detect ordinary rebuilds but are weaker
 than SHA-256: an edit preserving all recorded metadata goes unnoticed. Symlinks, FIFOs
 and over-limit trees stay unavailable and need a contract revision. Watched inputs
 always use exact hashes because they bind approvals.

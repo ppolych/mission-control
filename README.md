@@ -87,7 +87,7 @@ After an explicit refusal, run `deny` with the same arguments instead (returns 1
 - Verification receipts go stale when declared outputs or watched inputs change. Files over 1 MiB and directories get metadata receipts, which are weaker than SHA-256. Watched inputs stay exact-hash.
 - `validate`, `init`, `revise` and `revision-diff` refuse unknown contract and step fields, so a misspelled `needs_approval` cannot remove a gate. Prefix comments with `_`.
 - Step `verify_timeout` (up to 86400 seconds) overrides `VERIFY_TIMEOUT`, whose default is 60. Timeouts count as failures.
-- After a failed verification of reversible work, `recover --resolution applied_incorrect` allows a budgeted corrective attempt. Uncertain outcomes stay blocked until reconciled.
+- After a failed verification of reversible work with no network access or external actions, `recover --resolution applied_incorrect` allows a budgeted corrective attempt. Uncertain outcomes stay blocked until reconciled.
 - `finish` sets `done_verified` before the required goal review. `status`, `handoff` and `diagnose` report `goal_review_status` until it is recorded.
 - A hash-linked transition journal commits atomically with each schema-3 checkpoint. It is unkeyed local evidence, not an authenticated audit log.
 - Everything depends on the agent following the workflow. These prompts install no host hook, and reviews are recorded judgments.

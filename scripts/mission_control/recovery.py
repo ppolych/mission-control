@@ -46,9 +46,9 @@ def reconcile_recovery(contract, state, step, args):
         # Only a failure of the latest attempt counts; older failures describe older work.
         if not entry.get('failed_verification'):
             raise ValueError('applied_incorrect requires a failed verification; inspect interrupted work and use another resolution')
-        effects = step['effects']
-        if effects['external_actions'] or not effects['reversible']:
-            raise ValueError('applied_incorrect refuses external or irreversible effects; a corrective attempt could repeat them')
+        # An unknown external result cannot justify repeating the work.
+        if report['external_result'] != 'not_declared' or not step['effects']['reversible']:
+            raise ValueError('applied_incorrect refuses network, external or irreversible effects; a corrective attempt could repeat them')
     resolved = args.resolution in ('completed', 'not_applied', 'applied_incorrect')
     if resolved and any(f['classification'] == 'unavailable' for f in report['files'].values()):
         raise ValueError('unavailable files require inspection; recovery cannot be declared resolved')

@@ -173,6 +173,62 @@ class AppliedIncorrectEvidence(Base):
         self.assertTrue(any(record.get('evidence') for record in entry['history']))
 
 
+class AppliedIncorrectNetwork(Base):
+    def test_network_effects_are_refused_as_uncertain(self):
+        for network in ('external', 'self_hosted'):
+            with self.subTest(network=network):
+                mission = 'mission-' + network
+                data = contract(['a.txt'], [('grep', 'good', 'a.txt')])
+                data['steps'][0]['effects']['network'] = network
+                (self.root / 'contract.json').write_text(json.dumps(data))
+                self.assertEqual(self.call('init', '--mission', mission, '--contract', 'contract.json').returncode, 0)
+                self.call('start', '--mission', mission, '--step', 's1')
+                (self.root / 'a.txt').write_text('bad\n')
+                self.assertEqual(self.call('verify', '--mission', mission, '--step', 's1').returncode, 1)
+                report = json.loads(self.call('recovery', '--mission', mission, '--step', 's1').stdout)
+                self.assertEqual(report['external_result'], 'unknown')
+                result = self.call('recover', '--mission', mission, '--step', 's1', '--digest', report['digest'],
+                                   '--resolution', 'applied_incorrect', '--rationale', 'r')
+                self.assertEqual(result.returncode, 2)
+                self.assertIn('network', result.stderr)
+                (self.root / 'a.txt').unlink()
+
+
+class DirectoryObservationLimit(unittest.TestCase):
+    def test_scan_stops_at_the_entry_limit(self):
+        from mission_control import observations
+        original = os.scandir
+        seen = []
+        class CountingScan:
+            def __init__(self, fd):
+                self.inner = original(fd)
+            def __enter__(self):
+                return self
+            def __exit__(self, *details):
+                self.inner.close()
+            def __iter__(self):
+                for item in self.inner:
+                    seen.append(item.name)
+                    yield item
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            (root / 'build').mkdir()
+            for index in range(20):
+                (root / 'build' / str(index)).touch()
+            with patch.object(observations, 'MAX_TREE_ENTRIES', 3), patch.object(os, 'scandir', CountingScan):
+                value = observations.observe_artifact(str(root), 'build')
+        self.assertEqual(value, {'status': 'unavailable', 'reason': 'directory_too_large'})
+        self.assertLessEqual(len(seen), 4)
+
+
+class MutationRunnerInput(unittest.TestCase):
+    def test_unknown_mutant_is_refused(self):
+        result = subprocess.run([sys.executable, str(ROOT / 'evals/mutation_check.py'), '--only', 'typo_unknown_mutant'],
+                                capture_output=True, text=True)
+        self.assertEqual(result.returncode, 2, result.stdout)
+        self.assertIn('typo_unknown_mutant', result.stderr)
+
+
 class StoredContract(Base):
     def test_fifo_contract_is_refused_without_hanging(self):
         self.init(contract())

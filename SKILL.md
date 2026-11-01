@@ -156,7 +156,7 @@ use `recovery`, inspect both files and external outcomes, then `recover` with
 the current report digest and an evidence-linked resolution. `completed` permits
 checks-only revalidation; `not_applied` permits a budgeted attempt; `partial` or
 `unknown` stays blocked. After a failed verification of reversible work with no
-external actions, use `applied_incorrect` to spend a budgeted corrective attempt;
+network access or external actions, use `applied_incorrect` to spend a budgeted corrective attempt;
 do not record `not_applied` for work that did happen. Never infer completion from a changed file hash.
 
 After step verification, use `coverage` and `criterion-review` with evidence
