@@ -2,6 +2,10 @@
 
 Test results for each release are in [the validation record](references/operational-validation.md).
 
+## 0.4.2.7
+
+No behavior change. Removes a leftover line in `AGENTS.md` that contradicted bumping the version with every change.
+
 ## 0.4.2.6
 
 No behavior change. Records the real Nestor run on 0.4.2.5, and every committed change now gets its own version, so an installed number identifies its content.

@@ -46,7 +46,7 @@ Where the code lives in `scripts/mission_control/`:
 
 ## Project Structure & Module Organization
 
-Mission Control 0.4.2.6 is a Nestor orchestration skill with a Python core and Bash entrypoints.
+Mission Control 0.4.2.7 is a Nestor orchestration skill with a Python core and Bash entrypoints.
 
 - `VERSION` is the canonical release; keep skill metadata consistent. Contract schemas 2 and 3 are separate from the release version.
 - `SKILL.md` is the concise agent entrypoint; workflow details belong in `references/`.
@@ -165,8 +165,8 @@ Use imperative subjects; describe behavior, validation, and limitations. Exclude
 
 ## Operational Helpers
 
-Version is 0.4.2.6. Every committed change gets the next 0.4.2.x, by explicit author instruction. Keep VERSION, skill metadata
-and current documentation consistent; do not bump it again without permission. Keep metrics/handoff/search/impact read-only and all helpers dependency-free.
+Version is 0.4.2.7. Every committed change gets the next 0.4.2.x, by explicit author instruction. Keep VERSION, skill metadata
+and current documentation consistent. Keep metrics/handoff/search/impact read-only and all helpers dependency-free.
 Store publication and service observations may update only explicitly selected
 auxiliary files under persistent locks; they grant no lifecycle permissions. Search only
 a known bounded lessons scope, with no-follow regular-file reads and source

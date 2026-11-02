@@ -1,4 +1,4 @@
-# Skill Learnings — Mission Control 0.4.2.6
+# Skill Learnings — Mission Control 0.4.2.7
 
 This is the skill-level evidence register, separate from per-mission lessons.
 No five-mission batch has been reviewed in this repository yet. Unit tests and
