@@ -97,7 +97,10 @@ Optionally declare evidence_kinds per acceptance item; the new template requires
 content evidence. Use [quality guidance](references/quality-and-learning.md) for
 behavioral baselines, sufficiency gaps, diagnosis, lesson audits and analysis cache.
 Map acceptance IDs to steps; declare exact effects, watched inputs and retry
-policy. Read [schema-3 evidence and recovery](references/evidence-recovery.md)
+policy. The template sets `discipline: strict`: a step that writes declares
+`test_first`, or `test_first_exempt` with a reason. Choose in proportion to the task
+using the [development method](references/development-method.md); [strict discipline](references/strict-discipline.md)
+states what is enforced, what is a heuristic and what is only an agent statement. Read [schema-3 evidence and recovery](references/evidence-recovery.md)
 when drafting, reconciling interruptions, or creating revisions.
 For that new mission run `validate`, then `init`; existing contracts must not be overwritten or
 weakened. New requirements need an explicit new mission revision (`revision-diff`, then
@@ -246,6 +249,8 @@ Read only the file a task needs. Each one is linked from here directly.
 | Status, handoff, metrics, audits | [report commands](references/commands-reports.md) |
 | Stores, service health, impact, cache, containment | [helper commands](references/commands-helpers.md) |
 | Schema-3 evidence, recovery, effects, revisions | [evidence and recovery](references/evidence-recovery.md) |
+| `discipline: strict`, `red`, `scope-note`, `gate`, pre-push hook | [strict discipline](references/strict-discipline.md) |
+| Splitting steps, choosing tests, review in proportion to risk | [development method](references/development-method.md) |
 | Starting safely before project changes | [controller activation](references/controller-activation.md) |
 | Drafting, final review, lessons | [agent workflow](references/agentic-workflow.md) |
 | Mission selection, briefs, decisions | [execution context](references/execution-context.md) |

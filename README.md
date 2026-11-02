@@ -91,6 +91,7 @@ After an explicit refusal, run `deny` with the same arguments instead (returns 1
 - `finish` sets `done_verified` before the required goal review. `status`, `handoff` and `diagnose` report `goal_review_status` until it is recorded.
 - A hash-linked transition journal commits atomically with each schema-3 checkpoint. It is unkeyed local evidence, not an authenticated audit log.
 - Everything depends on the agent following the workflow. These prompts install no host hook, and reviews are recorded judgments.
+- `discipline: strict` makes the controller refuse more, but it is not a sandbox. Git observations and the optional pre-push `gate` hook can be bypassed, and they do not show who made a change. See [strict discipline](references/strict-discipline.md).
 
 Details: [evidence and recovery](references/evidence-recovery.md).
 

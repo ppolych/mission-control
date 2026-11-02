@@ -89,6 +89,20 @@ class ApprovalReplyRules(unittest.TestCase):
             self.assertIn(phrase, text)
 
 
+class SkillSize(unittest.TestCase):
+    def test_skill_stays_under_the_size_kept_after_compaction(self):
+        self.assertLess((ROOT / 'SKILL.md').stat().st_size, 20000)
+
+
+class StrictDisciplineDocs(unittest.TestCase):
+    def test_boundaries_are_stated(self):
+        text = ' '.join((ROOT / 'references/strict-discipline.md').read_text(encoding='utf-8').split())
+        for phrase in ('Nothing here is a sandbox', 'not who changed it', 'never `passed`', 'never installed automatically',
+                       'does not work as a server-side hook', 'not that the intended assertion failed',
+                       'manual_evidence_only: agent assessment, not automated verification'):
+            self.assertIn(phrase, text)
+
+
 class KnownCorrections(unittest.TestCase):
     def all_commands(self):
         return ''.join(path.read_text(encoding='utf-8') for path in REFERENCES if path.name.startswith('commands-'))

@@ -32,6 +32,8 @@ Documentation for other products named Nestor, Cursor or Claude is not evidence
 of compatibility with this Desktop build.
 
 No mission.py guard or Nestor adapter is added against an unverified interface.
+The `gate` command and optional pre-push hook are host-independent checks on a commit; they
+are not a Nestor adapter and stop nothing before a tool runs.
 If a supported pre-tool interface becomes available, document its event schema,
 path semantics, denial behavior and explicit enablement before implementing one.
 It must remain disabled unless explicitly selected by the operator.

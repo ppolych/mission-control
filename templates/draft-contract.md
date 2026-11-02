@@ -32,6 +32,9 @@ a new CLI command, approval gate, or part of the frozen JSON schema.
 - Combined-outcome criterion or final goal-check step:
 - Any genuinely consequential missing requirement, with proposed default:
 
+- For each writing step: `test_first`, or `test_first_exempt` with a one-line reason:
+- What is still unclear in this contract, and which failure would no check catch? (Use a fresh reader in proportion to risk.)
+
 ## 5. Which checks can safely rerun?
 
 - Exact argv checks, manual rubrics, and evidence locations per step:

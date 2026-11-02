@@ -285,6 +285,10 @@ existing permissions; do not add routine approval gates or auto-resume on contex
 refresh. Details: references/controller-activation.md. No host hook is implied.
 
 
+## Strict Discipline
+
+`discipline: strict` is an optional schema-3 field; contracts without it keep their behavior and frozen contracts are not upgraded. Details: references/strict-discipline.md. Keep these true: git observation never claims who changed a path, ownership stays unverified, and nothing is ever reverted automatically. An unavailable scope check is reported as not performed, never as passed. `gate` stays read-only and only passes content a receipt can prove. Red/green records facts, not test quality, and never asks for work to be undone. Regressions: tests/test_discipline.py, test_test_first.py, test_scope_check.py, test_gate.py, test_gate_refs.py.
+
 ## Usability and Recovery Rules
 
 Regressions live in tests/test_review_fixes.py and tests/test_bug_fixes.py. Random lifecycle invariants live in tests/test_lifecycle_random.py, whose deep-state test keeps sequences from passing vacuously. `evals/mutation_check.py` breaks safety invariants one at a time and every mutant must be caught; run it after changing safety code. Refusals commit only when state changes, and `start` archives previous evidence. `applied_incorrect` depends on `failed_verification`, set by the latest attempt only. Strict field checks run only on new

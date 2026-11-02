@@ -15,6 +15,12 @@
 
 The command list, contract format, checks, initialization, goal review and migration.
 
+## Strict commands
+
+`red --step STEP`, `test-first-note --step STEP --reason TEXT`, `verify --already-satisfied --rationale TEXT` and
+`scope-note --path P --disposition D --rationale TEXT` apply to contracts with `discipline: strict`. Their rules
+are in the strict discipline reference.
+
 ## Command list
 
 Run `python3 "$SKILL/scripts/mission.py" COMMAND --mission PATH`. `--help` lists every command and flag.

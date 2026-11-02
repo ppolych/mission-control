@@ -101,6 +101,11 @@ local to each call and shared by coverage/traceability in evidence-audit. They
 store structural relationships only, not file hashes or mutable authorization.
 Existing fresh observations and receipt checks remain unchanged.
 
+## Commit gate
+
+`gate [--commit SHA]` is read-only and compares a commit with the recorded evidence. It exits 0, 1 or 2, and is
+not a sandbox. Its tables are in the strict discipline reference.
+
 ## Report behavior
 
 Reports (`status`, `history`, `metrics`, `handoff`, `coverage`, `recovery`, `diagnose`,
