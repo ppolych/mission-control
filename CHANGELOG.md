@@ -2,6 +2,13 @@
 
 Test results for each release are in [the validation record](references/operational-validation.md).
 
+## 0.4.2.3
+
+In a real Nestor session, an agent committed work with no mission, was stopped by the pre-push hook, then started a mission on that commit and recorded it as already satisfied. `gate` certified it and the push passed, without `--no-verify`.
+
+- `gate --commit SHA --remote-sha SHA` refuses a push carrying the mission's base or earlier commits. The pre-push hook passes the flag, so existing copies of the hook need replacing. A first push, with no remote-tracking refs, cannot tell earlier commits apart.
+- `gate --commit` refuses a path that a `no_change` step claims was already satisfied but that differs from the base, which covers uncommitted work from before the mission.
+
 ## 0.4.2.2
 
 A real Nestor session under time pressure loaded the skill and then skipped the mission, citing the small size of the task.

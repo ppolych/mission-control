@@ -103,7 +103,7 @@ Existing fresh observations and receipt checks remain unchanged.
 
 ## Commit gate
 
-`gate [--commit SHA]` is read-only and compares a commit with the recorded evidence. It exits 0, 1 or 2, and is
+`gate [--commit SHA [--remote-sha SHA]]` is read-only and compares a commit with the recorded evidence. It exits 0, 1 or 2, and is
 not a sandbox. Its tables are in the strict discipline reference.
 
 ## Report behavior

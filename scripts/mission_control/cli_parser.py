@@ -1,5 +1,6 @@
 """Command-line definition for the Mission Control controller."""
 import argparse
+import re
 
 COMMAND_GROUPS = (
     ('Lifecycle', ('validate', 'init', 'start', 'red', 'test-first-note', 'assess', 'verify', 'block', 'stop', 'resume',
@@ -41,6 +42,7 @@ FLAGS = (
     ('--disposition', {'choices': ['mine', 'not_mine', 'unknown'],
                        'help': 'scope-note: a recorded statement about an observed path, not proof'}),
     ('--commit', {'help': 'gate: commit to compare with the recorded evidence'}),
+    ('--remote-sha', {'help': 'gate: commit the remote has for this ref, all zeros for a new ref; refuses work older than the mission'}),
     ('--lessons-root', {'help': 'known lessons directory to search'}),
     ('--query', {'action': 'append', 'help': 'search or analysis query'}),
     ('--limit', {'type': int, 'default': 10, 'help': 'maximum search results'}),
@@ -94,6 +96,8 @@ def reject_misplaced_flags(args):
         raise ValueError('--already-satisfied is only for verify')
     if args.commit and args.command != 'gate':
         raise ValueError('--commit is only for gate')
+    if args.remote_sha is not None and (args.command != 'gate' or not args.commit or not re.fullmatch(r'[0-9a-f]{40}|[0-9a-f]{64}', args.remote_sha)):
+        raise ValueError('--remote-sha is only for gate --commit and must be a full commit hash')
     if args.digest and args.command not in ('approve', 'deny', 'recover'):
         raise ValueError('--digest is only for approve, deny or recover')
     if args.contract and args.command not in ('init', 'validate', 'revise', 'revision-diff'):

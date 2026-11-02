@@ -56,6 +56,8 @@ MUTANTS = (
     ('gate_allows_rewritten_base', 'gate.py', "if run_git(workspace, 'merge-base', '--is-ancestor', start, commit, ok=(0, 1)).returncode:", 'if False:'),
     ('gate_follows_links', 'gate.py', "if mode in ('120000', '160000') or depth == len(parts):", 'if depth == len(parts):'),
     ('gate_no_mission_passes', 'cli.py', "print(json.dumps(no_mission_report(), indent=2))\n        return 1", "print(json.dumps(no_mission_report(), indent=2))\n        return 0"),
+    ('gate_allows_earlier_commits', 'gate.py', "    if remote_sha is not None:\n", "    if False:\n"),
+    ('gate_allows_no_change_work', 'gate.py', "    if paths:\n        return [{'reason': 'no_change_step_changed_path'", "    if False:\n        return [{'reason': 'no_change_step_changed_path'"),
     ('external_check_allowed', 'discipline.py', "    if not has_outside_effect(step):\n        return\n", "    return\n"),
     ('repeat_without_lock', 'cli_aux.py', "with persistent_lock(path.with_name(path.name + '.lock'), wait=REPEAT_LOCK_WAIT_SECONDS):", 'if True:'),
 )

@@ -17,7 +17,7 @@ def run_report(contract, state, args, root):
     command = args.command
     if command == 'gate':
         from .gate import gate_report
-        code, report = gate_report(contract, state, args.commit, root)
+        code, report = gate_report(contract, state, args.commit, root, args.remote_sha)
         print(json.dumps(report, indent=2))
         return code
     if command == 'evidence-audit':

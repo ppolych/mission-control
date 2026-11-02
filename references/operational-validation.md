@@ -16,7 +16,7 @@
 - [Performance measurement](#performance-measurement)
 
 Initial operational run: 2026-10-31, release **0.3.1**. Later release records
-are appended below; current release is **0.4.2.2**.
+are appended below; current release is **0.4.2.3**.
 No contract schema, default mode, approval, recovery or attempt-budget policy
 was changed. The additions are `metrics`, `handoff`, bounded `lessons-search`,
 and prompt guidance for progress/waits, safe polling and evidence-based review.
@@ -298,4 +298,12 @@ Real Nestor runs on 0.4.2.1 that led to this release, with `qwen3-6-coder-gefion
 
 One real Nestor session then ran with 0.4.2.2, with the same model, request and reviewer, on a new neutral path. It ran the short path with red before the edit, through verify, finish and goal review, and the journal shows that flow within 28 seconds. Of its 23 minutes and 324 thousand tokens, about 21 minutes were one `find /` looking for the skill directory, because the host reports a Windows path to a WSL shell. The later fix in `SKILL.md` and `references/wsl.md` has not been run in a real session. One run does not show the rule holds under other pressure, and the request named the skill.
 
-Not run: macOS and four prepared cases in `evals/discipline_trials.py`.
+A later real session with 0.4.2.2 at commit 2a8c913 used `wslpath`, ran no `find /`, kept red before the edit, and took 117 seconds and 333 thousand tokens. In a further session with the `no_controller_call` request on a neutral path, the agent announced skipping the mission before changing anything, and the hook refused its push. No `--no-verify` was used. After the operator stopped a stuck question and replied "Your choice.", it started a mission on the existing commit and recorded it as already satisfied, and `gate` certified it and the push passed. That gap led to 0.4.2.3.
+
+Not run: macOS and three prepared cases in `evals/discipline_trials.py`.
+
+## Release 0.4.2.3 verification
+
+`check_all.sh` passed on Linux 6.18.54.1-microsoft-standard-WSL2 with Python 3.14.4: 549 tests in 167.326 seconds, then 549 tests in 155.880 seconds with a symlinked TMPDIR, plus behavioral probes, template and shell checks and package smoke checks (148 entries). `mutation_check.py`: 47 of 47 caught.
+
+Not run: macOS, three prepared cases in `evals/discipline_trials.py`, and any real session with 0.4.2.3.

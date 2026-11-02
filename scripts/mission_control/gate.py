@@ -121,6 +121,42 @@ def resolve_commit(workspace, value):
     return text(run_git(workspace, 'rev-parse', '--verify', '-q', value + '^{commit}', ok=(0, 1))) or None
 
 
+def pushed_range_problems(contract, state, workspace, commit, prefix, remote_sha):
+    """A push may carry only commits after the base; the base itself must already be on the remote."""
+    base = state.get('mission_base', {})
+    if base.get('status') != 'commit':
+        return []
+    start = base['commit']
+    if not remote_sha.strip('0'):
+        if not text(run_git(workspace, 'for-each-ref', '--count=1', 'refs/remotes')):
+            empty = text(run_git(workspace, 'hash-object', '-t', 'tree', '--stdin'))
+            names = null_separated(run_git(workspace, 'diff', '--name-only', '-z', '--no-renames', '--no-ext-diff', empty, commit))
+            return no_change_problems(contract, state, names, prefix)
+        if text(run_git(workspace, 'for-each-ref', '--count=1', '--contains', start, 'refs/remotes')):
+            return []
+    elif run_git(workspace, 'cat-file', '-e', remote_sha + '^{commit}', ok=(0, 1, 128)).returncode:
+        return [{'reason': 'remote_commit_unknown', 'detail': 'The remote commit is not available here, so the pushed range cannot be judged.'}]
+    elif not run_git(workspace, 'merge-base', '--is-ancestor', start, remote_sha, ok=(0, 1)).returncode:
+        return []
+    return [{'reason': 'commits_before_mission', 'base': start,
+             'detail': 'This push carries the recorded base or earlier commits, which were made before the mission began.'}]
+
+
+def no_change_problems(contract, state, names, prefix):
+    """A path a no-change step claims was already satisfied cannot also be new since the base."""
+    from .scope_check import covered
+    changed, unchanged = set(), set()
+    for step in contract['steps']:
+        outcome = state['steps'].get(step['id'], {}).get('discipline_outcome', {}).get('outcome')
+        (unchanged if outcome == 'no_change' else changed).update(step['effects']['writes'])
+    paths = sorted(name for name in names if name.startswith(prefix) and covered(name[len(prefix):], unchanged)
+                   and not covered(name[len(prefix):], changed))
+    if paths:
+        return [{'reason': 'no_change_step_changed_path', 'paths': paths, 'ownership': 'unverified',
+                 'detail': 'A step recorded no change, but these paths differ from the recorded base, so the work predates its verification.'}]
+    return []
+
+
 def range_problems(contract, state, workspace, commit, prefix, root):
     from .scope_check import covered, excluded, mission_relative
     base = state.get('mission_base', {})
@@ -136,15 +172,16 @@ def range_problems(contract, state, workspace, commit, prefix, root):
     names = null_separated(run_git(workspace, 'diff', '--name-only', '-z', '--no-renames', '--no-ext-diff', start, commit))
     writes = declared_writes(contract)
     mission = mission_relative(root, workspace)
+    problems = no_change_problems(contract, state, names, prefix)
     outside = []
     for name in names:
         relative = name[len(prefix):] if name.startswith(prefix) else None
         if relative is None or not (covered(relative, writes) or excluded(relative, mission)):
             outside.append(name)
     if outside:
-        return [{'reason': 'outside_scope', 'paths': sorted(outside), 'ownership': 'unverified',
-                 'detail': 'Paths changed since the recorded base are not declared writes; who changed them is unknown.'}]
-    return []
+        problems.append({'reason': 'outside_scope', 'paths': sorted(outside), 'ownership': 'unverified',
+                         'detail': 'Paths changed since the recorded base are not declared writes; who changed them is unknown.'})
+    return problems
 
 
 def scope_summary(contract, state):
@@ -199,7 +236,7 @@ def no_mission_report():
                        scope_check={'status': 'not_performed'})
 
 
-def gate_report(contract, state, commit_value, root):
+def gate_report(contract, state, commit_value, root, remote_sha=None):
     """Return (exit code, report); exit 2 comes from raised errors, never from a refusal."""
     from .discipline import is_strict
     if not is_strict(contract):
@@ -221,6 +258,8 @@ def gate_report(contract, state, commit_value, root):
         problems.append({'reason': 'scope_check_not_performed', 'steps': scope['steps'],
                          'detail': 'The scope check did not complete, so it cannot count as passed.'})
     problems.extend(range_problems(contract, state, workspace, commit, prefix, root))
+    if remote_sha is not None:
+        problems.extend(pushed_range_problems(contract, state, workspace, commit, prefix, remote_sha))
     receipts = latest_receipts(contract, state)
     uncommitted = declared_uncommitted(contract)
     artifacts = []

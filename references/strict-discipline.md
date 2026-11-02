@@ -186,7 +186,9 @@ large file keeps only size and times, so neither can prove content.
 
 When several steps write a path, the latest receipt decides.
 
-The range is always judged from the base recorded at `init`, never from the remote.
+The range is judged from the base recorded at `init`. With `--remote-sha`, which the hook passes, `gate` also
+refuses a push carrying the base or earlier commits, because that work predates the mission. Without the flag it
+does not look at the remote, so a person or script running `gate --commit` alone does not get this check.
 
 | Case | Behavior |
 |---|---|
@@ -194,6 +196,10 @@ The range is always judged from the base recorded at `init`, never from the remo
 | Base is not an ancestor, as after a rebase | `base_not_ancestor`, with no fallback to a merge base |
 | Base object missing, as in a shallow clone | Exit 2 |
 | No recorded base | `no_base` |
+| A `no_change` step's write differs from the base, as for uncommitted work from before the mission | `no_change_step_changed_path` |
+| With `--remote-sha`: the base is not on the remote | `commits_before_mission`, even for an old unrelated commit |
+| With `--remote-sha`: that commit is not available locally | `remote_commit_unknown` |
+| With `--remote-sha`: first push, with no remote-tracking refs | Allowed, except `no_change_step_changed_path`. Earlier commits cannot be told apart here |
 | Repository had no commits at `init` | Compared with the empty tree |
 | Merge commit | Same rule on the final tree; bringing in other paths is `outside_scope` |
 | Annotated tag | Its commit is judged; a tag of anything else is `not_a_commit` |

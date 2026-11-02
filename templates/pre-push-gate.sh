@@ -31,7 +31,7 @@ while read -r _ local_sha remote_ref remote_sha; do
       fi
       ;;
   esac
-  if ! python3 "$mission_py" gate --mission "$mission_dir" --commit "$local_sha" >&2; then
+  if ! python3 "$mission_py" gate --mission "$mission_dir" --commit "$local_sha" --remote-sha "$remote_sha" >&2; then
     echo "mission gate: $remote_ref not certified for $local_sha" >&2
     failed=1
   fi
