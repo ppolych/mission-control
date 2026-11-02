@@ -16,7 +16,7 @@
 - [Performance measurement](#performance-measurement)
 
 Initial operational run: 2026-10-31, release **0.3.1**. Later release records
-are appended below; current release is **0.4.1**.
+are appended below; current release is **0.4.2**.
 No contract schema, default mode, approval, recovery or attempt-budget policy
 was changed. The additions are `metrics`, `handoff`, bounded `lessons-search`,
 and prompt guidance for progress/waits, safe polling and evidence-based review.
@@ -271,3 +271,9 @@ The final 0.4.0 check_all.sh run also passed: 353 tests with 200 lifecycle seeds
 ## Release 0.4.1 verification
 
 The author authorized release 0.4.1. `check_all.sh` passed on Linux 7.0.0-34-generic with Python 3.14.4: 368 tests in 115.201 seconds, then 368 tests in 94.857 seconds with a symlinked TMPDIR, plus behavioral probes, template and shell checks and extracted-package smoke. No macOS or real Nestor run was made for this release.
+
+## Release 0.4.2 verification
+
+Before the version bump, `check_all.sh` passed on Linux 7.0.0-34-generic with Python 3.14.4: 514 tests in 168.830 seconds, then 514 tests in 149.051 seconds with a symlinked TMPDIR, plus behavioral probes, template and shell checks and packaging. `mutation_check.py` caught 44 of 44 mutants.
+
+Not run: macOS, a real agent model, and every case in `evals/discipline_trials.py`. The real-Nestor acceptance case is **not run** until a real session has run and its trace has been reviewed. The practical effect of strict discipline on agent behavior is unmeasured.

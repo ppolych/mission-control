@@ -2,14 +2,14 @@
 name: mission-control
 description: Orchestrate substantial multi-step goals with durable mission state, evidence-based verification, bounded recovery, and explicit outcomes. Use for controlled, autonomous, or multi-session work; exclude simple edits and quick questions.
 metadata:
-  version: "0.4.1"
+  version: "0.4.2"
   author: "Panos Polychronis"
   email: "ppolych@netcompany.com"
 ---
 
 # Mission Control
 
-Version 0.4.1. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
+Version 0.4.2. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
 or macOS. For WSL paths and setup, read [WSL guidance](references/wsl.md).
 Preserve the user's scope, existing authorization, and host permissions.
 

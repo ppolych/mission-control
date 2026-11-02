@@ -2,6 +2,17 @@
 
 Test results for each release are in [the validation record](references/operational-validation.md).
 
+## 0.4.2
+
+Add optional `discipline: strict` in schema 3, enabled in the template. Contracts without it keep their behavior, and frozen contracts are not upgraded.
+
+- `verify` refuses a step whose declared writes never changed, and `--already-satisfied` records a valid no-change outcome.
+- `red` and `test-first-note` record red/green evidence. A match is evidence, not proof, and nothing asks for work to be undone.
+- Git-based observation of changes outside declared writes, with unverified ownership, and `scope-note` for recorded statements.
+- Read-only `gate --commit` and an optional pre-push hook template. These are not a sandbox and do not show who wrote a commit.
+- `manual_only` makes a step without automated checks explicit, and its result is labelled as agent assessment.
+- New development method and strict discipline references, a review brief and strict trial cases.
+
 ## 0.4.1
 
 - Report `next_action` in `status`, `handoff` and `diagnose`, and print it on stderr after transitions. It is advisory.
