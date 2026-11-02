@@ -2,14 +2,14 @@
 name: mission-control
 description: Orchestrate substantial multi-step goals with durable mission state, evidence-based verification, bounded recovery, and explicit outcomes. Use for controlled, autonomous, or multi-session work; exclude simple edits and quick questions.
 metadata:
-  version: "0.3.3"
+  version: "0.4.0"
   author: "Panos Polychronis"
   email: "ppolych@netcompany.com"
 ---
 
 # Mission Control
 
-Version 0.3.3. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
+Version 0.4.0. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
 or macOS. For WSL paths and setup, read [WSL guidance](references/wsl.md).
 Preserve the user's scope, existing authorization, and host permissions.
 
@@ -249,3 +249,5 @@ Read only the file a task needs. Each one is linked from here directly.
 | WSL paths and setup | [WSL guidance](references/wsl.md) |
 | Design sources and limits | [research](references/research.md) |
 | Recorded test results | [operational validation](references/operational-validation.md) |
+
+Read [Nestor integration](references/nestor-integration.md) when installing or assessing host enforcement. The inspected Nestor build exposes no supported configurable pre-tool hook: no adapter/guard is installed. Shell writes remain outside enforcement; a hook alone would not prevent self-approval.

@@ -8,6 +8,7 @@
 - [Post-split five-pass audit (unchanged 0.3.2)](#post-split-five-pass-audit-unchanged-032)
 - [Optional allowed_paths at unchanged 0.3.2](#optional-allowed_paths-at-unchanged-032)
 - [Five-pass containment compatibility review (unchanged 0.3.2)](#five-pass-containment-compatibility-review-unchanged-032)
+- [Release validation](#release-validation)
 - [Release 0.3.3 verification](#release-033-verification)
 - [Earlier baseline records moved from AGENTS.md](#earlier-baseline-records-moved-from-agentsmd)
 - [Six optimizations at unchanged 0.3.3](#six-optimizations-at-unchanged-033)
@@ -15,7 +16,7 @@
 - [Performance measurement](#performance-measurement)
 
 Initial operational run: 2026-10-31, release **0.3.1**. Later release records
-are appended below; current release is **0.3.3**.
+are appended below; current release is **0.4.0**.
 No contract schema, default mode, approval, recovery or attempt-budget policy
 was changed. The additions are `metrics`, `handoff`, bounded `lessons-search`,
 and prompt guidance for progress/waits, safe polling and evidence-based review.
@@ -241,3 +242,24 @@ to `CHANGELOG.md`, every reference is linked directly from `SKILL.md`, and refer
 lines open with contents. `tests/test_docs.py` enforces these rules. The README dropped from
 366 to 136 lines. Total documentation fell only modestly, from 26,946 to about 26,100 words,
 because invariants were kept rather than summarized away.
+
+
+## Release validation
+
+The author authorized release 0.4.0. Before updating version metadata, check_all.sh
+passed on Linux 6.18.54.1-microsoft-standard-WSL2 with Python 3.14.4 and system zsh
+5.9: 353 tests with 200 lifecycle seeds in 124.753 seconds, then 353 tests using a
+symlinked TMPDIR in 116.323 seconds; both passed without skips. Normal/optimized
+behavioral probes, template/shell checks and extracted-package smoke also passed.
+No code failure required repair. The missing-shell prerequisite was resolved by
+the operator installing zsh; a temporary Ubuntu package copy was not substituted
+for the final system-shell checks. This is a WSL/Linux result, not an actual macOS run.
+
+Nestor Desktop 2.0.3's installed skill loader was inspected. The complete current
+0.3.3 skill was installed and manifest-checked in the actual userData/skills root,
+with a backup retained outside that root. No existing conversation was changed.
+No supported configurable pre-tool hook was discovered in the installed build;
+therefore no speculative adapter or guard was added. Upstream source access was
+unavailable, so this finding is limited to the inspected interfaces/build.
+
+The final 0.4.0 check_all.sh run also passed: 353 tests with 200 lifecycle seeds in 131.200 seconds, then 353 tests with symlinked TMPDIR in 113.499 seconds, without skips. Normal and optimized behavioral probes, template and shell checks, ShellCheck and extracted-package smoke all passed. The skill frontmatter validator also passed. No controller/state schema change or unsupported host hook was introduced.

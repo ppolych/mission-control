@@ -145,7 +145,7 @@ class WslReleaseCompatibility(unittest.TestCase):
         for command in (['python3',CLI,'--version'],['bash','scripts/verify.sh','--version'],['bash','scripts/no_progress.sh','--version']):
             result=subprocess.run(command,cwd=Path(CLI).parent.parent,env=env,capture_output=True,text=True)
             self.assertEqual(result.returncode,0,result.stderr)
-            self.assertEqual(result.stdout.strip(),'Mission Control 0.3.3')
+            self.assertEqual(result.stdout.strip(),'Mission Control 0.4.0')
 
 class GoalReviewLifecycle(unittest.TestCase):
     setUp = original_fixtures.Lifecycle.setUp

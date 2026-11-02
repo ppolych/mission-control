@@ -2,9 +2,9 @@
 
 Test results for each release are in [the validation record](references/operational-validation.md).
 
-## Unreleased
+## 0.4.0
 
-Changes on `main` since 0.3.3, pending the 0.4.0 release:
+Changes since 0.3.3:
 
 - Require Python 3.11. Refuse older versions with a clear message.
 - Refuse unknown contract and step fields in new drafts.
@@ -20,6 +20,8 @@ Changes on `main` since 0.3.3, pending the 0.4.0 release:
 - Sync directories after renames, and load modules only when needed.
 - Make the shell wrappers executable. Split the command reference by topic.
 - Add random lifecycle tests, a mutation check, a benchmark and `evals/check_all.sh`.
+
+- Document the installed Nestor skill loader and the absence of a supported pre-tool hook; no speculative adapter is enabled.
 
 ## 0.3.3
 

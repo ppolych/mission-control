@@ -1,6 +1,6 @@
 # Mission Control
 
-Version: see `VERSION` (`python3 scripts/mission.py --version`). Release history is in [the changelog](CHANGELOG.md).
+Current release: **0.4.0**. See `VERSION` (`python3 scripts/mission.py --version`). Release history is in [the changelog](CHANGELOG.md).
 
 Author: Panos Polychronis — [ppolych@netcompany.com](mailto:ppolych@netcompany.com)
 
@@ -134,3 +134,7 @@ Pass `--output PATH` to choose another location. The build emits a reproducible 
 ## WSL2
 
 Run with Linux Python inside your distribution. See [WSL setup](references/wsl.md).
+
+## Nestor installation
+
+The installed Desktop loader reads skills from `%APPDATA%/nestor-desktop/skills`. Install the complete skill directory there and reload it in a new invocation/session. See [Nestor integration](references/nestor-integration.md) for verified loader details and limits. The inspected build exposes no supported configurable pre-tool hook; no guard command or adapter has been added. Shell writes are not blocked by this skill, and a hook alone would not prevent an agent from recording its own approval.
