@@ -1,9 +1,10 @@
 import os, signal, subprocess
 
 
-def supervised_process(cmd,cwd,quiet,timeout):
+def supervised_process(cmd,cwd,quiet,timeout,output=None):
     process=subprocess.Popen(cmd,cwd=cwd,stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL if quiet else None,stderr=subprocess.DEVNULL if quiet else None,
+        stdout=output or (subprocess.DEVNULL if quiet else None),
+        stderr=subprocess.STDOUT if output else (subprocess.DEVNULL if quiet else None),
         start_new_session=True)
     try:
         try:status=process.wait(timeout=timeout)

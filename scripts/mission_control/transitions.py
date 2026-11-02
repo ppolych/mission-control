@@ -71,6 +71,12 @@ def step_transition(contract, state, args, path):
         block_step(contract, step, entry, args)
     elif args.command == 'assess':
         assess_step(contract, state, step, entry, args)
+    elif args.command == 'red':
+        from .test_first import record_red
+        return record_red(contract, state, step, entry)
+    elif args.command == 'test-first-note':
+        from .test_first import record_note
+        record_note(contract, step, entry, args)
     else:
         verify_step(contract, state, step, entry, args)
     return None

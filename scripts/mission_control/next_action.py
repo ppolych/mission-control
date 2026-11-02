@@ -17,6 +17,10 @@ def _active_step(contract, state, root):
         if state['steps'].get(step['id'], {}).get('status') != 'in_progress':
             continue
         identifier = step['id']
+        from .test_first import needs_red
+        if needs_red(contract, step, state['steps'][identifier]):
+            return _report('red', ['red', '--step', identifier],
+                           'Write the test, then show it fails before implementing. test-first-note records why not.', root, identifier)
         guidance = step_guidance(contract, state, step, True)
         pending = guidance['missing_assessments'] + guidance['unverified_assessments']
         if pending:

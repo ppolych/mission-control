@@ -6,7 +6,7 @@ from .settings import VERSION, MAX_STATE_BYTES
 
 READ_ONLY_COMMANDS = ('status', 'history', 'metrics', 'handoff', 'coverage', 'recovery',
                       'diagnose', 'evidence-audit', 'revision-diff')
-STEP_COMMANDS = ('start', 'verify', 'block', 'assess', 'approve', 'deny', 'recovery', 'recover')
+STEP_COMMANDS = ('start', 'verify', 'block', 'assess', 'approve', 'deny', 'recovery', 'recover', 'red', 'test-first-note')
 
 
 def run_report(contract, state, args, root):

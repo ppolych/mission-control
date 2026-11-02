@@ -5,7 +5,7 @@ CONTRACT_FIELDS = {'schema_version', 'mission', 'constraints', 'budget', 'steps'
                    'acceptance', 'allowed_paths', 'revision', 'discipline'}
 STEP_FIELDS = {'id', 'description', 'depends_on', 'verify', 'verify_timeout', 'risk', 'needs_approval',
                'commands', 'acceptance_refs', 'watch', 'retry', 'effects', 'legacy_passes',
-               'test_first_exempt', 'manual_only'}
+               'test_first', 'test_first_exempt', 'manual_only'}
 
 
 def validate_known_fields(contract):

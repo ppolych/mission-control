@@ -5,6 +5,7 @@ EXEMPT_KINDS = ('docs', 'config', 'exploratory', 'low_impact', 'not_reproducible
 AUTOMATED_KINDS = {'behavior', 'integration'}
 TRIVIAL_EXECUTABLES = {'true', ':', '/bin/true', '/usr/bin/true'}
 TRIVIAL_SCRIPTS = {'true', ':', 'exit 0'}
+STRICT_STEP_FIELDS = {'test_first', 'test_first_exempt', 'manual_only'}
 SHELLS = {'sh', 'bash', 'zsh', 'dash', '/bin/sh', '/bin/bash', '/bin/zsh', '/bin/dash'}
 
 
@@ -36,6 +37,11 @@ def validate_draft_fields(contract):
         raise ValueError('discipline requires schema_version 3')
     if 'discipline' in contract and contract['discipline'] != 'strict':
         raise ValueError('discipline must be "strict" when present')
+    if 'discipline' not in contract:
+        for step in contract['steps']:
+            found = STRICT_STEP_FIELDS & set(step)
+            if found:
+                raise ValueError(step['id'] + ': ' + ', '.join(sorted(found)) + ' requires discipline: strict')
 
 
 def validate_exemption(step):
@@ -101,15 +107,22 @@ def step_outcome(contract, state, step, entry, args):
         return None
     changed = changed_writes(step, entry, state['workspace'])
     result = evidence_basis(step)
+    if 'test_first_exempt' in step:
+        result['test_first_exempt'] = step['test_first_exempt']
     if claimed:
         if not nonblank(args.rationale):
             raise ValueError('--already-satisfied requires a nonblank --rationale')
         if changed:
             raise ValueError('--already-satisfied refused: declared writes changed: ' + ', '.join(changed))
+        if 'test_first' in step:
+            result['red_green'] = 'not_applicable_no_change'
         return dict(result, outcome='no_change', rationale=args.rationale)
     if step['effects']['writes'] and not changed:
         raise ValueError('no declared write changed since this step began; do the work, or if the requested state '
                          'already exists use verify --already-satisfied --rationale TEXT')
+    if 'test_first' in step:
+        from .test_first import red_green_status
+        result.update(red_green_status(step, entry, state['workspace']))
     return dict(result, outcome='changed' if changed else 'no_declared_writes')
 
 
@@ -136,6 +149,6 @@ def print_outcome(entry):
 
 def validate_discipline_state(state):
     for entry in state['steps'].values():
-        for key in ('discipline_outcome', 'first_effect_baseline'):
+        for key in ('discipline_outcome', 'first_effect_baseline', 'red'):
             if key in entry and not isinstance(entry[key], dict):
                 raise ValueError('invalid checkpoint discipline record: ' + key)

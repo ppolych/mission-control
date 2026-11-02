@@ -2,7 +2,7 @@
 import argparse
 
 COMMAND_GROUPS = (
-    ('Lifecycle', ('validate', 'init', 'start', 'assess', 'verify', 'block', 'stop', 'resume',
+    ('Lifecycle', ('validate', 'init', 'start', 'red', 'test-first-note', 'assess', 'verify', 'block', 'stop', 'resume',
                    'criterion-review', 'finish', 'goal-review')),
     ('Controlled mode', ('approve', 'deny')),
     ('Recovery and revision', ('recovery', 'recover', 'revision-diff', 'revise', 'migrate')),

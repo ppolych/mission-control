@@ -36,6 +36,11 @@ MUTANTS = (
     ('manual_evidence_unlabelled', 'discipline.py', "return {'evidence_basis': MANUAL_LABEL, 'manual_only_reason': step['manual_only']['reason']}", "return {'evidence_basis': 'automated'}"),
     ('behavior_accepts_assessment', 'discipline.py', "isinstance(checks[int(index)], list)", 'True'),
     ('first_baseline_overwritten', 'lifecycle_start.py', "entry.setdefault('first_effect_baseline', entry['effect_baseline'])", "entry['first_effect_baseline'] = entry['effect_baseline']"),
+    ('red_accepts_a_pass', 'test_first.py', '    if status == 0:\n', '    if False:\n'),
+    ('red_ignores_failure_reason', 'test_first.py', 'if pattern is not None and not re.search(pattern, output):', 'if False:'),
+    ('red_after_implementation', 'test_first.py', "if started and 'red' not in entry:", 'if False:'),
+    ('verify_ignores_test_change', 'test_first.py', "if observations(workspace, step['test_first']['test_paths']) != red['test_digests']:", 'if False:'),
+    ('note_confirms_red', 'test_first.py', "return {'red_green': 'unconfirmed', 'test_first_notes': notes}", "return {'red_green': 'confirmed', 'test_first_notes': notes}"),
     ('repeat_without_lock', 'cli_aux.py', "with persistent_lock(path.with_name(path.name + '.lock'), wait=REPEAT_LOCK_WAIT_SECONDS):", 'if True:'),
 )
 # A second identical check guards these, so one removal changes no behavior.
