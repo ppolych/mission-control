@@ -2,6 +2,13 @@
 
 Test results for each release are in [the validation record](references/operational-validation.md).
 
+## 0.4.2.5
+
+The host resends `SKILL.md` with every model call, so its size is paid for repeatedly on small tasks.
+
+- `SKILL.md` shrinks from about 20 KB to about 11 KB. Drafting, running, learning, store and install detail moves to `references/mission-guide.md`, which a larger mission reads first. Activation, the short path, approval rules, recovery limits and the final goal review stay in `SKILL.md`.
+- The effect on tokens has not been measured in a real session.
+
 ## 0.4.2.4
 
 In a real Nestor session, `red` refused the import error of a new function against the small-fix template's `failure_matches`. The agent deleted `.mission`, started over and did not report it.

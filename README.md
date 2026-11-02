@@ -1,6 +1,6 @@
 # Mission Control
 
-Current release: **0.4.2.4**. See `VERSION` (`python3 scripts/mission.py --version`). Release history is in [the changelog](CHANGELOG.md).
+Current release: **0.4.2.5**. See `VERSION` (`python3 scripts/mission.py --version`). Release history is in [the changelog](CHANGELOG.md).
 
 Author: Panos Polychronis — [ppolych@netcompany.com](mailto:ppolych@netcompany.com)
 

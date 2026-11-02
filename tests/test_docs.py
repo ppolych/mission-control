@@ -90,8 +90,14 @@ class ApprovalReplyRules(unittest.TestCase):
 
 
 class SkillSize(unittest.TestCase):
+    def test_moved_rules_stay_in_the_guide(self):
+        text = ' '.join((ROOT / 'references/mission-guide.md').read_text(encoding='utf-8').split())
+        for phrase in ('never reset counters', 'never replay uncertain side effects', 'Never self-approve',
+                       'at most two reusable lessons', 'allowed_paths'):
+            self.assertIn(phrase, text)
+
     def test_skill_stays_under_the_size_kept_after_compaction(self):
-        self.assertLess((ROOT / 'SKILL.md').stat().st_size, 20000)
+        self.assertLess((ROOT / 'SKILL.md').stat().st_size, 13000)
 
 
 class StrictDisciplineDocs(unittest.TestCase):

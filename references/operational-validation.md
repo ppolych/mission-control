@@ -16,7 +16,7 @@
 - [Performance measurement](#performance-measurement)
 
 Initial operational run: 2026-10-31, release **0.3.1**. Later release records
-are appended below; current release is **0.4.2.4**.
+are appended below; current release is **0.4.2.5**.
 No contract schema, default mode, approval, recovery or attempt-budget policy
 was changed. The additions are `metrics`, `handoff`, bounded `lessons-search`,
 and prompt guidance for progress/waits, safe polling and evidence-based review.
@@ -317,3 +317,9 @@ Not run: macOS and three prepared cases in `evals/discipline_trials.py`.
 Three real Nestor sessions then ran with 0.4.2.4 on neutral paths, with the same model and reviewer, not an independent operator, and requests naming the skill. `no_op_work` passed with no intervention: red before the edit, then verify, finish and goal review, in 161 seconds and 438 thousand tokens. `undeclared_write` passed: `verify` flagged the undeclared file, the agent recorded a `scope-note`, and nothing was reverted. `valid_no_change` failed its criterion: the agent made no artificial change and verified the file, but ran no mission and no `--already-satisfied`. The latest run of the six cases gives five passes and one failure across different releases, so this does not measure one release, and no case has been repeated enough to show a rate. Requests that do not name the skill did not use it.
 
 The final refusal message change was made after those sessions, so no real session has run with it. Not run: macOS, and any prepared case with a request that does not name the skill on 0.4.2.4.
+
+## Release 0.4.2.5 verification
+
+`check_all.sh` passed on Linux 6.18.54.1-microsoft-standard-WSL2 with Python 3.14.4: 554 tests in 147.384 seconds, then 554 tests in 131.348 seconds with a symlinked TMPDIR, plus behavioral probes, template and shell checks and package smoke checks (149 entries). `mutation_check.py` was not rerun, since `scripts/` did not change.
+
+This release moves guidance out of `SKILL.md`. Not run: macOS and any real session with 0.4.2.5, so neither the token effect nor whether agents still follow the rules is known.

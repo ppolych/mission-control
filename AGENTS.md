@@ -39,14 +39,14 @@ Where the code lives in `scripts/mission_control/`:
 
 - **Performance:** measure with `evals/benchmark.py` before optimizing, and change only what measurably matters. Keep imports inside the branch that needs them (`tests/test_performance.py`). Never weaken journal validation or freshness checks for speed.
 - **File size:** see Working Rules; `tests/test_platform.py` enforces it. In `scripts/`, lines also stay within 160 characters and functions within 120 lines (`tests/test_review_fixes.py`).
-- **Docs move with behavior:** update `README.md`, `references/commands-*.md` and `templates/` alongside CLI changes. Keep `SKILL.md` concise and put workflow detail in `references/`. Record test results in `references/operational-validation.md`, not in new historical counts elsewhere.
+- **Docs move with behavior:** update `README.md`, `references/commands-*.md` and `templates/` alongside CLI changes. Keep `SKILL.md` under 13,000 bytes and put workflow detail in `references/`, mainly `references/mission-guide.md`. Record test results in `references/operational-validation.md`, not in new historical counts elsewhere.
 - **Read-only commands:** reports and invalid requests must not append journal events or change checkpoint bytes. Reports take no lock but refuse a non-regular `.lock` entry.
 - **Locks:** regular persistent inodes opened no-follow. Never unlink or truncate them.
 - **Tests:** use temporary missions and never run failure paths against real operator state. New tests patch the owning module directly; `tests/core_adapter.py` exists only for legacy fault-injection tests, and `tests/v3_fixture.py` provides the schema-3 fixture.
 
 ## Project Structure & Module Organization
 
-Mission Control 0.4.2.4 is a Nestor orchestration skill with a Python core and Bash entrypoints.
+Mission Control 0.4.2.5 is a Nestor orchestration skill with a Python core and Bash entrypoints.
 
 - `VERSION` is the canonical release; keep skill metadata consistent. Contract schemas 2 and 3 are separate from the release version.
 - `SKILL.md` is the concise agent entrypoint; workflow details belong in `references/`.
@@ -165,7 +165,7 @@ Use imperative subjects; describe behavior, validation, and limitations. Exclude
 
 ## Operational Helpers
 
-Version is 0.4.2.4 by explicit author instruction; later releases use 0.4.2.x when the author asks. Keep VERSION, skill metadata
+Version is 0.4.2.5 by explicit author instruction; later releases use 0.4.2.x when the author asks. Keep VERSION, skill metadata
 and current documentation consistent; do not bump it again without permission. Keep metrics/handoff/search/impact read-only and all helpers dependency-free.
 Store publication and service observations may update only explicitly selected
 auxiliary files under persistent locks; they grant no lifecycle permissions. Search only
@@ -237,7 +237,7 @@ Cache publication must reject output/lock aliases of inputs, reports and install
 
 Build releases with `python3 scripts/package_release.py`. Keep archive construction in `scripts/release_archive.py`, including deterministic metadata and an embedded SHA-256 manifest. Exclude generated archives, checksums and caches. Packaging must pass extracted-install smoke checks before replacing the release archive.
 
-Test counts and release evidence belong only in [operational validation](references/operational-validation.md); do not duplicate them here. Keep version 0.4.2.4 unless the author explicitly requests another bump.
+Test counts and release evidence belong only in [operational validation](references/operational-validation.md); do not duplicate them here. Keep version 0.4.2.5 unless the author explicitly requests another bump.
 
 
 ## Focused Context and Traceability
