@@ -16,7 +16,7 @@
 - [Performance measurement](#performance-measurement)
 
 Initial operational run: 2026-10-31, release **0.3.1**. Later release records
-are appended below; current release is **0.4.2.5**.
+are appended below; current release is **0.4.2.6**.
 No contract schema, default mode, approval, recovery or attempt-budget policy
 was changed. The additions are `metrics`, `handoff`, bounded `lessons-search`,
 and prompt guidance for progress/waits, safe polling and evidence-based review.
@@ -323,3 +323,7 @@ The final refusal message change was made after those sessions, so no real sessi
 `check_all.sh` passed on Linux 6.18.54.1-microsoft-standard-WSL2 with Python 3.14.4: 554 tests in 147.384 seconds, then 554 tests in 131.348 seconds with a symlinked TMPDIR, plus behavioral probes, template and shell checks and package smoke checks (149 entries). `mutation_check.py` was not rerun, since `scripts/` did not change.
 
 This release moves guidance out of `SKILL.md`. One real Nestor session ran with it, with the `skipped_red` request naming the skill on a neutral path, the same model and the same reviewer. Red came before the edit, followed by verify, finish and goal review, in 77 seconds, 13 model turns and 187 thousand tokens, against 117 seconds, 18 turns and 333 thousand on 0.4.2.2 at 2a8c913. That is one run each, and fewer turns account for part of the drop. Not run: macOS, and the other prepared cases on 0.4.2.5.
+
+## Release 0.4.2.6 verification
+
+`check_all.sh` passed on Linux 6.18.54.1-microsoft-standard-WSL2 with Python 3.14.4: 554 tests in 159.302 seconds, then 554 in 145.830 seconds with a symlinked TMPDIR, with package smoke checks (149 entries). No behavior changed from 0.4.2.5, and no real session has run on this version.

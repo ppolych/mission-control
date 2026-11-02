@@ -46,7 +46,7 @@ Where the code lives in `scripts/mission_control/`:
 
 ## Project Structure & Module Organization
 
-Mission Control 0.4.2.5 is a Nestor orchestration skill with a Python core and Bash entrypoints.
+Mission Control 0.4.2.6 is a Nestor orchestration skill with a Python core and Bash entrypoints.
 
 - `VERSION` is the canonical release; keep skill metadata consistent. Contract schemas 2 and 3 are separate from the release version.
 - `SKILL.md` is the concise agent entrypoint; workflow details belong in `references/`.
@@ -165,7 +165,7 @@ Use imperative subjects; describe behavior, validation, and limitations. Exclude
 
 ## Operational Helpers
 
-Version is 0.4.2.5 by explicit author instruction; later releases use 0.4.2.x when the author asks. Keep VERSION, skill metadata
+Version is 0.4.2.6. Every committed change gets the next 0.4.2.x, by explicit author instruction. Keep VERSION, skill metadata
 and current documentation consistent; do not bump it again without permission. Keep metrics/handoff/search/impact read-only and all helpers dependency-free.
 Store publication and service observations may update only explicitly selected
 auxiliary files under persistent locks; they grant no lifecycle permissions. Search only
@@ -237,7 +237,7 @@ Cache publication must reject output/lock aliases of inputs, reports and install
 
 Build releases with `python3 scripts/package_release.py`. Keep archive construction in `scripts/release_archive.py`, including deterministic metadata and an embedded SHA-256 manifest. Exclude generated archives, checksums and caches. Packaging must pass extracted-install smoke checks before replacing the release archive.
 
-Test counts and release evidence belong only in [operational validation](references/operational-validation.md); do not duplicate them here. Keep version 0.4.2.5 unless the author explicitly requests another bump.
+Test counts and release evidence belong only in [operational validation](references/operational-validation.md); do not duplicate them here. Bump to the next 0.4.2.x with every change, never without one.
 
 
 ## Focused Context and Traceability
