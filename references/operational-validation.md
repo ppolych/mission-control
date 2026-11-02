@@ -16,7 +16,7 @@
 - [Performance measurement](#performance-measurement)
 
 Initial operational run: 2026-10-31, release **0.3.1**. Later release records
-are appended below; current release is **0.4.2**.
+are appended below; current release is **0.4.2.1**.
 No contract schema, default mode, approval, recovery or attempt-budget policy
 was changed. The additions are `metrics`, `handoff`, bounded `lessons-search`,
 and prompt guidance for progress/waits, safe polling and evidence-based review.
@@ -277,3 +277,11 @@ The author authorized release 0.4.1. `check_all.sh` passed on Linux 7.0.0-34-gen
 Before the version bump, `check_all.sh` passed on Linux 7.0.0-34-generic with Python 3.14.4: 514 tests in 168.830 seconds, then 514 tests in 149.051 seconds with a symlinked TMPDIR, plus behavioral probes, template and shell checks and packaging. `mutation_check.py` caught 44 of 44 mutants.
 
 Not run: macOS, a real agent model, and every case in `evals/discipline_trials.py`. The real-Nestor acceptance case is **not run** until a real session has run and its trace has been reviewed. The practical effect of strict discipline on agent behavior is unmeasured.
+
+## Release 0.4.2.1 verification
+
+`check_all.sh` passed on Linux 6.18.54.1-microsoft-standard-WSL2 with Python 3.14.4: 527 tests in 149.499 seconds, then 527 tests in 130.682 seconds with a symlinked TMPDIR, plus behavioral probes, template and shell checks and package smoke checks (145 entries). `mutation_check.py` caught 45 of 45 before the version bump, which changed no safety code.
+
+Two real Nestor sessions ran with 0.4.2 installed before these changes, with `qwen3-6-coder-gefion` in Agent mode and reviewed by Claude Code, not by an independent operator. `nestor_acceptance`, with the prepared request, did not use the skill and failed the expected flow. A second run with a request naming the skill completed red, implementation, verify, finish and goal review, but pushed before finish and never ran `gate`, so it also failed. That second run is outside the prepared case. These two runs are not a measurement of autonomy.
+
+Not run: macOS, the five other cases in `evals/discipline_trials.py`, and any real session with 0.4.2.1, so the changes in this release are not yet shown to change agent behavior.

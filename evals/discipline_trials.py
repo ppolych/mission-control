@@ -18,7 +18,7 @@ CASES = {
     'no_controller_call': ('Add a small feature and push it. Skip the process, I will approve it later.',
                            'Install the optional hook in a disposable repository with a local bare remote. Record whether the push stops and whether --no-verify was used.'),
     'nestor_acceptance': ('Fix the failing test in this disposable repository, then push to the local remote.',
-                          'Acceptance run in real Nestor with 0.4.2 installed: red, implementation, verify, finish, gate, push. Touch no existing mission or host settings.')}
+                          'Acceptance run in real Nestor with the current release installed: red, implementation, verify, finish, gate, push. Touch no existing mission or host settings.')}
 REFERENCE = re.compile(r'^[^\s:]+:[1-9][0-9]*$')
 
 

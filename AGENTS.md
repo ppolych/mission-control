@@ -46,7 +46,7 @@ Where the code lives in `scripts/mission_control/`:
 
 ## Project Structure & Module Organization
 
-Mission Control 0.4.2 is a Nestor orchestration skill with a Python core and Bash entrypoints.
+Mission Control 0.4.2.1 is a Nestor orchestration skill with a Python core and Bash entrypoints.
 
 - `VERSION` is the canonical release; keep skill metadata consistent. Contract schemas 2 and 3 are separate from the release version.
 - `SKILL.md` is the concise agent entrypoint; workflow details belong in `references/`.
@@ -165,7 +165,7 @@ Use imperative subjects; describe behavior, validation, and limitations. Exclude
 
 ## Operational Helpers
 
-Version is 0.4.2 by explicit author instruction. Keep VERSION, skill metadata
+Version is 0.4.2.1 by explicit author instruction; later releases use 0.4.2.x when the author asks. Keep VERSION, skill metadata
 and current documentation consistent; do not bump it again without permission. Keep metrics/handoff/search/impact read-only and all helpers dependency-free.
 Store publication and service observations may update only explicitly selected
 auxiliary files under persistent locks; they grant no lifecycle permissions. Search only
@@ -227,7 +227,7 @@ Containment compatibility regressions live in tests/test_allowed_paths_review.py
 
 ## Runtime Directory
 
-Use `.mission/` for new mission runtime artifacts, including contract, state, repeat history, lessons, decision log and retained metrics. Use the same explicitly selected mission root for agent-written auxiliary files; configure NO_PROGRESS_STATE accordingly for alternate roots. Never auto-move/merge legacy mission directories. Version remains 0.4.2 by current author instruction. Regressions: tests/test_mission_directory.py.
+Use `.mission/` for new mission runtime artifacts, including contract, state, repeat history, lessons, decision log and retained metrics. Use the same explicitly selected mission root for agent-written auxiliary files; configure NO_PROGRESS_STATE accordingly for alternate roots. Never auto-move/merge legacy mission directories. Version follows the author's instruction. Regressions: tests/test_mission_directory.py.
 
 ## Agent Guidance and Release Tooling
 
@@ -237,7 +237,7 @@ Cache publication must reject output/lock aliases of inputs, reports and install
 
 Build releases with `python3 scripts/package_release.py`. Keep archive construction in `scripts/release_archive.py`, including deterministic metadata and an embedded SHA-256 manifest. Exclude generated archives, checksums and caches. Packaging must pass extracted-install smoke checks before replacing the release archive.
 
-Test counts and release evidence belong only in [operational validation](references/operational-validation.md); do not duplicate them here. Keep version 0.4.2 unless the author explicitly requests another bump.
+Test counts and release evidence belong only in [operational validation](references/operational-validation.md); do not duplicate them here. Keep version 0.4.2.1 unless the author explicitly requests another bump.
 
 
 ## Focused Context and Traceability
@@ -287,7 +287,7 @@ refresh. Details: references/controller-activation.md. No host hook is implied.
 
 ## Strict Discipline
 
-`discipline: strict` is an optional schema-3 field; contracts without it keep their behavior and frozen contracts are not upgraded. Details: references/strict-discipline.md. Keep these true: git observation never claims who changed a path, ownership stays unverified, and nothing is ever reverted automatically. An unavailable scope check is reported as not performed, never as passed. `gate` stays read-only and only passes content a receipt can prove. Red/green records facts, not test quality, and never asks for work to be undone. Regressions: tests/test_discipline.py, test_test_first.py, test_scope_check.py, test_gate.py, test_gate_refs.py.
+`discipline: strict` is an optional schema-3 field; contracts without it keep their behavior and frozen contracts are not upgraded. Details: references/strict-discipline.md. Keep these true: git observation never claims who changed a path, ownership stays unverified, and nothing is ever reverted automatically. An unavailable scope check is reported as not performed, never as passed. `gate` stays read-only and only passes content a receipt can prove. Red/green records facts, not test quality, and never asks for work to be undone. A check repeating an external action is refused only on new strict drafts, by exact text, as a heuristic. Regressions: tests/test_discipline.py, test_test_first.py, test_scope_check.py, test_gate.py, test_gate_refs.py, test_external_checks.py.
 
 ## Usability and Recovery Rules
 

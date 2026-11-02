@@ -18,7 +18,7 @@ class OptimizationReports(fixtures.V3Fixture):
         state = self.mission/'state/progress.json';before=state.read_bytes()
         for command in ('handoff','diagnose'):
             report=json.loads(self.call(command).stdout)
-            self.assertEqual(report['installation']['version'],'0.4.2')
+            self.assertEqual(report['installation']['version'],'0.4.2.1')
             self.assertEqual(report['installation']['cli'],str(CLI))
             self.assertEqual(len(report['installation']['engine_fingerprint']),64)
             self.assertEqual(report['mission_directory'],str(self.mission.resolve()))

@@ -1,4 +1,5 @@
 """Optional strict discipline: stronger step outcomes for contracts that declare it."""
+import shlex
 
 MANUAL_LABEL = 'manual_evidence_only: agent assessment, not automated verification'
 EXEMPT_KINDS = ('docs', 'config', 'exploratory', 'low_impact', 'not_reproducible', 'not_applicable')
@@ -31,6 +32,30 @@ def nonblank(value):
     return isinstance(value, str) and bool(value.strip())
 
 
+def has_outside_effect(step):
+    effects = step['effects']
+    return bool(effects['external_actions']) or effects['network'] != 'none' or not effects['reversible']
+
+
+def check_command_text(check):
+    kind, *args = check
+    if kind == 'exec':
+        return ' '.join(args[0].split())
+    return shlex.join(args) if kind == 'exit0' else None
+
+
+def validate_checks_repeat_no_external_action(step):
+    """Checks rerun on every verify, so one must not repeat the action. Exact text only: a heuristic."""
+    if not has_outside_effect(step):
+        return
+    declared = {' '.join(action.split()) for action in step['effects']['external_actions']}
+    declared |= {shlex.join(command) for command in step.get('commands', [])}
+    for check in step['verify']:
+        if isinstance(check, list) and check_command_text(check) in declared:
+            raise ValueError(step['id'] + ': check repeats an external action and would rerun on every verify: '
+                             + check_command_text(check) + '; check the result with a read-only command')
+
+
 def validate_draft_fields(contract):
     """Field values only new drafts must meet; frozen contracts are not rechecked."""
     if 'discipline' in contract and contract['schema_version'] != 3:
@@ -44,6 +69,9 @@ def validate_draft_fields(contract):
             found = STRICT_STEP_FIELDS & set(step)
             if found:
                 raise ValueError(step['id'] + ': ' + ', '.join(sorted(found)) + ' requires discipline: strict')
+    elif is_strict(contract):
+        for step in contract['steps']:
+            validate_checks_repeat_no_external_action(step)
 
 
 def validate_exemption(step):

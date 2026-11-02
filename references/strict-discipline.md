@@ -55,6 +55,15 @@ exception to a running mission needs `revise`.
 `validate` also refuses a short list of always-true checks, such as `true`, `:`, `exit 0` and
 `sh -c true`. That list is finite and says nothing about check quality.
 
+`validate` also refuses a check that repeats an external action. When a step declares an external action, a
+network effect or `reversible: false`, a check whose text exactly equals a declared action or command would
+rerun on every `verify`, so check the result with a read-only command. This is an exact-text heuristic: a
+reworded command is not detected, and frozen contracts are not rechecked.
+
+`test_paths` must be inside `effects.writes`, including an existing test the step should not change. Listing
+it does not require a change: once `red` has run, `verify` refuses a test file that changed without a
+`test-first-note`.
+
 `effects.uncommitted` optionally lists declared writes that do not belong in a commit, such as generated
 files. See the gate table.
 
@@ -194,6 +203,10 @@ A revision keeps its parent's base and unresolved observations.
 **What it does not certify.** It does not rerun checks. It does not judge quality. A local mission does not
 prove who wrote a commit: a commit by someone else with the same content in declared paths passes, because
 content is certified, not authorship.
+
+Keep the push outside the mission, because `gate` needs a finished mission: `finish`, `goal-review`, commit,
+`gate --commit SHA`, then push only on exit 0. A commit made before `finish` can still pass, but a push inside
+a step happens before anything can be gated.
 
 ## Optional pre-push hook
 

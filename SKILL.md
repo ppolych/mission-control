@@ -2,14 +2,14 @@
 name: mission-control
 description: Orchestrate substantial multi-step goals with durable mission state, evidence-based verification, bounded recovery, and explicit outcomes. Use for controlled, autonomous, or multi-session work; exclude simple edits and quick questions.
 metadata:
-  version: "0.4.2"
+  version: "0.4.2.1"
   author: "Panos Polychronis"
   email: "ppolych@netcompany.com"
 ---
 
 # Mission Control
 
-Version 0.4.2. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
+Version 0.4.2.1. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
 or macOS. For WSL paths and setup, read [WSL guidance](references/wsl.md).
 Preserve the user's scope, existing authorization, and host permissions.
 
@@ -100,7 +100,9 @@ Map acceptance IDs to steps; declare exact effects, watched inputs and retry
 policy. The template sets `discipline: strict`: a step that writes declares
 `test_first`, or `test_first_exempt` with a reason. Choose in proportion to the task
 using the [development method](references/development-method.md); [strict discipline](references/strict-discipline.md)
-states what is enforced, what is a heuristic and what is only an agent statement. Read [schema-3 evidence and recovery](references/evidence-recovery.md)
+states what is enforced, what is a heuristic and what is only an agent statement.
+A strict mission stops before a push: keep the push out of the steps, then after `finish` and a passing
+`goal-review` commit, run `gate --commit SHA`, and push only if it exits 0. Read [schema-3 evidence and recovery](references/evidence-recovery.md)
 when drafting, reconciling interruptions, or creating revisions.
 For that new mission run `validate`, then `init`; existing contracts must not be overwritten or
 weakened. New requirements need an explicit new mission revision (`revision-diff`, then

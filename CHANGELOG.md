@@ -2,6 +2,14 @@
 
 Test results for each release are in [the validation record](references/operational-validation.md).
 
+## 0.4.2.1
+
+Findings from real Nestor trials in strict missions.
+
+- `validate` and new-contract `init` refuse a check that exactly repeats a step's external action or declared outside-effect command. Frozen contracts are not rechecked.
+- After a passing goal review, the advisory note names `gate --commit SHA` before any push. The action and its argv are unchanged.
+- The skill and strict discipline reference state that a push belongs outside the mission, and that `test_paths` stays inside `effects.writes`.
+
 ## 0.4.2
 
 Add optional `discipline: strict` in schema 3, enabled in the template. Contracts without it keep their behavior, and frozen contracts are not upgraded.

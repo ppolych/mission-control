@@ -76,7 +76,10 @@ def next_action(contract, state, root=None):
         if open_paths:
             argv = ['scope-note', '--path', open_paths[0], '--disposition', 'mine|not_mine|unknown', '--rationale', 'TEXT']
             return _report('scope_note', argv, 'Inspect the observed change, then record a statement; it is not proof.', root)
-        return _report('report_outcome', [], 'Report the final label, evidence and unresolved work.', root)
+        note = 'Report the final label, evidence and unresolved work.'
+        if goal_review_status(state) == 'pass' and contract.get('discipline') == 'strict':
+            note += ' Before any push, commit the result and run gate --commit SHA; it is read-only and proves content, not authorship.'
+        return _report('report_outcome', [], note, root)
     if stop:
         return _report('inspect_stop_reason', [], 'Stopped as ' + stop + '. Report it; resume only when the user asks.',
                        root, requires_user=True)
