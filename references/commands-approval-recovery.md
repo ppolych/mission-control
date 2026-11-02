@@ -52,7 +52,10 @@ criteria are disclosed separately in the step's existing `verify` array.
 2. Show the exact description/scope, work argv, verification argv/manual criteria,
    workspace and digest to the user. Wait for an explicit decision. Silence,
    elapsed time, a previous mission-level authorization, or the digest itself
-   is not consent. Never execute work while awaiting approval.
+   is not consent. Neither is an empty, dismissed, cancelled or ambiguous reply: ask
+   again or keep waiting. Use the user's words verbatim as the rationale. If you
+   cannot tell whether the user is present, ask and wait. Never execute work while
+   awaiting approval.
 3. After an explicit approval, run
    `approve --step ID --digest HASH --rationale TEXT`. It records the decision,
    returns 0 and makes the step pending; it does not start the step or run checks.

@@ -81,6 +81,14 @@ class CurrentBehaviorOnly(unittest.TestCase):
                     self.assertFalse(line.lstrip().startswith('#'), f'{path.name}: {line}')
 
 
+class ApprovalReplyRules(unittest.TestCase):
+    def test_skill_states_what_does_not_count_as_approval(self):
+        text = ' '.join((ROOT / 'SKILL.md').read_text(encoding='utf-8').split())
+        for phrase in ('empty, dismissed, cancelled or ambiguous reply is not approval',
+                       "user's words verbatim", 'cannot tell whether the user is present'):
+            self.assertIn(phrase, text)
+
+
 class KnownCorrections(unittest.TestCase):
     def all_commands(self):
         return ''.join(path.read_text(encoding='utf-8') for path in REFERENCES if path.name.startswith('commands-'))
@@ -90,7 +98,7 @@ class KnownCorrections(unittest.TestCase):
 
     def test_current_behavior_is_documented(self):
         text = self.all_commands()
-        for phrase in ('applied_incorrect', 'verify_timeout', 'goal_review_status', 'skipped_files'):
+        for phrase in ('applied_incorrect', 'verify_timeout', 'goal_review_status', 'skipped_files', 'next_action'):
             self.assertIn(phrase, text)
         self.assertNotIn('Additional metadata is allowed', text)
         self.assertNotIn('Do not share compatibility history between concurrent writers', text)

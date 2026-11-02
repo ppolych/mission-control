@@ -21,7 +21,7 @@ def compact_handoff(report):
         if key not in selected:
             selected.append(key)
     keys = ('installation', 'mission_directory', 'workspace', 'contract_hash',
-            'journal_head', 'active_steps', 'stop_reason', 'goal_review_status', 'reminder')
+            'journal_head', 'active_steps', 'stop_reason', 'goal_review_status', 'next_action', 'reminder')
     result = {key: report[key] for key in keys}
     result.update(compact=True, step_counts=counts, next_ready_step=ready,
                   steps={key: steps[key] for key in selected},

@@ -58,6 +58,11 @@ Exit codes: 0 success; 1 refusal, check failure or exhausted work; 2 invalid inp
 or transition; 3 waiting for a controlled-step decision. Failed checks report their
 index and exit status, not their output; rerun the check yourself to diagnose it.
 
+After each transition the controller prints `next (advisory): COMMAND` on stderr, and
+`status`, `handoff` and `diagnose` report `next_action`. Uppercase words are placeholders.
+It is guidance from recorded state: it grants no permission, and it never replaces
+inspecting the actual work or a user's decision.
+
 ## Phase 0 — Inspect and draft autonomously
 
 Inspect the workspace FIRST: relevant source, conventions, tests, existing
@@ -114,7 +119,10 @@ the exact step, criteria, command arrays, pinned workspace and request digest;
 wait for explicit user approval or denial. Only then record `approve` or `deny`
 with that digest and the user's decision as rationale. Never self-approve,
 infer approval from silence, or treat the mission's initial approval as a step
-approval. After approval, rerun `start`; approval does not itself start work.
+approval. An empty, dismissed, cancelled or ambiguous reply is not approval: ask
+again or keep waiting. Record the user's words verbatim as the rationale; never
+compose or summarize them into a decision. If you cannot tell whether the user is
+present, ask and wait. After approval, rerun `start`; approval does not itself start work.
 
 Approvals persist across resume only for the same contract/workspace digest.
 Changed scope/commands/checks require a new reviewed mission revision. Denied

@@ -12,6 +12,7 @@ STEP_COMMANDS = ('start', 'verify', 'block', 'assess', 'approve', 'deny', 'recov
 def run_report(contract, state, args, root):
     """Print one report that never mutates mission state."""
     from .approvals import validate_approval_workspace
+    from .next_action import next_action
     from .reports import goal_review_status
     command = args.command
     if command == 'evidence-audit':
@@ -23,6 +24,7 @@ def run_report(contract, state, args, root):
         report = diagnose_report(contract, state)
         report['mission_directory'] = str(root.resolve())
         report['goal_review_status'] = goal_review_status(state)
+        report['next_action'] = next_action(contract, state, root)
     elif command == 'metrics':
         from .reports import metrics_report
         print(json.dumps(metrics_report(contract, state, root)))
@@ -34,7 +36,7 @@ def run_report(contract, state, args, root):
             from .compact_handoff import compact_handoff
             report = compact_handoff(report)
     elif command == 'status':
-        report = dict(state, goal_review_status=goal_review_status(state))
+        report = dict(state, goal_review_status=goal_review_status(state), next_action=next_action(contract, state, root))
     elif command == 'history':
         report = {'events': state.get('journal', [])}
     elif command == 'coverage':
@@ -64,6 +66,7 @@ def run_transition(contract, state, args, root, path):
     from .approvals import exhaustion_reason, validate_approval_workspace
     from .budgets import step_budget_exhausted
     from .journal import commit_state
+    from .next_action import print_hint
     from .publication import now
     from . import lifecycle_stop, transitions
     command = args.command
@@ -92,6 +95,8 @@ def run_transition(contract, state, args, root, path):
     else:
         code = transitions.step_transition(contract, state, args, path)
     if code is not None:
+        if command == 'start':
+            print_hint(contract, state, root)
         return code
     if (command == 'verify' and not state.get('stop_reason')
             and any(entry.get('budget_exhausted') or entry.get('approval_denied') for entry in state['steps'].values())
@@ -99,6 +104,7 @@ def run_transition(contract, state, args, root, path):
         state['stop_reason'] = exhaustion_reason(state)
     state['last_update'] = now()
     commit_state(path, state, contract, args)
+    print_hint(contract, state, root)
     if command == 'finish':
         lifecycle_stop.print_goal_review_notice(state)
     if command == 'verify':

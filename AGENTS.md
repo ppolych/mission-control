@@ -32,7 +32,7 @@ Where the code lives in `scripts/mission_control/`:
 | Persistence and locks | `fsio.py`, `storage.py`, `publication.py`, `journal.py`, `store.py` |
 | Controlled mode, recovery, budgets | `approvals.py`, `recovery.py`, `budgets.py` |
 | Running checks, file evidence | `checks.py`, `processes.py`, `observations.py`, `coverage.py` |
-| Read-only reports | `reports.py`, `compact_handoff.py`, `guidance.py`, `quality.py`, `traceability.py` |
+| Read-only reports | `reports.py`, `compact_handoff.py`, `guidance.py`, `next_action.py`, `quality.py`, `traceability.py` |
 | Advisory helpers | `lessons.py`, `ranking.py`, `impact.py`, `services.py`, `cache.py` |
 
 ## Enforced Constraints

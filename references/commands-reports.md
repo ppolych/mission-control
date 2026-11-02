@@ -1,5 +1,15 @@
 # Commands: reports
 
+## Contents
+
+- [Operational reports](#operational-reports)
+- [Evidence and diagnosis reports](#evidence-and-diagnosis-reports)
+- [Continuation hints and installation identity](#continuation-hints-and-installation-identity)
+- [Next action](#next-action)
+- [Structural traceability in evidence-audit](#structural-traceability-in-evidence-audit)
+- [Compact handoff and structural indexing](#compact-handoff-and-structural-indexing)
+- [Report behavior](#report-behavior)
+
 Read-only commands and how to interpret them.
 
 ## Operational reports
@@ -41,6 +51,21 @@ not add an implicit execution retry or alter inspect/approval/budget rules.
 Suggested actions prioritize user denial, mission stops, uncertain-outcome recovery and pending approval. Active steps suggest completing assessments or verification; pending work reports dependencies, other active work, revalidation and budget boundaries. All suggestions require current evidence and independent lifecycle/host permission checks; they never authorize retry or automatically resume a stopped mission.
 
 Prefix resolution is reused only within one allowed-path validation call. Each later validation resolves again. Approval/evidence checks and postflight cache bindings remain fresh.
+
+## Next action
+
+`status`, `handoff`, `handoff --compact` and `diagnose` report `next_action`, derived from the checkpoint alone without reading workspace files. Successful transitions print the same command as `next (advisory): ...` on stderr, as does `start` when it refuses or waits; stdout is unchanged.
+
+| Field | Meaning |
+| --- | --- |
+| `action` | `start`, `revalidate`, `assess`, `verify`, `inspect_recovery`, `wait_for_user_decision`, `criterion_review`, `finish`, `goal_review`, `report_outcome`, `inspect_stop_reason` or `ask_user` |
+| `step` | Step concerned, or null |
+| `argv` | Arguments after `mission.py`, empty when no command applies. Uppercase words are placeholders |
+| `note` | What to do before running it |
+| `requires_user` | True when only the user can decide what happens next |
+| `advisory`, `retry_authorized` | Always true and false: the hint grants nothing |
+
+Steps are taken in contract order, so a waiting approval can be named while an independent step is also ready. A `finish` hint does not prove coverage is current: `finish` checks that itself.
 
 ## Structural traceability in evidence-audit
 

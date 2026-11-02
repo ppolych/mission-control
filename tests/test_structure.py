@@ -11,7 +11,7 @@ PACKAGE = ROOT / 'scripts/mission_control'
 sys.path.insert(0, str(ROOT / 'scripts'))
 NO_SEMICOLONS = ('fsio.py', 'lifecycle_rules.py', 'lifecycle_start.py', 'lifecycle_verify.py', 'lifecycle_stop.py',
                  'transitions.py', 'lessons.py', 'observations.py', 'store.py', 'storage.py', 'budgets.py', 'settings.py',
-                 'cli.py', 'cli_aux.py', 'cli_parser.py')
+                 'cli.py', 'cli_aux.py', 'cli_parser.py', 'next_action.py')
 
 
 class SharedHelpers(unittest.TestCase):

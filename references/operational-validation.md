@@ -263,3 +263,7 @@ therefore no speculative adapter or guard was added. Upstream source access was
 unavailable, so this finding is limited to the inspected interfaces/build.
 
 The final 0.4.0 check_all.sh run also passed: 353 tests with 200 lifecycle seeds in 131.200 seconds, then 353 tests with symlinked TMPDIR in 113.499 seconds, without skips. Normal and optimized behavioral probes, template and shell checks, ShellCheck and extracted-package smoke all passed. The skill frontmatter validator also passed. No controller/state schema change or unsupported host hook was introduced.
+
+## Next action and approval reply rules
+
+`check_all.sh` passed on Linux 7.0.0-34-generic with Python 3.14.4: 368 tests in 115.395 seconds, then 368 tests with a symlinked TMPDIR in 96.963 seconds, plus behavioral probes, template and shell checks and extracted-package smoke. Whether agents follow the hint more reliably is unmeasured until real Nestor trials run. No macOS or Nestor run was made for this change.

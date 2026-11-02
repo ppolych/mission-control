@@ -2,6 +2,11 @@
 
 Test results for each release are in [the validation record](references/operational-validation.md).
 
+## Unreleased
+
+- Report `next_action` in `status`, `handoff` and `diagnose`, and print it on stderr after transitions. It is advisory.
+- State that an empty, dismissed or ambiguous reply is not approval, and that rationales use the user's words verbatim.
+
 ## 0.4.0
 
 Changes since 0.3.3:

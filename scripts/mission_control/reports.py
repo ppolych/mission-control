@@ -39,6 +39,7 @@ def metrics_report(contract, state, root):
 
 def handoff_report(contract, state, root):
     from .guidance import installation_identity, step_guidance
+    from .next_action import next_action
     active_step_present=any(entry.get('status')=='in_progress' for entry in state['steps'].values())
     steps={}
     for step in contract['steps']:
@@ -57,6 +58,7 @@ def handoff_report(contract, state, root):
             'journal_head':(state.get('journal') or [{}])[-1].get('hash'),
             'active_steps':[key for key,value in steps.items() if value['status']=='in_progress'],
             'steps':steps,'stop_reason':state.get('stop_reason'),'goal_review_status':goal_review_status(state),
+            'next_action':next_action(contract, state, root),
             'pending_approvals':{key:entry['approval_request'] for key,entry in state['steps'].items() if entry.get('status')=='awaiting_approval'},
             'approved_digests':{key:record['digest'] for key,record in state.get('approved_steps',{}).items()},
             'evidence_refs':{key:[{'check':e.get('check'),'code':e.get('code')} for e in entry.get('evidence',[])] for key,entry in state['steps'].items()},

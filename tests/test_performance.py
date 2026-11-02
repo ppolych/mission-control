@@ -30,7 +30,7 @@ class ImportBudget(unittest.TestCase):
                 'effects': {'reads': [], 'writes': [], 'network': 'none', 'external_actions': [], 'reversible': True}}
         (self.root / 'contract.json').write_text(json.dumps({
             'schema_version': 3, 'mission': 'probe', 'steps': [step], 'acceptance': [{'id': 'A', 'description': 'x'}]}))
-        subprocess.run([sys.executable, str(CLI), 'init', '--contract', 'contract.json'], cwd=self.root, check=True)
+        subprocess.run([sys.executable, str(CLI), 'init', '--contract', 'contract.json'], cwd=self.root, check=True, capture_output=True)
 
     def own_heavy(self, loaded):
         # argparse itself loads some of these on newer Python versions; that cost is not ours.

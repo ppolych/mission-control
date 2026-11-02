@@ -30,6 +30,7 @@ MUTANTS = (
     ('stale_failure_accepted', 'recovery.py', "if not entry.get('failed_verification'):", 'if False:'),
     ('corrective_retry_ignores_network', 'recovery.py', "if report['external_result'] != 'not_declared' or not step['effects']['reversible']:", "if step['effects']['external_actions'] or not step['effects']['reversible']:"),
     ('tree_limit_after_full_read', 'observations.py', "                if count > MAX_TREE_ENTRIES:\n                    raise OverflowError('directory_too_large')\n                items.append(item)", "                items.append(item)\n        if count > MAX_TREE_ENTRIES:\n            raise OverflowError('directory_too_large')"),
+    ('next_action_ignores_stop', 'next_action.py', "    if stop:\n", "    if False:\n"),
     ('repeat_without_lock', 'cli_aux.py', "with persistent_lock(path.with_name(path.name + '.lock'), wait=REPEAT_LOCK_WAIT_SECONDS):", 'if True:'),
 )
 # A second identical check guards these, so one removal changes no behavior.
