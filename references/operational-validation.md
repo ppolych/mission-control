@@ -16,7 +16,7 @@
 - [Performance measurement](#performance-measurement)
 
 Initial operational run: 2026-10-31, release **0.3.1**. Later release records
-are appended below; current release is **0.4.0**.
+are appended below; current release is **0.4.1**.
 No contract schema, default mode, approval, recovery or attempt-budget policy
 was changed. The additions are `metrics`, `handoff`, bounded `lessons-search`,
 and prompt guidance for progress/waits, safe polling and evidence-based review.
@@ -267,3 +267,7 @@ The final 0.4.0 check_all.sh run also passed: 353 tests with 200 lifecycle seeds
 ## Next action and approval reply rules
 
 `check_all.sh` passed on Linux 7.0.0-34-generic with Python 3.14.4: 368 tests in 115.395 seconds, then 368 tests with a symlinked TMPDIR in 96.963 seconds, plus behavioral probes, template and shell checks and extracted-package smoke. Whether agents follow the hint more reliably is unmeasured until real Nestor trials run. No macOS or Nestor run was made for this change.
+
+## Release 0.4.1 verification
+
+The author authorized release 0.4.1. `check_all.sh` passed on Linux 7.0.0-34-generic with Python 3.14.4: 368 tests in 115.201 seconds, then 368 tests in 94.857 seconds with a symlinked TMPDIR, plus behavioral probes, template and shell checks and extracted-package smoke. No macOS or real Nestor run was made for this release.

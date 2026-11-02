@@ -34,7 +34,7 @@ complete run merely to obtain a comparable score.
 
 Compare only against the same agent suite/scenario set with an explicit baseline.
 Keep raw pass counts, case-level regressions and model/runner differences visible.
-No real model runs have been performed or claimed for the 0.4.0 release; earlier CLI-only results remain historical artifacts.
+No real model runs have been performed or claimed for the 0.4.1 release; earlier CLI-only results remain historical artifacts.
 
 The runner rejects --output aliases of the grade input, baseline, evaluated CLI
 and itself. Reports are atomically replaced while retaining existing permissions;
