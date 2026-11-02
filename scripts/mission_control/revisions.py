@@ -71,5 +71,7 @@ def validate_advanced_state(state, contract):
             raise ValueError('invalid verification artifact receipt')
         if 'recovery_history' in entry and not isinstance(entry['recovery_history'], list):
             raise ValueError('invalid recovery history')
+    from .discipline import validate_discipline_state
+    validate_discipline_state(state)
     validate_journal(state, contract)
 

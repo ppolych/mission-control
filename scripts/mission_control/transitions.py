@@ -72,5 +72,5 @@ def step_transition(contract, state, args, path):
     elif args.command == 'assess':
         assess_step(contract, state, step, entry, args)
     else:
-        verify_step(contract, state, step, entry)
+        verify_step(contract, state, step, entry, args)
     return None

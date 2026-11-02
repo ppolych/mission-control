@@ -26,6 +26,8 @@ FLAGS = (
                            'criterion-review: supported/unmet/unverified'}),
     ('--rationale', {'help': 'evidence-based reason; required to resume a human_abort stop'}),
     ('--revalidate', {'action': 'store_true', 'help': 'start for checks only; do not repeat work'}),
+    ('--already-satisfied', {'action': 'store_true',
+                             'help': 'verify, strict only: the requested state already existed; needs --rationale'}),
     ('--workspace', {'help': 'workspace to pin at init (default: current directory)'}),
     ('--digest', {'help': 'digest from the current approval request or recovery report'}),
     ('--criterion', {'help': 'acceptance ID for criterion-review'}),
@@ -84,6 +86,8 @@ def build_parser():
 def reject_misplaced_flags(args):
     if args.compact and args.command != 'handoff':
         raise ValueError('--compact is only for handoff')
+    if args.already_satisfied and args.command != 'verify':
+        raise ValueError('--already-satisfied is only for verify')
     if args.digest and args.command not in ('approve', 'deny', 'recover'):
         raise ValueError('--digest is only for approve, deny or recover')
     if args.contract and args.command not in ('init', 'validate', 'revise', 'revision-diff'):

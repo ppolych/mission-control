@@ -73,6 +73,9 @@ def record_criterion_review(contract, state, args):
     if args.verdict=='supported' and set(required)-set(kinds):raise ValueError('missing required evidence kind declarations')
     mapped = {step['id'] for step in contract['steps'] if args.criterion in step.get('acceptance_refs', [])}
     if args.verdict == 'supported':
+        from .discipline import require_automated_evidence
+        require_automated_evidence(contract, {step['id']: step for step in contract['steps'] if step['id'] in mapped}, kinds, refs)
+    if args.verdict == 'supported':
         if not refs or any(state['steps'].get(identifier, {}).get('status') != 'completed' for identifier in mapped):
             raise ValueError('supported requires completed mapped steps and evidence references')
         if any(not verification_is_current(step, state) for step in contract['steps'] if step['id'] in mapped):

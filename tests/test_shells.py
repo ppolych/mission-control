@@ -23,16 +23,20 @@ def section(text, title):
     return text[start:following if following != -1 else len(text)]
 
 
+def with_work(blocks):
+    """The documents leave the work to the agent between the first two command blocks."""
+    return '\n'.join([blocks[0], "printf 'report\\n' > report.txt", *blocks[1:]])
+
+
 def skill_commands():
-    block = '\n'.join(bash_blocks(section((ROOT / 'SKILL.md').read_text(encoding='utf-8'), 'Command path')))
+    block = with_work(bash_blocks(section((ROOT / 'SKILL.md').read_text(encoding='utf-8'), 'Command path')))
     block = block.replace('check:STEP:INDEX', 'check:example-001:1')
     block = block.replace('--step STEP', '--step example-001').replace('--check INDEX', '--check 1')
     return block.replace('TEXT', "'Inspected the actual artifact'")
 
 
 def readme_commands():
-    blocks = bash_blocks(section((ROOT / 'README.md').read_text(encoding='utf-8'), 'Quick start'))
-    return '\n'.join(blocks)
+    return with_work(bash_blocks(section((ROOT / 'README.md').read_text(encoding='utf-8'), 'Quick start')))
 
 
 class ShellBase(unittest.TestCase):
@@ -47,7 +51,6 @@ class ShellBase(unittest.TestCase):
         self.workspace = self.root / 'work space résumé'
         self.workspace.mkdir()
         shutil.copyfile(ROOT / 'templates/contract.json', self.workspace / 'contract.json')
-        (self.workspace / 'report.txt').write_text('report\n', encoding='utf-8')
 
     def shell(self, name):
         path = shutil.which(name)
@@ -75,6 +78,7 @@ class DocumentedFlows(ShellBase):
         for name in SHELLS:
             with self.subTest(shell=name):
                 shutil.rmtree(self.workspace / '.mission', ignore_errors=True)
+                (self.workspace / 'report.txt').unlink(missing_ok=True)
                 result = self.run_script(name, readme_commands())
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 self.assert_completed()
@@ -83,6 +87,7 @@ class DocumentedFlows(ShellBase):
         for name in SHELLS:
             with self.subTest(shell=name):
                 shutil.rmtree(self.workspace / '.mission', ignore_errors=True)
+                (self.workspace / 'report.txt').unlink(missing_ok=True)
                 result = self.run_script(name, skill_commands())
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 self.assert_completed()
@@ -107,6 +112,7 @@ class Wrappers(ShellBase):
     def test_wrappers_run_directly_from_each_shell(self):
         for name in SHELLS:
             with self.subTest(shell=name):
+                (self.workspace / 'report.txt').write_text('report\n', encoding='utf-8')
                 result = self.run_script(name, '"$SKILL/scripts/verify.sh" file report.txt\n'
                                                f'NO_PROGRESS_STATE={name}.json "$SKILL/scripts/no_progress.sh" record tool x\n')
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

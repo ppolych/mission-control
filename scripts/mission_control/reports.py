@@ -49,6 +49,8 @@ def handoff_report(contract, state, root):
         steps[step['id']]['status']=entry.get('status','pending')
         steps[step['id']]['depends_on']=step.get('depends_on',[])
         steps[step['id']].update(step_guidance(contract, state, step, active_step_present))
+        if 'discipline_outcome' in entry:
+            steps[step['id']]['discipline_outcome']=entry['discipline_outcome']
     return {'installation': installation_identity(), 'mission_directory': str(root.resolve()),
             'goal':contract['mission'],'constraints':contract.get('constraints',[]),
             'workspace':state.get('workspace'),'contract_hash':state['contract_hash'],

@@ -2,9 +2,10 @@ from pathlib import Path
 
 
 CONTRACT_FIELDS = {'schema_version', 'mission', 'constraints', 'budget', 'steps', 'mode',
-                   'acceptance', 'allowed_paths', 'revision'}
+                   'acceptance', 'allowed_paths', 'revision', 'discipline'}
 STEP_FIELDS = {'id', 'description', 'depends_on', 'verify', 'verify_timeout', 'risk', 'needs_approval',
-               'commands', 'acceptance_refs', 'watch', 'retry', 'effects', 'legacy_passes'}
+               'commands', 'acceptance_refs', 'watch', 'retry', 'effects', 'legacy_passes',
+               'test_first_exempt', 'manual_only'}
 
 
 def validate_known_fields(contract):
@@ -16,6 +17,8 @@ def validate_known_fields(contract):
         names.extend(step['id'] + '.' + key for key in unknown(step, STEP_FIELDS))
     if names:
         raise ValueError('unknown contract fields: ' + ', '.join(names) + '; check spelling or prefix comments with _')
+    from .discipline import validate_draft_fields
+    validate_draft_fields(contract)
 
 
 def relative_path(value, allow_workspace_root=False):

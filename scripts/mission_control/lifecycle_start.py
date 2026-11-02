@@ -4,6 +4,7 @@
 def start_step(contract, state, step, entry, args, path):
     from .approvals import exhaustion_reason, has_approval, request_approval, requires_approval, validate_approval_workspace
     from .budgets import attempts_per_step, mission_attempts, step_budget_exhausted
+    from .discipline import is_strict
     from .journal import commit_state
     from .observations import artifact_observations, readable_observations, watched_inputs
     from .publication import now
@@ -66,6 +67,8 @@ def start_step(contract, state, step, entry, args, path):
     if schema3 and not args.revalidate:
         entry['effect_baseline'] = artifact_observations(state['workspace'], step['effects']['writes'])
         readable_observations(entry['effect_baseline'])
+        if is_strict(contract):
+            entry.setdefault('first_effect_baseline', entry['effect_baseline'])
         entry['input_baseline'] = watched_inputs(contract, step, state['workspace'])
         readable_observations(entry['input_baseline'])
     entry['context'] = args.context

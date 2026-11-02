@@ -1,5 +1,6 @@
 {
   "schema_version": 3,
+  "discipline": "strict",
   "mission": "Produce the requested artifact",
   "constraints": [],
   "budget": {
@@ -36,6 +37,10 @@
         "network": "none",
         "external_actions": [],
         "reversible": true
+      },
+      "test_first_exempt": {
+        "kind": "docs",
+        "reason": "Replace with test_first for behavior changes; keep a reason when a failing test first is not proportionate."
       }
     }
   ],

@@ -108,6 +108,8 @@ def run_transition(contract, state, args, root, path):
     if command == 'finish':
         lifecycle_stop.print_goal_review_notice(state)
     if command == 'verify':
+        from .discipline import print_outcome
+        print_outcome(state['steps'][args.step])
         return int(state['steps'][args.step]['status'] != 'completed')
     if command == 'goal-review':
         return int(args.verdict == 'fail')

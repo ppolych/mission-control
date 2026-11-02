@@ -63,6 +63,8 @@ def validate(c):
     if 'constraints' in c and (not isinstance(c['constraints'],list) or not all(isinstance(x,str) for x in c['constraints'])):
         raise ValueError('constraints must be string array')
     validate_advanced(c)
+    from .discipline import validate_discipline
+    validate_discipline(c)
 
 
 def validate_step_records(entry):
