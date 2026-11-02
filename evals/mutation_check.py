@@ -46,8 +46,16 @@ MUTANTS = (
     ('note_outlives_content', 'scope_check.py', "return record['status'] if path_digest(workspace, name) == record['digest'] else 'open'", "return record['status']"),
     ('unknown_closes_observation', 'scope_check.py', "'unknown': 'open'}", "'unknown': 'stated_not_mine'}"),
     ('scope_path_limit_removed', 'scope_check.py', 'if len(items) > MAX_SCOPE_PATHS:', 'if False:'),
-    ('fsmonitor_allowed', 'git_read.py', "'--literal-pathspecs', '-c', 'core.fsmonitor=false',", "'--literal-pathspecs',"),
+    ('fsmonitor_allowed', 'git_read.py', "'-c', 'core.fsmonitor=false',", ""),
     ('git_environment_kept', 'git_read.py', "environment = {key: value for key, value in os.environ.items() if not key.startswith('GIT_')}", 'environment = dict(os.environ)'),
+    ('gate_ignores_content', 'gate.py', "return 'content_match' if same else 'content_mismatch'", "return 'content_match'"),
+    ('gate_trusts_metadata', 'gate.py', "    if receipt.get('kind') in UNPROVABLE:\n", "    if False:\n"),
+    ('gate_passes_without_scope', 'gate.py', "if scope['status'] != 'performed':", 'if False:'),
+    ('gate_ignores_open_observation', 'gate.py', '    if unresolved:\n', '    if False:\n'),
+    ('gate_ignores_outside_paths', 'gate.py', '    if outside:\n', '    if False:\n'),
+    ('gate_allows_rewritten_base', 'gate.py', "if run_git(workspace, 'merge-base', '--is-ancestor', start, commit, ok=(0, 1)).returncode:", 'if False:'),
+    ('gate_follows_links', 'gate.py', "if mode in ('120000', '160000') or depth == len(parts):", 'if depth == len(parts):'),
+    ('gate_no_mission_passes', 'cli.py', "print(json.dumps(no_mission_report(), indent=2))\n        return 1", "print(json.dumps(no_mission_report(), indent=2))\n        return 0"),
     ('repeat_without_lock', 'cli_aux.py', "with persistent_lock(path.with_name(path.name + '.lock'), wait=REPEAT_LOCK_WAIT_SECONDS):", 'if True:'),
 )
 # A second identical check guards these, so one removal changes no behavior.

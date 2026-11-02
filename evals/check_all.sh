@@ -24,9 +24,9 @@ python3 -O evals/run_behavioral.py --baseline evals/baseline-control-plane.json 
 
 echo "== template and shell syntax"
 python3 scripts/mission.py validate --contract templates/contract.json
-bash -n scripts/verify.sh scripts/no_progress.sh evals/check_all.sh
+bash -n scripts/verify.sh scripts/no_progress.sh evals/check_all.sh templates/pre-push-gate.sh
 if command -v shellcheck >/dev/null; then
-  shellcheck scripts/*.sh evals/check_all.sh
+  shellcheck scripts/*.sh evals/check_all.sh templates/pre-push-gate.sh
 else
   echo "shellcheck not installed; skipped"
 fi

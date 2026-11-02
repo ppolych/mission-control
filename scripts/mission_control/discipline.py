@@ -80,6 +80,9 @@ def validate_discipline(contract):
         if 'test_first_exempt' in step:
             validate_exemption(step)
         validate_test_first(step)
+        uncommitted = step['effects'].get('uncommitted', [])
+        if not isinstance(uncommitted, list) or set(map(str, uncommitted)) - set(step['effects']['writes']):
+            raise ValueError(step['id'] + ': effects.uncommitted must be a subset of effects.writes')
         if step['effects']['writes'] and not {'test_first', 'test_first_exempt'} & set(step):
             raise ValueError(step['id'] + ': a step that writes must declare test_first or test_first_exempt')
 
@@ -163,6 +166,8 @@ def print_outcome(entry):
 def validate_discipline_state(state):
     from .scope_check import validate_scope_state
     validate_scope_state(state)
+    if not isinstance(state.get('mission_base', {}), dict):
+        raise ValueError('invalid mission base')
     for entry in state['steps'].values():
         for key in ('discipline_outcome', 'first_effect_baseline', 'red'):
             if key in entry and not isinstance(entry[key], dict):

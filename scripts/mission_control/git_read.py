@@ -8,13 +8,13 @@ class GitError(ValueError):
     """Git could not answer; callers must not treat this as a clean result."""
 
 
-def run_git(workspace, *args, ok=(0,)):
+def run_git(workspace, *args, ok=(0,), literal=True):
     import subprocess
     # A hook sets GIT_DIR and similar variables that would redirect these reads.
     environment = {key: value for key, value in os.environ.items() if not key.startswith('GIT_')}
     environment['GIT_OPTIONAL_LOCKS'] = '0'
     # core.fsmonitor can name a command to run from repository configuration.
-    command = ['git', '-C', str(workspace), '--literal-pathspecs', '-c', 'core.fsmonitor=false',
+    command = ['git', '-C', str(workspace), *(['--literal-pathspecs'] if literal else []), '-c', 'core.fsmonitor=false',
                '-c', 'status.submoduleSummary=false', *args]
     try:
         result = subprocess.run(command, capture_output=True, env=environment, stdin=subprocess.DEVNULL,

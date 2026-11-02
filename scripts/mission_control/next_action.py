@@ -72,6 +72,10 @@ def next_action(contract, state, root=None):
         if goal_review_status(state) == 'missing':
             return _report('goal_review', ['goal-review', '--verdict', 'VERDICT', '--rationale', 'TEXT'],
                            'Compare the combined outcome with the original goal.', root)
+        open_paths = sorted(name for name, record in state.get('scope_observations', {}).items() if record.get('status') == 'open')
+        if open_paths:
+            argv = ['scope-note', '--path', open_paths[0], '--disposition', 'mine|not_mine|unknown', '--rationale', 'TEXT']
+            return _report('scope_note', argv, 'Inspect the observed change, then record a statement; it is not proof.', root)
         return _report('report_outcome', [], 'Report the final label, evidence and unresolved work.', root)
     if stop:
         return _report('inspect_stop_reason', [], 'Stopped as ' + stop + '. Report it; resume only when the user asks.',

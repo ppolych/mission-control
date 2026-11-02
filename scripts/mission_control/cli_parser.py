@@ -7,7 +7,7 @@ COMMAND_GROUPS = (
     ('Controlled mode', ('approve', 'deny')),
     ('Recovery and revision', ('recovery', 'recover', 'revision-diff', 'revise', 'migrate', 'scope-note')),
     ('Read-only reports', ('status', 'history', 'coverage', 'metrics', 'handoff', 'evidence-audit',
-                           'diagnose', 'impact', 'lessons-search', 'lesson-audit', 'store-read',
+                           'diagnose', 'gate', 'impact', 'lessons-search', 'lesson-audit', 'store-read',
                            'service-status')),
     ('Auxiliary stores', ('store-publish', 'service-probe', 'service-record',
                           'analysis-key', 'cache-save', 'cache-check')),
@@ -40,6 +40,7 @@ FLAGS = (
     ('--path', {'help': 'observed workspace-relative path for scope-note'}),
     ('--disposition', {'choices': ['mine', 'not_mine', 'unknown'],
                        'help': 'scope-note: a recorded statement about an observed path, not proof'}),
+    ('--commit', {'help': 'gate: commit to compare with the recorded evidence'}),
     ('--lessons-root', {'help': 'known lessons directory to search'}),
     ('--query', {'action': 'append', 'help': 'search or analysis query'}),
     ('--limit', {'type': int, 'default': 10, 'help': 'maximum search results'}),
@@ -91,6 +92,8 @@ def reject_misplaced_flags(args):
         raise ValueError('--compact is only for handoff')
     if args.already_satisfied and args.command != 'verify':
         raise ValueError('--already-satisfied is only for verify')
+    if args.commit and args.command != 'gate':
+        raise ValueError('--commit is only for gate')
     if args.digest and args.command not in ('approve', 'deny', 'recover'):
         raise ValueError('--digest is only for approve, deny or recover')
     if args.contract and args.command not in ('init', 'validate', 'revise', 'revision-diff'):

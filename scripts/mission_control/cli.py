@@ -5,7 +5,7 @@ from pathlib import Path
 from .settings import VERSION, MAX_STATE_BYTES
 
 READ_ONLY_COMMANDS = ('status', 'history', 'metrics', 'handoff', 'coverage', 'recovery',
-                      'diagnose', 'evidence-audit', 'revision-diff')
+                      'diagnose', 'evidence-audit', 'revision-diff', 'gate')
 STEP_COMMANDS = ('start', 'verify', 'block', 'assess', 'approve', 'deny', 'recovery', 'recover', 'red', 'test-first-note')
 
 
@@ -15,6 +15,11 @@ def run_report(contract, state, args, root):
     from .next_action import next_action
     from .reports import goal_review_status
     command = args.command
+    if command == 'gate':
+        from .gate import gate_report
+        code, report = gate_report(contract, state, args.commit, root)
+        print(json.dumps(report, indent=2))
+        return code
     if command == 'evidence-audit':
         from .quality import evidence_audit
         validate_approval_workspace(state)
@@ -187,4 +192,10 @@ def main(argv):
     reject_misplaced_flags(args)
     root = Path(args.mission)
     code = run_helper(args, root)
-    return code if code is not None else run_mission_command(args, root)
+    if code is not None:
+        return code
+    if args.command == 'gate' and not (root / 'state/progress.json').exists():
+        from .gate import no_mission_report
+        print(json.dumps(no_mission_report(), indent=2))
+        return 1
+    return run_mission_command(args, root)

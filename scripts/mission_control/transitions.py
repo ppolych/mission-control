@@ -48,6 +48,10 @@ def init_mission(contract, state, args, root):
     state['contract_hash'] = digest(contract)
     state['workspace'] = str(workspace)
     state['approved_steps'] = {}
+    from .discipline import is_strict
+    if is_strict(contract):
+        from .gate import begin_mission
+        begin_mission(contract, state, workspace, root)
 
 
 def step_transition(contract, state, args, path):

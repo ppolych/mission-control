@@ -70,7 +70,8 @@ def validate_advanced(contract):
         artifact_paths(step.get('watch', []), 'watch')
         effects = step.get('effects')
         keys = {'reads', 'writes', 'network', 'external_actions', 'reversible'}
-        if not isinstance(effects, dict) or set(effects) != keys:
+        optional = {'uncommitted'} if contract.get('discipline') == 'strict' else set()
+        if not isinstance(effects, dict) or set(effects) - optional != keys:
             raise ValueError('schema 3 requires explicit reads/writes/network/external_actions/reversible effects')
         for name in ('reads', 'writes'):artifact_paths(effects[name], name)
         text_list(effects['external_actions'], 'external_actions')
