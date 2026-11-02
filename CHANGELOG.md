@@ -9,6 +9,7 @@ In a real Nestor session, `red` refused the import error of a new function again
 - The small-fix template no longer sets `failure_matches`, so that red records `exit_only`.
 - The `red` refusal names the ways forward and says not to delete the mission directory.
 - The skill forbids deleting the mission root and asks for every refusal in the final message. This is an instruction: nothing can detect a deleted mission afterwards.
+- The `test_paths` refusal says that an existing test also belongs in `effects.writes`.
 
 ## 0.4.2.3
 

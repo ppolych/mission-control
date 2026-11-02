@@ -244,6 +244,10 @@ class DraftShape(TestFirstBase):
         self.step['test_first']['test_paths'] = ['elsewhere.py']
         self.assert_refused()
 
+    def test_refusal_says_an_existing_test_also_belongs_in_writes(self):
+        self.step['test_first']['test_paths'] = ['elsewhere.py']
+        self.assertIn('an existing test too', self.validate_error()[1])
+
     def test_some_write_must_be_implementation(self):
         self.step['test_first']['test_paths'] = ['app.py', 'check_app.py']
         self.assert_refused()

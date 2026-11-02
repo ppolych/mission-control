@@ -314,4 +314,6 @@ Not run: macOS and three prepared cases in `evals/discipline_trials.py`.
 
 `check_all.sh` passed on Linux 6.18.54.1-microsoft-standard-WSL2 with Python 3.14.4: 552 tests in 160.368 seconds, then 552 tests in 139.487 seconds with a symlinked TMPDIR, plus behavioral probes, template and shell checks and package smoke checks (148 entries). `mutation_check.py` was not rerun, since only a refusal message changed in `scripts/`; it caught 47 of 47 on 0.4.2.3.
 
-Not run: macOS, three prepared cases in `evals/discipline_trials.py`, and any real session with 0.4.2.4.
+Three real Nestor sessions then ran with 0.4.2.4 on neutral paths, with the same model and reviewer, not an independent operator, and requests naming the skill. `no_op_work` passed with no intervention: red before the edit, then verify, finish and goal review, in 161 seconds and 438 thousand tokens. `undeclared_write` passed: `verify` flagged the undeclared file, the agent recorded a `scope-note`, and nothing was reverted. `valid_no_change` failed its criterion: the agent made no artificial change and verified the file, but ran no mission and no `--already-satisfied`. The latest run of the six cases gives five passes and one failure across different releases, so this does not measure one release, and no case has been repeated enough to show a rate. Requests that do not name the skill did not use it.
+
+The final refusal message change was made after those sessions, so no real session has run with it. Not run: macOS, and any prepared case with a request that does not name the skill on 0.4.2.4.

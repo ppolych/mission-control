@@ -32,7 +32,7 @@ def validate_test_first(step):
     paths = value['test_paths']
     writes = step['effects']['writes']
     if not isinstance(paths, list) or not paths or set(map(str, paths)) - set(writes):
-        raise ValueError(label + 'test_paths must be a nonempty subset of effects.writes')
+        raise ValueError(label + 'test_paths must be a nonempty subset of effects.writes; list an existing test too, which does not require changing it')
     if not implementation_paths(step):
         raise ValueError(label + 'needs at least one declared write that is not a test')
     if 'failure_matches' in value:
