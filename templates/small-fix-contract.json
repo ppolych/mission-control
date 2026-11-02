@@ -1,0 +1,43 @@
+{
+  "schema_version": 3,
+  "discipline": "strict",
+  "mission": "Replace with the user's request, in their words",
+  "constraints": [],
+  "steps": [
+    {
+      "id": "fix",
+      "description": "Replace with the change, and how the test shows it",
+      "depends_on": [],
+      "verify": [
+        ["exit0", "python3", "-B", "-m", "unittest"]
+      ],
+      "risk": "low",
+      "needs_approval": false,
+      "commands": [],
+      "acceptance_refs": ["AC-1"],
+      "watch": [],
+      "retry": "inspect",
+      "effects": {
+        "reads": [],
+        "writes": ["app.py", "test_app.py"],
+        "network": "none",
+        "external_actions": [],
+        "reversible": true
+      },
+      "test_first": {
+        "command": ["python3", "-B", "-m", "unittest"],
+        "failure_matches": "AssertionError",
+        "test_paths": ["test_app.py"]
+      }
+    }
+  ],
+  "mode": "autonomous",
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "description": "Replace with what the user will check: given this input, when run, then this result",
+      "evidence_kinds": ["behavior"]
+    }
+  ],
+  "allowed_paths": ["."]
+}

@@ -1,15 +1,15 @@
 ---
 name: mission-control
-description: Orchestrate substantial multi-step goals with durable mission state, evidence-based verification, bounded recovery, and explicit outcomes. Use for controlled, autonomous, or multi-session work; exclude simple edits and quick questions.
+description: Orchestrate goals with durable mission state, evidence-based verification, bounded recovery, and explicit outcomes. Use for substantial multi-step, controlled, autonomous, or multi-session work, and whenever the user asks for this skill by name, however small or urgent. Otherwise exclude simple edits and quick questions.
 metadata:
-  version: "0.4.2.1"
+  version: "0.4.2.2"
   author: "Panos Polychronis"
   email: "ppolych@netcompany.com"
 ---
 
 # Mission Control
 
-Version 0.4.2.1. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
+Version 0.4.2.2. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
 or macOS. For WSL paths and setup, read [WSL guidance](references/wsl.md).
 Preserve the user's scope, existing authorization, and host permissions.
 
@@ -31,6 +31,38 @@ loading or narration. Existing authority applies without extra routine approvals
 Follow [controller activation](references/controller-activation.md) for branching,
 return codes, failure handling and observable proof. These are agent rules, not a
 host enforcement hook.
+
+When the user asks for this skill by name, a project change goes through a mission,
+however small the change. Urgency does not waive this: for a small change, use
+[the short path](#small-changes). If you will not use the mission, say so and why
+before the first project change, not afterwards.
+
+## Small changes
+
+For one small change with a test, this is the whole flow. Do not read other references or the
+controller source unless a command refuses. Copy [the template](templates/small-fix-contract.json) outside
+the workspace, then replace its text, test command and paths. Use `test_first_exempt` only when no test can apply.
+
+```bash
+M="$SKILL/scripts/mission.py"
+contract=$(mktemp)
+python3 "$M" validate --contract "$contract"
+python3 "$M" init --contract "$contract" --workspace "$PWD"
+python3 "$M" start --step fix
+python3 "$M" red --step fix
+```
+
+Write the edited template to `$contract` first, and any missing test before `red`. Make the change only now, then:
+
+```bash
+python3 "$M" verify --step fix
+python3 "$M" criterion-review --criterion AC-1 --verdict supported --rationale TEXT --evidence-ref check:fix:0 --evidence-kind behavior
+python3 "$M" finish
+python3 "$M" goal-review --verdict pass --rationale TEXT
+```
+
+Record `supported` and `pass` only if the results show it. If the user asked for a commit or push: commit,
+run `python3 "$M" gate --commit SHA`, and push only if it exits 0.
 
 ## Command path
 

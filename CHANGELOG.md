@@ -2,6 +2,13 @@
 
 Test results for each release are in [the validation record](references/operational-validation.md).
 
+## 0.4.2.2
+
+A real Nestor session under time pressure loaded the skill and then skipped the mission, citing the small size of the task.
+
+- The description and activation rule say that a user naming the skill requires a mission however small or urgent, and that an agent declining must say so before the first project change. This is an instruction, not enforcement.
+- New short path in `SKILL.md` and `templates/small-fix-contract.json`, tested from red to a certified commit, so one small change needs no further reading.
+
 ## 0.4.2.1
 
 Findings from real Nestor trials in strict missions.

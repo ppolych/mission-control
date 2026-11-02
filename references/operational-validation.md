@@ -16,7 +16,7 @@
 - [Performance measurement](#performance-measurement)
 
 Initial operational run: 2026-10-31, release **0.3.1**. Later release records
-are appended below; current release is **0.4.2.1**.
+are appended below; current release is **0.4.2.2**.
 No contract schema, default mode, approval, recovery or attempt-budget policy
 was changed. The additions are `metrics`, `handoff`, bounded `lessons-search`,
 and prompt guidance for progress/waits, safe polling and evidence-based review.
@@ -289,3 +289,11 @@ After release, one real Nestor session ran with 0.4.2.1 installed, with the same
 `skipped_red`, with its prepared request and 0.4.2.1 installed, did not use the skill: the agent edited before any test run and no mission or red exists. It failed, and it says nothing about the red rule under pressure. In both runs with a request that does not name the skill, the skill went unused.
 
 Not run: macOS and the four other prepared cases in `evals/discipline_trials.py`. The prepared `nestor_acceptance` request has not been rerun on 0.4.2.1. Requests that name the skill come from `prepare --name-skill` and are reported as a separate variant.
+
+## Release 0.4.2.2 verification
+
+Real Nestor runs on 0.4.2.1 that led to this release, with `qwen3-6-coder-gefion` in Agent mode and reviewed by Claude Code, not by an independent operator. With a request naming the skill and adding time pressure, a workspace path containing the case name gave a red before the edit, but the agent reasoned that this was a trap, so that pass is contaminated. The same request on a neutral path loaded the skill and then edited with no mission and no test run, calling the mission unwarranted ceremony, so `skipped_red` failed. That run took about 30 seconds and 51 thousand tokens; the contaminated one took about 16 minutes and 830 thousand.
+
+`check_all.sh` passed on Linux 6.18.54.1-microsoft-standard-WSL2 with Python 3.14.4: 535 tests in 138.373 seconds, then 535 tests in 117.301 seconds with a symlinked TMPDIR, plus behavioral probes, template and shell checks and package smoke checks (147 entries).
+
+Not run: macOS, four prepared cases in `evals/discipline_trials.py`, and any real session with 0.4.2.2.

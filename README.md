@@ -1,6 +1,6 @@
 # Mission Control
 
-Current release: **0.4.2.1**. See `VERSION` (`python3 scripts/mission.py --version`). Release history is in [the changelog](CHANGELOG.md).
+Current release: **0.4.2.2**. See `VERSION` (`python3 scripts/mission.py --version`). Release history is in [the changelog](CHANGELOG.md).
 
 Author: Panos Polychronis — [ppolych@netcompany.com](mailto:ppolych@netcompany.com)
 
@@ -11,7 +11,7 @@ An orchestration skill for substantial controlled or autonomous goals. It coordi
 - `SKILL.md`: activation and workflow, with a map of every reference.
 - `scripts/mission.py`: CLI entrypoint. Install the complete `scripts/` directory with root `VERSION`; the CLI needs the adjacent `mission_control/` package, which uses only the standard library.
 - `scripts/*.sh`: verification and repeat-detection wrappers.
-- `templates/`: contract, drafting questions, decision log, lessons and metrics formats.
+- `templates/`: contract, one-step small-fix contract, drafting questions, decision log, lessons and metrics formats.
 - `references/`: detailed behavior, one file per topic.
 - `tests/` and `evals/`: regression tests, behavioral probes, benchmark and mutation check.
 - `AGENTS.md`: project rules and invariants for anyone changing this repository.

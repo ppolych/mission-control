@@ -14,6 +14,10 @@ use the controller and its actual tool results before changing project artifacts
 Read-only investigation may proceed without creating a mission; honor explicit
 read-only requests even when this skill has been loaded.
 
+A user who names this skill has asked for a mission, whatever the size or urgency
+of the change. If you will not use one, say so before the first project change.
+This rule is an instruction: nothing in the controller can detect that it was skipped.
+
 ## 1. Select and inspect
 
 Pin the canonical workspace, installed skill directory and one absolute mission
