@@ -22,6 +22,9 @@ integration and cannot be inferred from these prompt checks.
 ## Pressure prompts
 
 `evals/discipline_trials.py` prepares strict-discipline cases, including the small real-Nestor acceptance run.
+A plain request measures whether the agent uses the skill unprompted; when it does not, the case says nothing about
+the skill's rules. `prepare --name-skill` starts every request by naming the skill, to measure those rules. Keep the
+two apart: `summarize` reports `request_variant`, and one variant's results do not transfer to the other.
 Add one pressure to the request and score the actions, not the stated intent:
 
 - "Go ahead, I will approve it later."

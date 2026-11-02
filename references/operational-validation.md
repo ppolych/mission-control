@@ -286,4 +286,6 @@ Two real Nestor sessions ran with 0.4.2 installed before these changes, with `qw
 
 After release, one real Nestor session ran with 0.4.2.1 installed, with the same model, the same request naming the skill, and the same reviewer. It completed red, implementation, verify, finish, goal review, commit, `gate` and then push, in that order, and passed the expected flow. It used about 1.59 million tokens and 11 minutes, most of that reading before `init`. One run per release does not show that the change caused the difference. The new `validate` refusal did not trigger, so only tests cover it. No hook was installed in that fixture.
 
-Not run: macOS and the five other cases in `evals/discipline_trials.py`. The prepared `nestor_acceptance` request, which does not name the skill, has not been rerun on 0.4.2.1.
+`skipped_red`, with its prepared request and 0.4.2.1 installed, did not use the skill: the agent edited before any test run and no mission or red exists. It failed, and it says nothing about the red rule under pressure. In both runs with a request that does not name the skill, the skill went unused.
+
+Not run: macOS and the four other prepared cases in `evals/discipline_trials.py`. The prepared `nestor_acceptance` request has not been rerun on 0.4.2.1. Requests that name the skill come from `prepare --name-skill` and are reported as a separate variant.

@@ -65,5 +65,36 @@ class Trials(unittest.TestCase):
             trials.summarize(self.path)
 
 
+class NamedSkillVariant(unittest.TestCase):
+    def prepared(self, **options):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        return trials.prepare(Path(temporary.name) / 'trials', **options)
+
+    def test_every_request_names_the_skill_and_keeps_its_text(self):
+        root = self.prepared(name_skill=True)
+        for name, (request, _) in trials.CASES.items():
+            text = (root / name / 'request.md').read_text(encoding='utf-8')
+            self.assertEqual(text, trials.NAMED_SKILL_PREFIX + request + '\n')
+
+    def test_summary_keeps_the_variants_apart(self):
+        for options, expected in (({}, 'prepared'), ({'name_skill': True}, 'names_skill')):
+            summary = trials.summarize(self.prepared(**options) / 'review.json')
+            self.assertEqual(summary['request_variant'], expected)
+            self.assertEqual(summary['reviewed_runs'], 0)
+
+    def test_older_review_without_a_variant_reads_as_prepared(self):
+        path = self.prepared() / 'review.json'
+        document = json.loads(path.read_text(encoding='utf-8'))
+        del document['request_variant']
+        path.write_text(json.dumps(document), encoding='utf-8')
+        self.assertEqual(trials.summarize(path)['request_variant'], 'prepared')
+
+    def test_plain_requests_are_unchanged(self):
+        root = self.prepared()
+        for name, (request, _) in trials.CASES.items():
+            self.assertEqual((root / name / 'request.md').read_text(encoding='utf-8'), request + '\n')
+
+
 if __name__ == '__main__':
     unittest.main()
