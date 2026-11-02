@@ -9,7 +9,7 @@
 - [Bounded recovery from transient observations](#bounded-recovery-from-transient-observations)
 - [Origin and adaptation](#origin-and-adaptation)
 
-These additions were introduced in 0.3.1 and remain available in 0.4.2.3. Contract schemas,
+These additions were introduced in 0.3.1 and remain available in 0.4.2.4. Contract schemas,
 approval policy, attempt budgets and recovery transitions are unchanged. All
 three helpers below are read-only: they do not execute checks, add journal events,
 record approvals, or reset counters. Explicit shell redirection writes an export.

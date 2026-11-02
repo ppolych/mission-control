@@ -68,8 +68,49 @@ class ShortPath(unittest.TestCase):
             self.assertRegex(section, r'"\$M" ' + name + r'\b')
         self.assertIn('templates/small-fix-contract.json', section)
 
+    def test_new_function_fails_with_an_import_error_and_still_records_red(self):
+        self.git('init', '-q')
+        self.git('config', 'commit.gpgsign', 'false')
+        (self.work / '.gitignore').write_text('.mission/\n__pycache__/\n', encoding='utf-8')
+        (self.work / 'app.py').write_text('', encoding='utf-8')
+        (self.work / 'test_app.py').write_text(TEST, encoding='utf-8')
+        self.git('add', '.')
+        self.git('commit', '-q', '-m', 'base')
+        contract = str(self.root / 'contract.json')
+        Path(contract).write_bytes((ROOT / 'templates/small-fix-contract.json').read_bytes())
+        self.mission('init', '--contract', contract, '--workspace', str(self.work))
+        self.mission('start', '--step', 'fix')
+        self.mission('red', '--step', 'fix')
+        status = json.loads((self.work / '.mission/state/progress.json').read_text(encoding='utf-8'))
+        self.assertEqual(status['steps']['fix']['red']['failure_match'], 'exit_only')
+
+    def test_mismatch_refusal_names_the_way_forward_and_keeps_the_mission(self):
+        self.git('init', '-q')
+        self.git('config', 'commit.gpgsign', 'false')
+        (self.work / '.gitignore').write_text('.mission/\n__pycache__/\n', encoding='utf-8')
+        (self.work / 'app.py').write_text('', encoding='utf-8')
+        (self.work / 'test_app.py').write_text(TEST, encoding='utf-8')
+        self.git('add', '.')
+        self.git('commit', '-q', '-m', 'base')
+        document = json.loads((ROOT / 'templates/small-fix-contract.json').read_text(encoding='utf-8'))
+        document['steps'][0]['test_first']['failure_matches'] = 'AssertionError'
+        contract = self.root / 'contract.json'
+        contract.write_text(json.dumps(document), encoding='utf-8')
+        self.mission('init', '--contract', str(contract), '--workspace', str(self.work))
+        self.mission('start', '--step', 'fix')
+        result = subprocess.run(['python3', CLI, 'red', '--step', 'fix'], cwd=self.work, capture_output=True, text=True, env=self.environment)
+        self.assertEqual(result.returncode, 1, result.stderr)
+        for phrase in ('test-first-note', 'revise', 'Do not delete'):
+            self.assertIn(phrase, result.stderr)
+        self.assertTrue((self.work / '.mission/state/progress.json').exists())
+
 
 class NamedSkillRule(unittest.TestCase):
+    def test_mission_root_is_kept_and_refusals_are_reported(self):
+        section = ' '.join(SKILL.split('## Activate the controller', 1)[1].split('\n## ', 1)[0].split())
+        self.assertIn('Never delete the mission root', section)
+        self.assertIn('Report every refusal', section)
+
     def test_description_applies_when_named_and_no_longer_excludes_it(self):
         description = re.search(r'^description: (.+)$', SKILL, re.M).group(1)
         self.assertIn('by name', description)

@@ -2,14 +2,14 @@
 name: mission-control
 description: Orchestrate goals with durable mission state, evidence-based verification, bounded recovery, and explicit outcomes. Use for substantial multi-step, controlled, autonomous, or multi-session work, and whenever the user asks for this skill by name, however small or urgent. Otherwise exclude simple edits and quick questions.
 metadata:
-  version: "0.4.2.3"
+  version: "0.4.2.4"
   author: "Panos Polychronis"
   email: "ppolych@netcompany.com"
 ---
 
 # Mission Control
 
-Version 0.4.2.3. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
+Version 0.4.2.4. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
 or macOS. For WSL paths and setup, read [WSL guidance](references/wsl.md).
 Preserve the user's scope, existing authorization, and host permissions.
 
@@ -28,14 +28,14 @@ requires no initialization and must remain read-only when requested.
 After work, supply evidence-based `assess` when required and run `verify`; report
 completion only from successful controller results/current state, never from skill
 loading or narration. Existing authority applies without extra routine approvals.
+Never delete the mission root. Report every refusal in your final message.
 Follow [controller activation](references/controller-activation.md) for branching,
-return codes, failure handling and observable proof. These are agent rules, not a
+failures and proof. These are agent rules, not a
 host enforcement hook.
 
 When the user asks for this skill by name, a project change goes through a mission,
-however small the change. Urgency does not waive this: for a small change, use
-[the short path](#small-changes). If you will not use the mission, say so and why
-before the first project change, not afterwards.
+however small. Urgency does not waive this: use [the short path](#small-changes).
+If you will not use the mission, say so and why before the first project change.
 
 ## Command path
 

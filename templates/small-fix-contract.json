@@ -26,7 +26,6 @@
       },
       "test_first": {
         "command": ["python3", "-B", "-m", "unittest"],
-        "failure_matches": "AssertionError",
         "test_paths": ["test_app.py"]
       }
     }

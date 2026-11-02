@@ -98,7 +98,8 @@ def record_red(contract, state, step, entry):
         return refuse('command could not run to a test result (status ' + str(status) + ')')
     pattern = declared.get('failure_matches')
     if pattern is not None and not re.search(pattern, output):
-        return refuse('failure output did not match failure_matches; this looks like a different failure')
+        return refuse('failure output did not match failure_matches; this looks like a different failure. Fix the test, record test-first-note '
+                      '--reason TEXT, or use revise for a new pattern. Do not delete the mission directory to start over.')
     if 'red' in entry:
         entry.setdefault('red_history', []).append(entry['red'])
     entry['red'] = {'exit_status': status, 'failure_match': 'matched' if pattern is not None else 'exit_only',

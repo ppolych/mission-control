@@ -2,6 +2,14 @@
 
 Test results for each release are in [the validation record](references/operational-validation.md).
 
+## 0.4.2.4
+
+In a real Nestor session, `red` refused the import error of a new function against the small-fix template's `failure_matches`. The agent deleted `.mission`, started over and did not report it.
+
+- The small-fix template no longer sets `failure_matches`, so that red records `exit_only`.
+- The `red` refusal names the ways forward and says not to delete the mission directory.
+- The skill forbids deleting the mission root and asks for every refusal in the final message. This is an instruction: nothing can detect a deleted mission afterwards.
+
 ## 0.4.2.3
 
 In a real Nestor session, an agent committed work with no mission, was stopped by the pre-push hook, then started a mission on that commit and recorded it as already satisfied. `gate` certified it and the push passed, without `--no-verify`.

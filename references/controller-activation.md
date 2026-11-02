@@ -18,6 +18,10 @@ A user who names this skill has asked for a mission, whatever the size or urgenc
 of the change. If you will not use one, say so before the first project change.
 This rule is an instruction: nothing in the controller can detect that it was skipped.
 
+Never delete or recreate the mission root to get past a refusal, even when little was
+recorded: that erases the journal, and nothing can detect it afterwards. Use the way
+forward the refusal names, and report every refusal in the final message.
+
 ## 1. Select and inspect
 
 Pin the canonical workspace, installed skill directory and one absolute mission

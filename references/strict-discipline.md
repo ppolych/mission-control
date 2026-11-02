@@ -92,6 +92,7 @@ Flow within one step: `start`, write the test, `red`, implement, `verify`.
 the command timed out, died from a signal or returned 126 or 127. It stores the exit status, the match result
 and digests of the test files, never the output. `failure_matches` is a heuristic: it shows the output
 resembled what was expected, not that the intended assertion failed. Without it the record says `exit_only`.
+A new function often fails with an import error, so the small-fix template omits it.
 
 `verify` records `red_green`:
 

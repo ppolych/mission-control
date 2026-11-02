@@ -16,7 +16,7 @@
 - [Performance measurement](#performance-measurement)
 
 Initial operational run: 2026-10-31, release **0.3.1**. Later release records
-are appended below; current release is **0.4.2.3**.
+are appended below; current release is **0.4.2.4**.
 No contract schema, default mode, approval, recovery or attempt-budget policy
 was changed. The additions are `metrics`, `handoff`, bounded `lessons-search`,
 and prompt guidance for progress/waits, safe polling and evidence-based review.
@@ -306,4 +306,12 @@ Not run: macOS and three prepared cases in `evals/discipline_trials.py`.
 
 `check_all.sh` passed on Linux 6.18.54.1-microsoft-standard-WSL2 with Python 3.14.4: 549 tests in 167.326 seconds, then 549 tests in 155.880 seconds with a symlinked TMPDIR, plus behavioral probes, template and shell checks and package smoke checks (148 entries). `mutation_check.py`: 47 of 47 caught.
 
-Not run: macOS, three prepared cases in `evals/discipline_trials.py`, and any real session with 0.4.2.3.
+One real Nestor session ran with 0.4.2.3 and the `no_controller_call` request on a neutral path, with the operator answering its questions. The agent asked before changing anything, committed without a mission as answered, and predicted the refusal from the hook without attempting a push. Told to run the short path, it read the new rule, reset to the base and redid the change inside a mission, and `gate` and the hook then passed. No `--no-verify` was used, so `commits_before_mission` did not fire and only tests cover it. It also deleted `.mission` after a refused red and did not report that, which led to 0.4.2.4.
+
+Not run: macOS and three prepared cases in `evals/discipline_trials.py`.
+
+## Release 0.4.2.4 verification
+
+`check_all.sh` passed on Linux 6.18.54.1-microsoft-standard-WSL2 with Python 3.14.4: 552 tests in 160.368 seconds, then 552 tests in 139.487 seconds with a symlinked TMPDIR, plus behavioral probes, template and shell checks and package smoke checks (148 entries). `mutation_check.py` was not rerun, since only a refusal message changed in `scripts/`; it caught 47 of 47 on 0.4.2.3.
+
+Not run: macOS, three prepared cases in `evals/discipline_trials.py`, and any real session with 0.4.2.4.
