@@ -83,5 +83,18 @@ class NamedSkillRule(unittest.TestCase):
         self.assertIn('before the first project change', text)
 
 
+class WindowsHostPath(unittest.TestCase):
+    def test_skill_converts_the_path_and_forbids_searching_for_it(self):
+        text = ' '.join(SKILL.split('## Command path', 1)[1].split('```', 1)[0].split())
+        self.assertIn("SKILL=$(wslpath -u '", text)
+        self.assertIn('never search', text.lower())
+        self.assertIn('find /', text)
+
+    def test_wsl_guide_says_the_same(self):
+        guide = (ROOT / 'references/wsl.md').read_text(encoding='utf-8')
+        self.assertIn('wslpath -u', guide.split('## Locate the skill', 1)[1])
+        self.assertIn('find /', guide)
+
+
 if __name__ == '__main__':
     unittest.main()

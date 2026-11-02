@@ -296,4 +296,6 @@ Real Nestor runs on 0.4.2.1 that led to this release, with `qwen3-6-coder-gefion
 
 `check_all.sh` passed on Linux 6.18.54.1-microsoft-standard-WSL2 with Python 3.14.4: 535 tests in 138.373 seconds, then 535 tests in 117.301 seconds with a symlinked TMPDIR, plus behavioral probes, template and shell checks and package smoke checks (147 entries).
 
-Not run: macOS, four prepared cases in `evals/discipline_trials.py`, and any real session with 0.4.2.2.
+One real Nestor session then ran with 0.4.2.2, with the same model, request and reviewer, on a new neutral path. It ran the short path with red before the edit, through verify, finish and goal review, and the journal shows that flow within 28 seconds. Of its 23 minutes and 324 thousand tokens, about 21 minutes were one `find /` looking for the skill directory, because the host reports a Windows path to a WSL shell. The later fix in `SKILL.md` and `references/wsl.md` has not been run in a real session. One run does not show the rule holds under other pressure, and the request named the skill.
+
+Not run: macOS and four prepared cases in `evals/discipline_trials.py`.

@@ -8,6 +8,7 @@ A real Nestor session under time pressure loaded the skill and then skipped the 
 
 - The description and activation rule say that a user naming the skill requires a mission however small or urgent, and that an agent declining must say so before the first project change. This is an instruction, not enforcement.
 - New short path in `SKILL.md` and `templates/small-fix-contract.json`, tested from red to a certified commit, so one small change needs no further reading.
+- The skill and WSL guide say to convert a Windows skill path with `wslpath` and never to search with `find /`, which took about 21 minutes on a real run.
 
 ## 0.4.2.1
 

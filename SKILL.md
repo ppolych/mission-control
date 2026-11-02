@@ -37,36 +37,10 @@ however small the change. Urgency does not waive this: for a small change, use
 [the short path](#small-changes). If you will not use the mission, say so and why
 before the first project change, not afterwards.
 
-## Small changes
-
-For one small change with a test, this is the whole flow. Do not read other references or the
-controller source unless a command refuses. Copy [the template](templates/small-fix-contract.json) outside
-the workspace, then replace its text, test command and paths. Use `test_first_exempt` only when no test can apply.
-
-```bash
-M="$SKILL/scripts/mission.py"
-contract=$(mktemp)
-python3 "$M" validate --contract "$contract"
-python3 "$M" init --contract "$contract" --workspace "$PWD"
-python3 "$M" start --step fix
-python3 "$M" red --step fix
-```
-
-Write the edited template to `$contract` first, and any missing test before `red`. Make the change only now, then:
-
-```bash
-python3 "$M" verify --step fix
-python3 "$M" criterion-review --criterion AC-1 --verdict supported --rationale TEXT --evidence-ref check:fix:0 --evidence-kind behavior
-python3 "$M" finish
-python3 "$M" goal-review --verdict pass --rationale TEXT
-```
-
-Record `supported` and `pass` only if the results show it. If the user asked for a commit or push: commit,
-run `python3 "$M" gate --commit SHA`, and push only if it exits 0.
-
 ## Command path
 
-Set `SKILL` to this skill's absolute directory. Every command takes `--mission PATH`
+Set `SKILL` to this skill's absolute directory. If the host gives a Windows path and Bash runs in WSL, use
+`SKILL=$(wslpath -u 'C:\path\to\skill')`. Never search with `find /`. Every command takes `--mission PATH`
 when the mission root is not `.mission`; `--help` lists all commands and flags.
 
 ```bash
@@ -94,6 +68,32 @@ After each transition the controller prints `next (advisory): COMMAND` on stderr
 `status`, `handoff` and `diagnose` report `next_action`. Uppercase words are placeholders.
 It is guidance from recorded state: it grants no permission, and it never replaces
 inspecting the actual work or a user's decision.
+
+## Small changes
+
+For one small change with a test, this is the flow; read nothing else unless a command refuses. Fill in
+[the template](templates/small-fix-contract.json) outside the workspace. Use `test_first_exempt` only if no test can apply.
+
+```bash
+M="$SKILL/scripts/mission.py"
+contract=$(mktemp)
+python3 "$M" validate --contract "$contract"
+python3 "$M" init --contract "$contract" --workspace "$PWD"
+python3 "$M" start --step fix
+python3 "$M" red --step fix
+```
+
+Write the edited template to `$contract` first, and any missing test before `red`. Make the change only now, then:
+
+```bash
+python3 "$M" verify --step fix
+python3 "$M" criterion-review --criterion AC-1 --verdict supported --rationale TEXT --evidence-ref check:fix:0 --evidence-kind behavior
+python3 "$M" finish
+python3 "$M" goal-review --verdict pass --rationale TEXT
+```
+
+Record `supported` and `pass` only if results show it. For a requested push: commit,
+run `python3 "$M" gate --commit SHA`, and push only on exit 0.
 
 ## Phase 0 — Inspect and draft autonomously
 

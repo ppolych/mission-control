@@ -22,6 +22,16 @@ No pip dependencies are required. Run these commands from the skill directory.
 A complete installation includes `VERSION` beside `SKILL.md`, not just the
 Python script. Both shell wrappers also accept `--version`.
 
+## Locate the skill
+
+A Windows host can report this skill's directory as a Windows path while Bash runs in WSL. Convert that path:
+
+```bash
+SKILL=$(wslpath -u 'C:\Users\Name\AppData\Roaming\nestor-desktop\skills\mission-control')
+```
+
+Do not search with `find /`: it walks every mounted Windows drive and took over ten minutes on real runs.
+
 ## Files, paths, and editors
 
 Prefer keeping the skill and mission state in the distribution's Linux filesystem,
