@@ -1,4 +1,5 @@
 """Reserving a step attempt, including every start refusal."""
+from pathlib import Path
 
 
 def start_step(contract, state, step, entry, args, path):
@@ -69,6 +70,8 @@ def start_step(contract, state, step, entry, args, path):
         readable_observations(entry['effect_baseline'])
         if is_strict(contract):
             entry.setdefault('first_effect_baseline', entry['effect_baseline'])
+            from .scope_check import begin_step
+            begin_step(entry, state, Path(path).parent.parent if path else None)
         entry['input_baseline'] = watched_inputs(contract, step, state['workspace'])
         readable_observations(entry['input_baseline'])
     entry['context'] = args.context

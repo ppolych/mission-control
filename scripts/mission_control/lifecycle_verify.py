@@ -17,7 +17,7 @@ def assess_step(contract, state, step, entry, args):
     entry.setdefault('manual', {})[str(args.check)] = {'verdict': args.verdict, 'rationale': args.rationale, 'timestamp': now()}
 
 
-def verify_step(contract, state, step, entry, args=None):
+def verify_step(contract, state, step, entry, args=None, path=None):
     from .approvals import has_approval, requires_approval, validate_approval_workspace
     from .checks import run_check
     from .budgets import no_progress_threshold
@@ -46,7 +46,7 @@ def verify_step(contract, state, step, entry, args=None):
         raise ValueError('manual assessment is unverified; assess the active attempt before verification')
     if schema3 and len(state['journal']) >= MAX_JOURNAL_EVENTS:
         raise ValueError('journal event limit reached; refusing checks before an uncommittable verification')
-    outcome = step_outcome(contract, state, step, entry, args)
+    outcome = step_outcome(contract, state, step, entry, args, Path(path).parent.parent if path else None)
     results = []
     for index, check in sorted(enumerate(step['verify']), key=lambda pair: isinstance(pair[1], dict)):
         if isinstance(check, list):
@@ -75,6 +75,7 @@ def verify_step(contract, state, step, entry, args=None):
             entry['verified_artifacts'] = receipt
             if outcome:
                 entry['discipline_outcome'] = outcome
+                entry.pop('scope_start', None)
     entry['needs_revalidation'] = False
     if failed and schema3 and step.get('retry', 'inspect') == 'inspect' and not entry.get('revalidating'):
         entry['recovery_required'] = True

@@ -5,7 +5,7 @@ COMMAND_GROUPS = (
     ('Lifecycle', ('validate', 'init', 'start', 'red', 'test-first-note', 'assess', 'verify', 'block', 'stop', 'resume',
                    'criterion-review', 'finish', 'goal-review')),
     ('Controlled mode', ('approve', 'deny')),
-    ('Recovery and revision', ('recovery', 'recover', 'revision-diff', 'revise', 'migrate')),
+    ('Recovery and revision', ('recovery', 'recover', 'revision-diff', 'revise', 'migrate', 'scope-note')),
     ('Read-only reports', ('status', 'history', 'coverage', 'metrics', 'handoff', 'evidence-audit',
                            'diagnose', 'impact', 'lessons-search', 'lesson-audit', 'store-read',
                            'service-status')),
@@ -37,6 +37,9 @@ FLAGS = (
                               'not_applied (nothing happened; new attempt), applied_incorrect '
                               '(failed verification; new corrective attempt), partial or unknown '
                               '(stay blocked)'}),
+    ('--path', {'help': 'observed workspace-relative path for scope-note'}),
+    ('--disposition', {'choices': ['mine', 'not_mine', 'unknown'],
+                       'help': 'scope-note: a recorded statement about an observed path, not proof'}),
     ('--lessons-root', {'help': 'known lessons directory to search'}),
     ('--query', {'action': 'append', 'help': 'search or analysis query'}),
     ('--limit', {'type': int, 'default': 10, 'help': 'maximum search results'}),

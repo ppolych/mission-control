@@ -28,4 +28,6 @@ def compact_handoff(report):
                   omitted_steps=len(steps) - len(selected),
                   pending_approval_count=len(report['pending_approvals']),
                   retry_authorized=False)
+    if 'scope' in report:
+        result['open_scope_observations'] = report['scope']['open']
     return result

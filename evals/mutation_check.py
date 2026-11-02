@@ -41,6 +41,13 @@ MUTANTS = (
     ('red_after_implementation', 'test_first.py', "if started and 'red' not in entry:", 'if False:'),
     ('verify_ignores_test_change', 'test_first.py', "if observations(workspace, step['test_first']['test_paths']) != red['test_digests']:", 'if False:'),
     ('note_confirms_red', 'test_first.py', "return {'red_green': 'unconfirmed', 'test_first_notes': notes}", "return {'red_green': 'confirmed', 'test_first_notes': notes}"),
+    ('scope_ignores_changes', 'scope_check.py', "if start['paths'].get(name) == end['paths'].get(name) and not in_commit:", 'if True:'),
+    ('dedicated_never_refuses', 'scope_check.py', "if names and contract.get('workspace_isolation') == 'dedicated':", 'if False:'),
+    ('note_outlives_content', 'scope_check.py', "return record['status'] if path_digest(workspace, name) == record['digest'] else 'open'", "return record['status']"),
+    ('unknown_closes_observation', 'scope_check.py', "'unknown': 'open'}", "'unknown': 'stated_not_mine'}"),
+    ('scope_path_limit_removed', 'scope_check.py', 'if len(items) > MAX_SCOPE_PATHS:', 'if False:'),
+    ('fsmonitor_allowed', 'git_read.py', "'--literal-pathspecs', '-c', 'core.fsmonitor=false',", "'--literal-pathspecs',"),
+    ('git_environment_kept', 'git_read.py', "environment = {key: value for key, value in os.environ.items() if not key.startswith('GIT_')}", 'environment = dict(os.environ)'),
     ('repeat_without_lock', 'cli_aux.py', "with persistent_lock(path.with_name(path.name + '.lock'), wait=REPEAT_LOCK_WAIT_SECONDS):", 'if True:'),
 )
 # A second identical check guards these, so one removal changes no behavior.

@@ -38,6 +38,8 @@ def validate_draft_fields(contract):
     if 'discipline' in contract and contract['discipline'] != 'strict':
         raise ValueError('discipline must be "strict" when present')
     if 'discipline' not in contract:
+        if 'workspace_isolation' in contract:
+            raise ValueError('workspace_isolation requires discipline: strict')
         for step in contract['steps']:
             found = STRICT_STEP_FIELDS & set(step)
             if found:
@@ -68,6 +70,8 @@ def validate_discipline(contract):
     if not is_strict(contract):
         return
     from .test_first import validate_test_first
+    if contract.get('workspace_isolation', 'shared') not in ('shared', 'dedicated'):
+        raise ValueError('workspace_isolation must be shared or dedicated')
     for step in contract['steps']:
         for check in step['verify']:
             if isinstance(check, list) and is_trivial_check(check):
@@ -94,7 +98,7 @@ def evidence_basis(step):
     return {'evidence_basis': 'automated'}
 
 
-def step_outcome(contract, state, step, entry, args):
+def step_outcome(contract, state, step, entry, args, root=None):
     """Refuse an unproven outcome before checks run; return what verification records."""
     claimed = getattr(args, 'already_satisfied', False)
     if not is_strict(contract):
@@ -105,6 +109,7 @@ def step_outcome(contract, state, step, entry, args):
         if claimed:
             raise ValueError('--already-satisfied does not apply to checks-only revalidation')
         return None
+    from .scope_check import check_step
     changed = changed_writes(step, entry, state['workspace'])
     result = evidence_basis(step)
     if 'test_first_exempt' in step:
@@ -116,6 +121,7 @@ def step_outcome(contract, state, step, entry, args):
             raise ValueError('--already-satisfied refused: declared writes changed: ' + ', '.join(changed))
         if 'test_first' in step:
             result['red_green'] = 'not_applicable_no_change'
+        check_step(contract, state, step, entry, root)
         return dict(result, outcome='no_change', rationale=args.rationale)
     if step['effects']['writes'] and not changed:
         raise ValueError('no declared write changed since this step began; do the work, or if the requested state '
@@ -123,6 +129,7 @@ def step_outcome(contract, state, step, entry, args):
     if 'test_first' in step:
         from .test_first import red_green_status
         result.update(red_green_status(step, entry, state['workspace']))
+    check_step(contract, state, step, entry, root)
     return dict(result, outcome='changed' if changed else 'no_declared_writes')
 
 
@@ -145,9 +152,17 @@ def print_outcome(entry):
     outcome = entry.get('discipline_outcome')
     if outcome and outcome['evidence_basis'] != 'automated':
         print(outcome['evidence_basis'] + ' (' + outcome['manual_only_reason'] + ')', file=sys.stderr)
+    scope = entry.get('scope_check')
+    if scope and scope['status'] != 'performed':
+        print('scope check not performed: ' + str(scope.get('reason')), file=sys.stderr)
+    elif scope and scope['observed']:
+        names = ', '.join(item['path'] for item in scope['observed'])
+        print('undeclared changes observed, ownership unverified: ' + names + '; see scope-note', file=sys.stderr)
 
 
 def validate_discipline_state(state):
+    from .scope_check import validate_scope_state
+    validate_scope_state(state)
     for entry in state['steps'].values():
         for key in ('discipline_outcome', 'first_effect_baseline', 'red'):
             if key in entry and not isinstance(entry[key], dict):

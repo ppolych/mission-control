@@ -84,6 +84,9 @@ def run_transition(contract, state, args, root, path):
     elif command == 'recover':
         from .recovery import reconcile_recovery
         reconcile_recovery(contract, state, transitions.find_step(contract, args.step), args)
+    elif command == 'scope-note':
+        from .scope_check import record_note
+        record_note(contract, state, args)
     elif command == 'finish':
         code = lifecycle_stop.finish_mission(contract, state)
     elif command == 'goal-review':

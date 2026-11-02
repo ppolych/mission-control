@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 CONTRACT_FIELDS = {'schema_version', 'mission', 'constraints', 'budget', 'steps', 'mode',
-                   'acceptance', 'allowed_paths', 'revision', 'discipline'}
+                   'acceptance', 'allowed_paths', 'revision', 'discipline', 'workspace_isolation'}
 STEP_FIELDS = {'id', 'description', 'depends_on', 'verify', 'verify_timeout', 'risk', 'needs_approval',
                'commands', 'acceptance_refs', 'watch', 'retry', 'effects', 'legacy_passes',
                'test_first', 'test_first_exempt', 'manual_only'}

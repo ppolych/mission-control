@@ -78,5 +78,5 @@ def step_transition(contract, state, args, path):
         from .test_first import record_note
         record_note(contract, step, entry, args)
     else:
-        verify_step(contract, state, step, entry, args)
+        verify_step(contract, state, step, entry, args, path)
     return None

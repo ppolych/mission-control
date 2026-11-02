@@ -1,8 +1,5 @@
 """Red/green evidence for a step that declares test_first: recorded facts, not proof of a good test."""
 import os
-import re
-import subprocess
-import tempfile
 
 from .settings import MAX_OBSERVED_BYTES
 
@@ -17,6 +14,7 @@ def implementation_paths(step):
 def validate_test_first(step):
     if 'test_first' not in step:
         return
+    import re
     from .validation import check_args
     label = step['id'] + ': test_first '
     value = step['test_first']
@@ -46,6 +44,7 @@ def validate_test_first(step):
 
 def run_captured(command, workspace, timeout):
     """Return (status, output); output stays in a temporary file and is never stored."""
+    import tempfile
     from .processes import supervised_process
     with tempfile.TemporaryFile() as stream:
         process = supervised_process(command, workspace, False, timeout, output=stream)
@@ -61,6 +60,8 @@ def refuse(message):
 
 def record_red(contract, state, step, entry):
     """Return 1 when the command is not red; None when a new red record must be committed."""
+    import re
+    import subprocess
     from .approvals import has_approval, requires_approval, validate_approval_workspace
     from .discipline import is_strict
     from .observations import artifact_observations, observations, readable_observations

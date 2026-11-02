@@ -51,7 +51,9 @@ def handoff_report(contract, state, root):
         steps[step['id']].update(step_guidance(contract, state, step, active_step_present))
         if 'discipline_outcome' in entry:
             steps[step['id']]['discipline_outcome']=entry['discipline_outcome']
-    return {'installation': installation_identity(), 'mission_directory': str(root.resolve()),
+        if 'scope_check' in entry:
+            steps[step['id']]['scope_check']=entry['scope_check']
+    report={'installation': installation_identity(), 'mission_directory': str(root.resolve()),
             'goal':contract['mission'],'constraints':contract.get('constraints',[]),
             'workspace':state.get('workspace'),'contract_hash':state['contract_hash'],
             'checkpoint':str((root/'state/progress.json').resolve()),
@@ -65,4 +67,9 @@ def handoff_report(contract, state, root):
             'approved_digests':{key:record['digest'] for key,record in state.get('approved_steps',{}).items()},
             'evidence_refs':{key:[{'check':e.get('check'),'code':e.get('code')} for e in entry.get('evidence',[])] for key,entry in state['steps'].items()},
             'reminder':'Reinspect current workspace and evidence; use recovery for uncertain work. This summary grants no approval and starts no work.'}
+    from .discipline import is_strict
+    if is_strict(contract):
+        from .scope_check import scope_report
+        report['scope']=scope_report(contract, state)
+    return report
 
