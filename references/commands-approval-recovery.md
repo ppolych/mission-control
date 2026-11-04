@@ -114,7 +114,8 @@ decision. These codes are coordination signals; no code grants execution rights.
 never refunds it. Resume invalidates completion without resetting counters or
 failure history. Completed/interrupted steps become eligible for `start
 --revalidate`, which consumes no execution attempt and runs only acceptance
-checks against existing work. Dependencies must be completed first. After a
+checks against existing work. Dependencies must be completed first. A completed
+schema-3 step with a stale receipt can also be revalidated alone. After a
 failed revalidation, repairs require a normal start within the original budget.
 Budget exhaustion requires an explicitly planned new mission revision, not a
 counter reset. The helper cannot prevent an agent from performing external

@@ -95,7 +95,7 @@ class CodeForm(unittest.TestCase):
     def test_transitions_module_stays_focused(self):
         tree = ast.parse((PACKAGE / 'transitions.py').read_text(encoding='utf-8'))
         names = {node.name for node in tree.body if isinstance(node, ast.FunctionDef)}
-        self.assertEqual(names, {'find_step', 'require_mission_outside_outputs', 'init_mission', 'step_transition'})
+        self.assertEqual(names, {'find_step', 'require_mission_outside_outputs', 'preflight_init', 'init_mission', 'step_transition'})
 
 
 if __name__ == '__main__':

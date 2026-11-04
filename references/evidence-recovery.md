@@ -59,7 +59,16 @@ artifacts invalidate that binding. Re-review after inspecting the new evidence.
 Successful verification also stores `verified_artifacts` receipts for
 declared outputs and watched inputs. Supported review requires those receipts to
 match current observations: rerecording the judgment cannot re-bless old checks
-after a file changes. Resume, perform checks-only revalidation, and then review.
+after a file changes. Perform checks-only revalidation, and then review.
+
+A later step often changes a file an earlier step declared, as when a project
+grows step by step. That earlier step then has a stale receipt and `finish`
+names it. Run `start --step ID --revalidate` on that step alone: it spends no
+attempt and leaves the other steps completed. Assess its manual checks again
+from what you inspect now, run `verify`, then record `criterion-review` again.
+Do not narrow `writes`, start a new mission or `resume` the whole mission to get
+around a stale receipt. Do not declare a whole project or build-output directory
+as a write either: build tools change it on every run, so it never stays current.
 Older schema-3 checkpoints remain readable, but declared-file evidence without
 receipts needs that same revalidation; no attempts or counters are reset.
 Even after finish, a passing `goal-review` rejects stale acceptance evidence;

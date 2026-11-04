@@ -2,14 +2,14 @@
 name: mission-control
 description: Orchestrate goals with durable mission state, evidence-based verification, bounded recovery, and explicit outcomes. Use for substantial multi-step, controlled, autonomous, or multi-session work, and whenever the user asks for this skill by name, however small or urgent. Otherwise exclude simple edits and quick questions.
 metadata:
-  version: "0.4.2.7"
+  version: "0.4.2.8"
   author: "Panos Polychronis"
   email: "ppolych@netcompany.com"
 ---
 
 # Mission Control
 
-Version 0.4.2.7. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
+Version 0.4.2.8. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
 or macOS. For WSL paths and setup, read [WSL guidance](references/wsl.md).
 Preserve the user's scope, existing authorization, and host permissions.
 
@@ -129,6 +129,9 @@ Checks must be safe to rerun; manual judgments cannot override them. Each has a 
 `verify_timeout`), and two timeouts stop the mission as `no_progress`. Respect budgets and never reset counters. Never replay
 uncertain side effects: use `recovery`, inspect files and external outcomes, then `recover`. `partial` or `unknown` stays blocked,
 and `not_applied` must not be recorded for work that happened; for reversible local work that failed verification, use `applied_incorrect`. Only supported, current criteria allow schema-3 `finish`.
+When `finish` names a stale step, a later step changed its files: run `start --step ID --revalidate` on that step,
+assess its manual checks again, `verify`, and review its criteria again. Never narrow `writes`, start a new mission or
+copy earlier verdicts to get around it. Mission setup is not a step. After `finish`, more changes need a new mission.
 
 ## Finish — Check the original goal before reporting success
 

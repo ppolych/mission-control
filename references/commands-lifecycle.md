@@ -35,7 +35,7 @@ Run `python3 "$SKILL/scripts/mission.py" COMMAND --mission PATH`. `--help` lists
 - `revision-diff --contract FILE`: compare the proposed contract with the stored parent without mutation.
 - `revise --contract FILE --destination NEW_PATH --reason TEXT`: publish a separate linked schema-3 revision; parent state and approvals stay unchanged.
 - `history`: print schema-3 committed transition events; legacy schema 2 yields an empty list.
-- `start --step ID [--context TEXT] [--revalidate]`: begin an attempt with dependencies complete; controlled gates return 3 before reserving an attempt.
+- `start --step ID [--context TEXT] [--revalidate]`: begin an attempt with dependencies complete; controlled gates return 3 before reserving an attempt. In schema 3, `--revalidate` also reopens one completed step whose receipt is stale, for checks only; other steps stay completed, and a current step refuses it.
 - `approve|deny --step ID --digest HASH --rationale TEXT`: record an explicit user decision for the current presented controlled-mode request.
 - `assess --step ID --check INDEX --verdict pass|fail|unverified --rationale TEXT`: record a manual check judgment; indexes start at zero. Unverified leaves checks waiting, not failed.
 - `verify --step ID`: execute checks and save evidence; exit 1 means failure.

@@ -141,6 +141,12 @@ class Mission:
             return self.cli('finish'), False
         return self.cli('goal-review', '--verdict', values[0], '--rationale', 'r'), False
 
+    def stale_before(self, name, before):
+        """Only a stale schema-3 receipt lets revalidation reopen a completed step."""
+        from mission_control.coverage import verification_is_current
+        step = next(item for item in self.contract['steps'] if item['id'] == name)
+        return self.contract['schema_version'] == 3 and not verification_is_current(step, before)
+
     def check(self, operation):
         before_bytes = self.path.read_bytes()
         before = self.previous
@@ -156,7 +162,9 @@ class Mission:
             old = before['steps'].get(name, {})
             previous_status = old.get('status', 'pending')
             status = entry.get('status', 'pending')
-            assert status == previous_status or status in STATUS_TRANSITIONS[previous_status], (
+            reopened = (operation == ('revalidate', name) and previous_status == 'completed' and status == 'in_progress'
+                        and self.stale_before(name, before))
+            assert status == previous_status or status in STATUS_TRANSITIONS[previous_status] or reopened, (
                 f'undeclared status change {previous_status} -> {status}')
             assert entry.get('attempts', 0) >= old.get('attempts', 0), 'step attempts decreased'
             if old.get('approval_denied'):

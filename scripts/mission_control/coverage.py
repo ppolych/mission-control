@@ -39,6 +39,19 @@ def verification_is_current(step, state):
                            and all(v['status'] != 'unavailable' for v in current.values()))
 
 
+def stale_steps(contract, state):
+    return [step['id'] for step in contract['steps'] if state['steps'].get(step['id'], {}).get('status') == 'completed'
+            and not verification_is_current(step, state)]
+
+
+def revalidation_hint(contract, state):
+    names = stale_steps(contract, state)
+    if not names:
+        return 'complete and verify the mapped steps first'
+    return ('stale steps: ' + ', '.join(names) + '; for each, run start --step ' + names[0]
+            + ' --revalidate, assess any manual check again, verify, then criterion-review')
+
+
 def coverage_report(contract, state, index=None):
     if contract['schema_version'] != 3:raise ValueError('acceptance coverage requires schema 3')
     from .contract_index import requirement_steps
@@ -79,7 +92,7 @@ def record_criterion_review(contract, state, args):
         if not refs or any(state['steps'].get(identifier, {}).get('status') != 'completed' for identifier in mapped):
             raise ValueError('supported requires completed mapped steps and evidence references')
         if any(not verification_is_current(step, state) for step in contract['steps'] if step['id'] in mapped):
-            raise ValueError('verification artifact evidence is missing or stale; resume and revalidate before supporting the criterion')
+            raise ValueError('verification artifact evidence is missing or stale; ' + revalidation_hint(contract, state))
     for ref in refs:
         if ref.startswith('file:'):
             value = observe_artifact(state['workspace'], ref[5:])

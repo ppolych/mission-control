@@ -21,21 +21,30 @@ def require_mission_outside_outputs(contract, workspace, root):
             if mission == target or mission.is_relative_to(target):
                 raise ValueError('mission directory ' + str(mission) + ' is inside declared path ' + name
                                  + '; choose a mission directory outside declared outputs and watched inputs')
+            if target.is_relative_to(mission):
+                raise ValueError('declared path ' + name + ' is inside the mission directory ' + str(mission)
+                                 + '; the controller owns those files, so leave mission setup out of the steps')
+
+
+def preflight_init(contract, args, root):
+    """Refuse a bad init before the mission directory and its lock exist."""
+    from .contract import validate_allowed_paths
+    workspace = Path(args.workspace or Path.cwd()).resolve(strict=True)
+    if not workspace.is_dir():
+        raise ValueError('workspace must be directory')
+    validate_allowed_paths(contract, workspace)
+    require_mission_outside_outputs(contract, workspace, root)
+    return workspace
 
 
 def init_mission(contract, state, args, root):
-    from .contract import validate_allowed_paths
     from .publication import digest
     from .settings import MAX_STATE_BYTES
     from .storage import atomic
     from .store import read_bounded
     import json
     import os
-    workspace = Path(args.workspace or Path.cwd()).resolve(strict=True)
-    if not workspace.is_dir():
-        raise ValueError('workspace must be directory')
-    validate_allowed_paths(contract, workspace)
-    require_mission_outside_outputs(contract, workspace, root)
+    workspace = preflight_init(contract, args, root)
     destination = root / 'contract.json'
     if os.path.lexists(destination):
         if destination.is_symlink():

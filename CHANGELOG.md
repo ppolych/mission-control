@@ -2,6 +2,17 @@
 
 Test results for each release are in [the validation record](references/operational-validation.md).
 
+## 0.4.2.8
+
+A real Nestor session built a ten-step desktop app with the skill named. Later steps changed files that earlier steps had declared, so those receipts went stale and `finish` refused without saying why. The only way to refresh one was `stop` and `resume`, which reopens every step. The agent read the controller's source, published three revisions and passed a fourth mission by declaring no writes for the scaffold step and copying earlier manual verdicts.
+
+- `start --step ID --revalidate` reopens one completed schema-3 step whose receipt is stale, for checks only. It spends no attempt, leaves other steps completed, and is refused while another step is active or when the receipt is current.
+- `finish`, the `criterion-review` refusal and `next_action` name the stale steps and that command.
+- A failed `init --contract` creates no mission directory. Before, it left a directory holding only `.lock`, which then blocked `revise` into it, and the agent deleted it.
+- `init` refuses a declared write or watch inside the mission directory, because the controller changes those files.
+- `SKILL.md` and the references say that mission setup is not a step, that whole project or build directories make poor writes, that changes after `finish` need a new mission, and that manual verdicts are not copied.
+- Not changed: the session also found two acceptance gaps after its goal review passed and fixed them outside any mission. No controller check can show that a manual verdict was inspected.
+
 ## 0.4.2.7
 
 No behavior change. Removes a leftover line in `AGENTS.md` that contradicted bumping the version with every change.

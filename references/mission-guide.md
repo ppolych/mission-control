@@ -104,6 +104,13 @@ bounded backoff; never replay uncertain side effects. See
 Use `handoff` for a concise checkpoint-derived transfer summary; revalidate
 current state before continuing. For bug audits, apply `references/review-quality.md`.
 
+Leave mission setup out of the steps: the contract and checkpoint belong to the controller, `init`
+refuses declared paths inside the mission directory, and checks should not run the controller.
+Declare the files a step changes, not the whole project or build output. When a later step makes an
+earlier receipt stale, revalidate that step alone, as `evidence-recovery.md` describes.
+After `finish`, further project changes need a new mission or a revision; record manual verdicts only
+from inspection in the current mission, never by copying an earlier one.
+
 Use `block` only for an active step; `deny` applies to a presented approval request.
 Resume invalidates completion, including downstream
 steps; inspect interrupted external actions before any retry. Use

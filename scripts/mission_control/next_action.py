@@ -87,6 +87,12 @@ def next_action(contract, state, root=None):
     if found:
         return found
     if all(state['steps'].get(step['id'], {}).get('status') == 'completed' for step in contract['steps']):
+        if contract['schema_version'] == 3:
+            from .coverage import stale_steps
+            stale = stale_steps(contract, state)
+            if stale:
+                return _report('revalidate', ['start', '--step', stale[0], '--revalidate'],
+                               'A later step changed its files: rerun its checks, then review its criteria again.', root, stale[0])
         return _review_step(contract, state, root) or _report('finish', ['finish'], 'Finish checks current coverage.', root)
     return _report('ask_user', [], 'No step can run: inspect denials, budgets and dependencies, then report them.',
                    root, requires_user=True)
@@ -97,5 +103,5 @@ def print_hint(contract, state, root):
     import shlex
     import sys
     report = next_action(contract, state, root)
-    target = shlex.join(report['argv']) if report['argv'] else report['action']
+    target = shlex.join(report['argv']) if report['argv'] else 'no command (' + report['action'] + ')'
     print('next (advisory): ' + target + ' -- ' + report['note'], file=sys.stderr)

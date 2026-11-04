@@ -4,7 +4,7 @@ from pathlib import Path
 
 def finish_mission(contract, state):
     from .approvals import validate_approval_workspace
-    from .coverage import coverage_report
+    from .coverage import coverage_report, revalidation_hint, stale_steps
     if state.get('stop_reason') not in (None, 'done_verified'):
         raise ValueError('resume before finish')
     if any(state['steps'].get(step['id'], {}).get('status') != 'completed' for step in contract['steps']):
@@ -12,7 +12,8 @@ def finish_mission(contract, state):
     if contract['schema_version'] == 3:
         validate_approval_workspace(state)
         if not coverage_report(contract, state)['all_supported']:
-            raise ValueError('acceptance coverage is unmet, unverified or stale')
+            detail = '; ' + revalidation_hint(contract, state) if stale_steps(contract, state) else ''
+            raise ValueError('acceptance coverage is unmet, unverified or stale' + detail)
     if state.get('stop_reason') == 'done_verified':
         print_goal_review_notice(state)
         return 0
@@ -29,7 +30,7 @@ def print_goal_review_notice(state):
 
 def record_goal_review(contract, state, args):
     from .approvals import validate_approval_workspace
-    from .coverage import coverage_report
+    from .coverage import coverage_report, revalidation_hint, stale_steps
     from .publication import now
     incomplete = any(state['steps'].get(step['id'], {}).get('status') != 'completed' for step in contract['steps'])
     if state.get('stop_reason') != 'done_verified' or incomplete:

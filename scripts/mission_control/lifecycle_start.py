@@ -28,11 +28,18 @@ def start_step(contract, state, step, entry, args, path):
             state['last_update'] = now()
             commit_state(path, state, contract, args)
         return 1
-    if args.revalidate and not entry.get('needs_revalidation'):
+    # A later step may change files an earlier completed step declared. Rerunning
+    # that step's checks refreshes its receipt; it reopens no other step.
+    stale = args.revalidate and schema3 and entry.get('status') == 'completed' and not entry.get('needs_revalidation')
+    if stale:
+        from .coverage import verification_is_current
+        if verification_is_current(step, state):
+            raise ValueError('verification is current; nothing to revalidate')
+    elif args.revalidate and not entry.get('needs_revalidation'):
         raise ValueError('no interrupted or completed work to revalidate')
     if entry.get('needs_revalidation') and not args.revalidate:
         raise ValueError('inspect prior work and start --revalidate first')
-    if entry.get('status') == 'completed':
+    if entry.get('status') == 'completed' and not stale:
         raise ValueError('step already completed')
     if active:
         raise ValueError('another step active')

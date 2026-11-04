@@ -138,6 +138,12 @@ def run_mission_command(args, root):
     from .validation import validate, validate_state
     command = args.command
     if command == 'init':
+        if args.contract and not os.path.lexists(root):
+            from .transitions import preflight_init
+            proposed = json.loads(Path(args.contract).read_text(encoding='utf-8-sig'))
+            validate(proposed)
+            validate_known_fields(proposed)
+            preflight_init(proposed, args, root)
         root.mkdir(parents=True, exist_ok=True)
     elif not root.is_dir():
         raise ValueError('mission directory does not exist: ' + str(root))
