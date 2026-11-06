@@ -66,6 +66,8 @@ grows step by step. That earlier step then has a stale receipt and `finish`
 names it. Run `start --step ID --revalidate` on that step alone: it spends no
 attempt and leaves the other steps completed. Assess its manual checks again
 from what you inspect now, run `verify`, then record `criterion-review` again.
+The same works after `finish`: it reopens the mission for that step alone and
+archives the goal review, so run `finish` and `goal-review` again afterwards.
 Do not narrow `writes`, start a new mission or `resume` the whole mission to get
 around a stale receipt. Do not declare a whole project or build-output directory
 as a write either: build tools change it on every run, so it never stays current.

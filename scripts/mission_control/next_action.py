@@ -65,10 +65,25 @@ def _review_step(contract, state, root):
     return None
 
 
+def _stale_after_finish(contract, state, root):
+    if contract['schema_version'] != 3:
+        return None
+    from .coverage import stale_steps
+    stale = stale_steps(contract, state)
+    if not stale:
+        return None
+    return _report('revalidate', ['start', '--step', stale[0], '--revalidate'],
+                   'A change after finish made this step stale: rerun its checks alone; this reopens the mission for a new '
+                   'finish and goal review.', root, stale[0])
+
+
 def next_action(contract, state, root=None):
     from .reports import goal_review_status
     stop = state.get('stop_reason')
     if stop == 'done_verified':
+        stale = _stale_after_finish(contract, state, root)
+        if stale:
+            return stale
         if goal_review_status(state) == 'missing':
             return _report('goal_review', ['goal-review', '--verdict', 'VERDICT', '--rationale', 'TEXT'],
                            'Compare the combined outcome with the original goal.', root)

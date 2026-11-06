@@ -10,7 +10,7 @@
 - [6. Bounded code-impact candidates for contract drafting](#6-bounded-code-impact-candidates-for-contract-drafting)
 
 Implemented as a standard-library Python package plus agent guidance. Install the complete scripts directory with the root VERSION file.
-The current release is 0.4.2.10; these underlying policies are unchanged.
+The current release is 0.4.2.11; these underlying policies are unchanged.
 Contracts, approvals, recovery reports, mission modes and counters keep their
 existing semantics. No Rust runtime, embedding service, network client or
 background scheduler is introduced.

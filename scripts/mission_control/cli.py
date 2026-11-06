@@ -120,6 +120,7 @@ def run_transition(contract, state, args, root, path):
         print_outcome(state['steps'][args.step])
         return int(state['steps'][args.step]['status'] != 'completed')
     if command == 'goal-review':
+        lifecycle_stop.print_unconfirmed(state)
         return int(args.verdict == 'fail')
     if command == 'deny':
         return 1

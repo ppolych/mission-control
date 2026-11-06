@@ -80,7 +80,8 @@ def record_red(contract, state, step, entry):
     started = sorted(name for name, value in implementation.items() if baseline.get(name) != value)
     if started and 'red' not in entry:
         raise ValueError('implementation already changed (' + ', '.join(started) + '), so a failure now would not show the '
-                         'earlier state; record test-first-note --reason TEXT instead of undoing work')
+                         'earlier state; record test-first-note --reason TEXT instead of undoing work. Next time, put files '
+                         'the tests need to compile, such as go.mod, in an earlier step with test_first_exempt')
     if started and implementation != entry['red']['implementation']:
         raise ValueError('implementation changed since the last red; record test-first-note --reason TEXT instead of undoing work')
     digests = observations(workspace, declared['test_paths'])

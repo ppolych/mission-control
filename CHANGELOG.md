@@ -2,6 +2,16 @@
 
 Test results for each release are in [the validation record](references/operational-validation.md).
 
+## 0.4.2.11
+
+A real Nestor session on 0.4.2.10 built a Keycloak MCP server in one mission: 37 minutes and 23.8 million tokens, with the draft contract written inside `.mission/` at minute 4.5 and no refused file writes. `gate` then found a `.gitignore` pattern that hid `cmd/`; after the fix, `start --revalidate` answered only "resume mission first", and `resume` reopened all six steps, so the agent re-verified, re-assessed and re-reviewed everything. `red` had refused its first step because `go.mod` already existed, and the final report again omitted three steps with unconfirmed red/green.
+
+- `start --step ID --revalidate` on a stale step of a `done_verified` mission reopens the mission for that step alone and archives the goal review; `finish` and `goal-review` are needed again. A current step still refuses, and the checkpoint is unchanged on refusal.
+- Other step commands on a finished mission explain the three ways forward; a stopped mission names its stop reason.
+- After `finish`, `next_action` points a stale step to that command.
+- The `red` refusal suggests a first `test_first_exempt` step for files the tests need to compile.
+- `finish` and `goal-review` print on stdout which steps have unconfirmed red/green, for the final report.
+
 ## 0.4.2.10
 
 A real Nestor session on 0.4.2.9 built a Jenkins MCP server in one mission: about 58 minutes of work and 25.6 million tokens, with `start --revalidate` on two stale steps and a correct restore from `status` after the host stopped mid-step. Nestor's file tools refused the draft contract outside the workspace, so the agent wrote it through Bash, and reading skill files through those tools was refused as well. Three of four code steps ended with unconfirmed red/green, and the final report did not say so.

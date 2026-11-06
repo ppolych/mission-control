@@ -16,7 +16,7 @@
 - [Performance measurement](#performance-measurement)
 
 Initial operational run: 2026-10-31, release **0.3.1**. Later release records
-are appended below; current release is **0.4.2.10**.
+are appended below; current release is **0.4.2.11**.
 No contract schema, default mode, approval, recovery or attempt-budget policy
 was changed. The additions are `metrics`, `handoff`, bounded `lessons-search`,
 and prompt guidance for progress/waits, safe polling and evidence-based review.
@@ -347,3 +347,9 @@ One real Nestor session ran on 0.4.2.8 (`qwen3-6-coder-gefion`, Agent mode, thin
 `check_all.sh` passed on Linux 6.18.54.1-microsoft-standard-WSL2 with Python 3.14.4: 577 tests in 175.761 seconds, then 577 in 140.861 seconds with a symlinked TMPDIR, with package smoke checks (152 entries). New regressions are in `tests/test_draft_in_mission.py`.
 
 One real Nestor session ran on 0.4.2.9 (`qwen3-6-coder-gefion`, Agent mode, thinking high, new git workspace): a Go MCP server for Jenkins, one mission of six strict steps, about 58 minutes of work and 25.6 million tokens. The host stopped once mid-step; asked to continue, the agent restored the active step from `status`. `start --revalidate` refreshed two stale steps, the mission reached `done_verified` with a passing goal review, and `go vet` and `go test -race` passed again when rerun by the reviewer. The agent did not commit, as the request asked for a report. Three of four code steps ended with unconfirmed red/green, which the final report did not mention, and the request carried two mission hints that the Harbor request had not. The reviewer is the author's assistant, the sample is one run, and no session has run on 0.4.2.10.
+
+## Release 0.4.2.11 verification
+
+`check_all.sh` passed on Linux 6.18.54.1-microsoft-standard-WSL2 with Python 3.14.4: 591 tests in 171.310 seconds, then 591 in 213.512 seconds with a symlinked TMPDIR, with package smoke checks (153 entries). New regressions are in `tests/test_post_finish.py`.
+
+One real Nestor session ran on 0.4.2.10 (Qwen 3.8 27B, id `qwen3-6-coder-gefion`, Agent mode, thinking normal, new git workspace, no mission hints in the request): a Go MCP server for Keycloak, one mission of six strict steps, 37 minutes and 23.8 million tokens. The draft contract was written inside `.mission/` at minute 4.5 with no refused file writes, and `validate` passed on the third try. The agent built the Docker image, committed only declared files, and `gate` certified commit `5b49c8b`; `go vet` and `go test -race` passed again when rerun by the reviewer. A `.gitignore` fix after `finish` forced a full `resume`, `red` refused the first step because `go.mod` existed, and the final report omitted three unconfirmed red/green steps. The reviewer is the author's assistant, the sample is one run, and no session has run on 0.4.2.11.

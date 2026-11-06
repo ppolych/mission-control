@@ -46,7 +46,7 @@ Where the code lives in `scripts/mission_control/`:
 
 ## Project Structure & Module Organization
 
-Mission Control 0.4.2.10 is a Nestor orchestration skill with a Python core and Bash entrypoints.
+Mission Control 0.4.2.11 is a Nestor orchestration skill with a Python core and Bash entrypoints.
 
 - `VERSION` is the canonical release; keep skill metadata consistent. Contract schemas 2 and 3 are separate from the release version.
 - `SKILL.md` is the concise agent entrypoint; workflow details belong in `references/`.
@@ -165,7 +165,7 @@ Use imperative subjects; describe behavior, validation, and limitations. Exclude
 
 ## Operational Helpers
 
-Version is 0.4.2.10. Every committed change gets the next 0.4.2.x, by explicit author instruction. Keep VERSION, skill metadata
+Version is 0.4.2.11. Every committed change gets the next 0.4.2.x, by explicit author instruction. Keep VERSION, skill metadata
 and current documentation consistent. Keep metrics/handoff/search/impact read-only and all helpers dependency-free.
 Store publication and service observations may update only explicitly selected
 auxiliary files under persistent locks; they grant no lifecycle permissions. Search only
@@ -291,7 +291,7 @@ refresh. Details: references/controller-activation.md. No host hook is implied.
 
 ## Usability and Recovery Rules
 
-Regressions live in tests/test_review_fixes.py, tests/test_bug_fixes.py, tests/test_stale_revalidation.py, tests/test_refusal_messages.py and tests/test_draft_in_mission.py. Draft contracts live in the mission root; the final advisory names unconfirmed red/green. Refusals name what is missing, so an agent need not read the controller. A completed schema-3 step with a stale receipt may be revalidated alone, for checks only; a failed `init --contract` creates nothing, and `init` refuses declared paths inside the mission directory. Random lifecycle invariants live in tests/test_lifecycle_random.py, whose deep-state test keeps sequences from passing vacuously. `evals/mutation_check.py` breaks safety invariants one at a time and every mutant must be caught; run it after changing safety code. Refusals commit only when state changes, and `start` archives previous evidence. `applied_incorrect` depends on `failed_verification`, set by the latest attempt only. Strict field checks run only on new
+Regressions live in tests/test_review_fixes.py, tests/test_bug_fixes.py, tests/test_stale_revalidation.py, tests/test_refusal_messages.py, tests/test_draft_in_mission.py and tests/test_post_finish.py. A stale step of a done_verified mission reopens alone, archiving the goal review. Draft contracts live in the mission root; the final advisory names unconfirmed red/green. Refusals name what is missing, so an agent need not read the controller. A completed schema-3 step with a stale receipt may be revalidated alone, for checks only; a failed `init --contract` creates nothing, and `init` refuses declared paths inside the mission directory. Random lifecycle invariants live in tests/test_lifecycle_random.py, whose deep-state test keeps sequences from passing vacuously. `evals/mutation_check.py` breaks safety invariants one at a time and every mutant must be caught; run it after changing safety code. Refusals commit only when state changes, and `start` archives previous evidence. `applied_incorrect` depends on `failed_verification`, set by the latest attempt only. Strict field checks run only on new
 drafts (validate, init --contract, revise, revision-diff), never on frozen contracts.
 Read-only reports take no lock but still refuse a non-regular `.lock` entry. Lock
 contention raises `LockBusy`, an OSError. `applied_incorrect` requires a failed

@@ -107,6 +107,8 @@ Use `handoff` for a concise checkpoint-derived transfer summary; revalidate
 current state before continuing. For bug audits, apply `references/review-quality.md`.
 
 Create no project file before `start`, not even by `go mod init` or `npm init`; inspect versions read-only.
+Put files that tests need to compile, such as `go.mod` or `package.json`, in a first step with `test_first_exempt`
+(kind `config`), so later steps can record a real `red`.
 Declare housekeeping files such as `.gitignore` as writes of the step that creates them, or `gate` will refuse them.
 Leave mission setup out of the steps: the contract and checkpoint belong to the controller, `init`
 refuses declared paths inside the mission directory, and checks should not run the controller.

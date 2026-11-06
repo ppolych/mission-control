@@ -91,3 +91,13 @@ def start_step(contract, state, step, entry, args, path):
         entry['attempts'] = entry.get('attempts', 0) + 1
         state['attempts'] += 1
     return None
+
+
+def reopen_finished_mission(step, state):
+    """Reopen a finished mission for one stale step; the caller commits only if start succeeds."""
+    from .coverage import verification_is_current
+    if state['steps'].get(step['id'], {}).get('status') != 'completed' or verification_is_current(step, state):
+        raise ValueError('verification is current; nothing to revalidate')
+    if 'goal_review' in state:
+        state.setdefault('goal_review_history', []).append(state.pop('goal_review'))
+    state['stop_reason'] = None

@@ -72,8 +72,14 @@ def step_transition(contract, state, args, path):
     from .publication import now
     step = find_step(contract, args.step)
     entry = state['steps'].setdefault(args.step, {})
-    if state.get('stop_reason'):
-        raise ValueError('resume mission first')
+    if state.get('stop_reason') == 'done_verified':
+        if args.command != 'start' or not args.revalidate or contract['schema_version'] != 3:
+            raise ValueError('mission is done_verified; a step a later change made stale reopens alone with start --step ID '
+                             '--revalidate, new work needs a new mission, and resume reopens every step')
+        from .lifecycle_start import reopen_finished_mission
+        reopen_finished_mission(step, state)
+    elif state.get('stop_reason'):
+        raise ValueError('resume mission first (stopped as ' + str(state['stop_reason']) + ')')
     if args.command == 'start':
         return start_step(contract, state, step, entry, args, path)
     if args.command in ('approve', 'deny'):

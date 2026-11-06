@@ -26,6 +26,15 @@ def print_goal_review_notice(state):
     if goal_review_status(state) == 'missing':
         print('done_verified: steps verified. Required next: inspect the combined outcome against '
               'the original goal and record goal-review --verdict pass|fail --rationale TEXT.')
+    print_unconfirmed(state)
+
+
+def print_unconfirmed(state):
+    names = [name for name, entry in state['steps'].items()
+             if (entry.get('discipline_outcome') or {}).get('red_green') == 'unconfirmed']
+    if names:
+        print('Report in the final message: red/green unconfirmed for ' + ', '.join(names)
+              + '; status shows each test_first_notes reason.')
 
 
 def record_goal_review(contract, state, args):

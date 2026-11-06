@@ -2,14 +2,14 @@
 name: mission-control
 description: Orchestrate goals with durable mission state, evidence-based verification, bounded recovery, and explicit outcomes. Use for substantial multi-step, controlled, autonomous, or multi-session work, and whenever the user asks for this skill by name, however small or urgent. Otherwise exclude simple edits and quick questions.
 metadata:
-  version: "0.4.2.10"
+  version: "0.4.2.11"
   author: "Panos Polychronis"
   email: "ppolych@netcompany.com"
 ---
 
 # Mission Control
 
-Version 0.4.2.10. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
+Version 0.4.2.11. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
 or macOS. For WSL paths and setup, read [WSL guidance](references/wsl.md).
 Preserve the user's scope, existing authorization, and host permissions.
 
@@ -133,7 +133,10 @@ uncertain side effects: use `recovery`, inspect files and external outcomes, the
 and `not_applied` must not be recorded for work that happened; for reversible local work that failed verification, use `applied_incorrect`. Only supported, current criteria allow schema-3 `finish`.
 When `finish` names a stale step, a later step changed its files: run `start --step ID --revalidate` on that step,
 assess its manual checks again, `verify`, and review its criteria again. Never narrow `writes`, start a new mission or
-copy earlier verdicts to get around it. Mission setup is not a step. After `finish`, more changes need a new mission.
+copy earlier verdicts to get around it. After `finish`, the same command reopens the mission for that step alone, as
+when a fix `gate` asks for touches a declared file; never `resume` for this, since it reopens every step. Mission setup
+is not a step; new work after `finish` needs a new mission. Put files tests need to compile, such as `go.mod`, in a
+first step with `test_first_exempt`.
 
 ## Finish — Check the original goal before reporting success
 
