@@ -104,6 +104,8 @@ bounded backoff; never replay uncertain side effects. See
 Use `handoff` for a concise checkpoint-derived transfer summary; revalidate
 current state before continuing. For bug audits, apply `references/review-quality.md`.
 
+Create no project file before `start`, not even by `go mod init` or `npm init`; inspect versions read-only.
+Declare housekeeping files such as `.gitignore` as writes of the step that creates them, or `gate` will refuse them.
 Leave mission setup out of the steps: the contract and checkpoint belong to the controller, `init`
 refuses declared paths inside the mission directory, and checks should not run the controller.
 Declare the files a step changes, not the whole project or build output. When a later step makes an

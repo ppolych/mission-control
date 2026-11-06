@@ -75,8 +75,11 @@ def validate_advanced(contract):
             raise ValueError('schema 3 requires explicit reads/writes/network/external_actions/reversible effects')
         for name in ('reads', 'writes'):artifact_paths(effects[name], name)
         text_list(effects['external_actions'], 'external_actions')
-        if effects['network'] not in ('none', 'self_hosted', 'external') or type(effects['reversible']) is not bool:
-            raise ValueError('invalid network or reversible effect')
+        if effects['network'] not in ('none', 'self_hosted', 'external'):
+            raise ValueError('step ' + str(step['id']) + ': network must be one of none, self_hosted, external; got '
+                             + repr(effects['network']))
+        if type(effects['reversible']) is not bool:
+            raise ValueError('step ' + str(step['id']) + ': reversible must be true or false')
         if step.get('retry', 'inspect') not in ('safe', 'inspect'):raise ValueError('retry must be safe or inspect')
         if step.get('retry') == 'safe' and (effects['network'] != 'none' or effects['external_actions'] or not effects['reversible']):
             raise ValueError('safe retry cannot declare network, external actions, or irreversible effects')

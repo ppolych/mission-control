@@ -2,14 +2,14 @@
 name: mission-control
 description: Orchestrate goals with durable mission state, evidence-based verification, bounded recovery, and explicit outcomes. Use for substantial multi-step, controlled, autonomous, or multi-session work, and whenever the user asks for this skill by name, however small or urgent. Otherwise exclude simple edits and quick questions.
 metadata:
-  version: "0.4.2.8"
+  version: "0.4.2.9"
   author: "Panos Polychronis"
   email: "ppolych@netcompany.com"
 ---
 
 # Mission Control
 
-Version 0.4.2.8. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
+Version 0.4.2.9. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
 or macOS. For WSL paths and setup, read [WSL guidance](references/wsl.md).
 Preserve the user's scope, existing authorization, and host permissions.
 
@@ -102,7 +102,8 @@ then self-answer [the draft template](templates/draft-contract.md) and present a
 [the template](templates/contract.json); ask only for genuinely consequential missing requirements. Run `validate`, then
 `init`. Never overwrite or weaken an existing contract: new requirements need `revision-diff`, then `revise` into a separate
 destination. Existing schema-2 missions stay compatible. A strict mission stops before a push: keep the push out of the
-steps, then after `finish` and a passing `goal-review` commit, run `gate --commit SHA`, and push only if it exits 0.
+steps, then after `finish` and a passing `goal-review` commit, run `gate --commit SHA`, and push only if it exits 0. Never remove
+a needed file to make `gate` pass; report what it refused instead.
 
 ## Rules while running
 

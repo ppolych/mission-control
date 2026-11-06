@@ -83,14 +83,19 @@ def record_criterion_review(contract, state, args):
     text_list(refs, 'evidence references')
     kinds=evidence_kinds(getattr(args,'evidence_kind',None) or [])
     required=next(item for item in contract['acceptance'] if item['id']==args.criterion).get('evidence_kinds',[])
-    if args.verdict=='supported' and set(required)-set(kinds):raise ValueError('missing required evidence kind declarations')
+    if args.verdict=='supported' and set(required)-set(kinds):
+        missing=' '.join('--evidence-kind '+kind for kind in sorted(set(required)-set(kinds)))
+        raise ValueError('missing required evidence kind declarations: '+args.criterion+' requires '+missing)
     mapped = {step['id'] for step in contract['steps'] if args.criterion in step.get('acceptance_refs', [])}
     if args.verdict == 'supported':
         from .discipline import require_automated_evidence
         require_automated_evidence(contract, {step['id']: step for step in contract['steps'] if step['id'] in mapped}, kinds, refs)
     if args.verdict == 'supported':
-        if not refs or any(state['steps'].get(identifier, {}).get('status') != 'completed' for identifier in mapped):
-            raise ValueError('supported requires completed mapped steps and evidence references')
+        open_steps = sorted(identifier for identifier in mapped if state['steps'].get(identifier, {}).get('status') != 'completed')
+        if open_steps:
+            raise ValueError('supported requires completed mapped steps; mapped steps not completed: ' + ', '.join(open_steps))
+        if not refs:
+            raise ValueError('supported needs --evidence-ref check:STEP:INDEX or file:PATH')
         if any(not verification_is_current(step, state) for step in contract['steps'] if step['id'] in mapped):
             raise ValueError('verification artifact evidence is missing or stale; ' + revalidation_hint(contract, state))
     for ref in refs:

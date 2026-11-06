@@ -2,6 +2,16 @@
 
 Test results for each release are in [the validation record](references/operational-validation.md).
 
+## 0.4.2.9
+
+A real Nestor session on 0.4.2.8 built an MCP server in one mission, using `start --revalidate` on the three steps `finish` named as stale: 85 minutes and 33 million tokens, against 4 hours and 48 million for the earlier app on 0.4.2.7, a different and smaller task. About 15 minutes went to refusals that did not say what was missing, and the agent read the controller's source to recover. To pass `gate` it also dropped `.gitignore` from the commit.
+
+- `validate` names the step and the allowed `network` values, and says when `reversible` is not a boolean.
+- `criterion-review` names the missing `--evidence-kind`, the mapped steps not completed, and a missing `--evidence-ref`.
+- The `gate` `outside_scope` detail says not to drop a needed file, and how to certify it.
+- `SKILL.md` and the references say to create no project file before `start`, to declare files such as `.gitignore` in the step that creates them, and never to remove a file to make `gate` pass.
+- Not changed: the agent also edited a file during its final review step. The scope check caught it, and the agent recorded a scope note and revalidated.
+
 ## 0.4.2.8
 
 A real Nestor session built a ten-step desktop app with the skill named. Later steps changed files that earlier steps had declared, so those receipts went stale and `finish` refused without saying why. The only way to refresh one was `stop` and `resume`, which reopens every step. The agent read the controller's source, published three revisions and passed a fourth mission by declaring no writes for the scaffold step and copying earlier manual verdicts.

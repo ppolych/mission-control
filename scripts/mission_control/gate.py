@@ -180,7 +180,9 @@ def range_problems(contract, state, workspace, commit, prefix, root):
             outside.append(name)
     if outside:
         problems.append({'reason': 'outside_scope', 'paths': sorted(outside), 'ownership': 'unverified',
-                         'detail': 'Paths changed since the recorded base are not declared writes; who changed them is unknown.'})
+                         'detail': 'Paths changed since the recorded base are not declared writes; who changed them is unknown. '
+                                   'Do not drop a needed file to pass: report the result as not certified, or declare the '
+                                   'path as a write through revise and verify it in the new mission.'})
     return problems
 
 

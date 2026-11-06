@@ -193,7 +193,7 @@ does not look at the remote, so a person or script running `gate --commit` alone
 
 | Case | Behavior |
 |---|---|
-| Paths changed since the base | All must be declared writes, otherwise `outside_scope` |
+| Paths changed since the base | All must be declared writes, otherwise `outside_scope`. Never drop a needed file, such as `.gitignore`, to pass: report the result as not certified, or declare the path through `revise` |
 | Base is not an ancestor, as after a rebase | `base_not_ancestor`, with no fallback to a merge base |
 | Base object missing, as in a shallow clone | Exit 2 |
 | No recorded base | `no_base` |
