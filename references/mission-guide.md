@@ -37,7 +37,9 @@ resume. Draft concrete GIVEN/WHEN/THEN outcomes and map them to step/check evide
 Use `references/execution-context.md` for mission selection,
 small active-step briefs, consequence-aware decisions and combined-outcome review.
 
-For a new mission, create a schema-3 contract from `templates/contract.json`. Include a
+For a new mission, create a schema-3 contract from `templates/contract.json` and write the draft as
+`.mission/draft-contract.json`, inside the selected mission root: hosts such as Nestor refuse file tools outside the
+workspace, and `init` copies the draft to `contract.json`. Write a revision draft inside the current root too. Include a
 criterion testing whether the combined outcome satisfies the original goal, or
 an optional final `goal-check` step. Keep requirements separate from tactics.
 Optionally declare evidence_kinds per acceptance item; the new template requires

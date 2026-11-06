@@ -26,7 +26,8 @@ forward the refusal names, and report every refusal in the final message.
 
 Pin the canonical workspace, installed skill directory and one absolute mission
 root, `<workspace>/.mission` by default. Look for contract.json and
-state/progress.json under that selected root. Do not choose another root because
+state/progress.json under that selected root; a `draft-contract.json` alone means
+no mission was initialized yet. Do not choose another root because
 it is newer or create a competing mission for the same work.
 
 Inspect existing entries before writing. A malformed, unreadable or mismatched

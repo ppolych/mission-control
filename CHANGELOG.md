@@ -2,6 +2,14 @@
 
 Test results for each release are in [the validation record](references/operational-validation.md).
 
+## 0.4.2.10
+
+A real Nestor session on 0.4.2.9 built a Jenkins MCP server in one mission: about 58 minutes of work and 25.6 million tokens, with `start --revalidate` on two stale steps and a correct restore from `status` after the host stopped mid-step. Nestor's file tools refused the draft contract outside the workspace, so the agent wrote it through Bash, and reading skill files through those tools was refused as well. Three of four code steps ended with unconfirmed red/green, and the final report did not say so.
+
+- The draft contract goes in the mission root, as `.mission/draft-contract.json`, in `SKILL.md`, the short path and the references; a revision draft goes there too. `init` already accepted a draft inside an existing root, and `gate` already excludes the mission root; new regressions cover both.
+- `SKILL.md` says to read skill files with `cat` through Bash.
+- After a passing goal review, `next_action` names the steps whose red/green is unconfirmed, and `SKILL.md` asks the final report to name them and say why.
+
 ## 0.4.2.9
 
 A real Nestor session on 0.4.2.8 built an MCP server in one mission, using `start --revalidate` on the three steps `finish` named as stale: 85 minutes and 33 million tokens, against 4 hours and 48 million for the earlier app on 0.4.2.7, a different and smaller task. About 15 minutes went to refusals that did not say what was missing, and the agent read the controller's source to recover. To pass `gate` it also dropped `.gitignore` from the commit.

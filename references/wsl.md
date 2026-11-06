@@ -47,7 +47,7 @@ Quote paths containing spaces. Convert a Windows path explicitly when needed:
 
 ```bash
 workspace=$(wslpath -u 'C:\Users\Name\My Project')
-python3 scripts/mission.py init --contract contract.json --workspace "$workspace"
+python3 scripts/mission.py init --contract "$workspace/.mission/draft-contract.json" --workspace "$workspace"
 ```
 
 Mission Control does not rewrite arbitrary command arguments: they remain exact

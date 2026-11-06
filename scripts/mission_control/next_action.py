@@ -77,6 +77,10 @@ def next_action(contract, state, root=None):
             argv = ['scope-note', '--path', open_paths[0], '--disposition', 'mine|not_mine|unknown', '--rationale', 'TEXT']
             return _report('scope_note', argv, 'Inspect the observed change, then record a statement; it is not proof.', root)
         note = 'Report the final label, evidence and unresolved work.'
+        unconfirmed = [name for name, entry in state['steps'].items()
+                       if (entry.get('discipline_outcome') or {}).get('red_green') == 'unconfirmed']
+        if unconfirmed:
+            note += ' Name each step whose test did not fail first, and why: unconfirmed red/green: ' + ', '.join(unconfirmed) + '.'
         if goal_review_status(state) == 'pass' and contract.get('discipline') == 'strict':
             note += ' Before any push, commit the result and run gate --commit SHA; it is read-only and proves content, not authorship.'
         return _report('report_outcome', [], note, root)

@@ -2,14 +2,14 @@
 name: mission-control
 description: Orchestrate goals with durable mission state, evidence-based verification, bounded recovery, and explicit outcomes. Use for substantial multi-step, controlled, autonomous, or multi-session work, and whenever the user asks for this skill by name, however small or urgent. Otherwise exclude simple edits and quick questions.
 metadata:
-  version: "0.4.2.9"
+  version: "0.4.2.10"
   author: "Panos Polychronis"
   email: "ppolych@netcompany.com"
 ---
 
 # Mission Control
 
-Version 0.4.2.9. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
+Version 0.4.2.10. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
 or macOS. For WSL paths and setup, read [WSL guidance](references/wsl.md).
 Preserve the user's scope, existing authorization, and host permissions.
 
@@ -40,12 +40,13 @@ If you will not use the mission, say so and why before the first project change.
 ## Command path
 
 Set `SKILL` to this skill's absolute directory. If the host gives a Windows path and Bash runs in WSL, use
-`SKILL=$(wslpath -u 'C:\path\to\skill')`. Never search with `find /`. Every command takes `--mission PATH`
+`SKILL=$(wslpath -u 'C:\path\to\skill')`. Never search with `find /`. Hosts such as Nestor refuse file tools outside
+the workspace, so read skill files with `cat` through Bash, and write every draft contract inside the mission root. Every command takes `--mission PATH`
 when the mission root is not `.mission`; `--help` lists all commands and flags.
 
 ```bash
-python3 "$SKILL/scripts/mission.py" validate --contract contract.json
-python3 "$SKILL/scripts/mission.py" init --contract contract.json --workspace "$PWD"
+python3 "$SKILL/scripts/mission.py" validate --contract .mission/draft-contract.json
+python3 "$SKILL/scripts/mission.py" init --contract .mission/draft-contract.json --workspace "$PWD"
 python3 "$SKILL/scripts/mission.py" start --step STEP
 ```
 
@@ -72,18 +73,18 @@ inspecting the actual work or a user's decision.
 ## Small changes
 
 For one small change with a test, this is the flow; read nothing else unless a command refuses. Fill in
-[the template](templates/small-fix-contract.json) outside the workspace. Use `test_first_exempt` only if no test can apply.
+[the template](templates/small-fix-contract.json) as `.mission/draft-contract.json`. Use `test_first_exempt` only if no test can apply.
 
 ```bash
 M="$SKILL/scripts/mission.py"
-contract=$(mktemp)
+contract=.mission/draft-contract.json
 python3 "$M" validate --contract "$contract"
 python3 "$M" init --contract "$contract" --workspace "$PWD"
 python3 "$M" start --step fix
 python3 "$M" red --step fix
 ```
 
-Write the edited template to `$contract` first, and any missing test before `red`. Make the change only now, then:
+Create `.mission/` and write the edited template to `$contract` first, and any missing test before `red`. Make the change only now, then:
 
 ```bash
 python3 "$M" verify --step fix
@@ -147,7 +148,7 @@ Do not silently report `done_verified`, weaken criteria, or override a stop.
 `status`, `handoff` and `diagnose` means the mission is not yet reportable as done.
 
 Report the final label, verified step count, goal-review evidence, and unresolved
-work. Existing labels remain unchanged. Manual review is an assessment, not an
+work, including every step whose red/green stayed `unconfirmed` and why. Existing labels remain unchanged. Manual review is an assessment, not an
 automatic guarantee of semantic correctness.
 
 ## After the mission

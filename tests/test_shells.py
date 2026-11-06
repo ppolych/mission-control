@@ -87,6 +87,8 @@ class DocumentedFlows(ShellBase):
         for name in SHELLS:
             with self.subTest(shell=name):
                 shutil.rmtree(self.workspace / '.mission', ignore_errors=True)
+                (self.workspace / '.mission').mkdir()
+                shutil.copyfile(self.workspace / 'contract.json', self.workspace / '.mission/draft-contract.json')
                 (self.workspace / 'report.txt').unlink(missing_ok=True)
                 result = self.run_script(name, skill_commands())
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

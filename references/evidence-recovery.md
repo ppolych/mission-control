@@ -196,13 +196,13 @@ and isolation remain necessary. Changing effects/commands/scope requires a revis
 Draft the proposed schema-3 contract outside the existing mission. Inspect:
 
 ```bash
-python3 "$SKILL/scripts/mission.py" revision-diff --contract revised-contract.json
+python3 "$SKILL/scripts/mission.py" revision-diff --contract .mission/revised-contract.json
 ```
 
 After authorization for the changed scope:
 
 ```bash
-python3 "$SKILL/scripts/mission.py" revise --contract revised-contract.json \
+python3 "$SKILL/scripts/mission.py" revise --contract .mission/revised-contract.json \
   --destination mission-r2 --reason 'User authorized the described scope change'
 python3 "$SKILL/scripts/mission.py" init --mission mission-r2 --workspace "$PWD"
 ```

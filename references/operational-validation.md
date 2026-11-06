@@ -16,7 +16,7 @@
 - [Performance measurement](#performance-measurement)
 
 Initial operational run: 2026-10-31, release **0.3.1**. Later release records
-are appended below; current release is **0.4.2.9**.
+are appended below; current release is **0.4.2.10**.
 No contract schema, default mode, approval, recovery or attempt-budget policy
 was changed. The additions are `metrics`, `handoff`, bounded `lessons-search`,
 and prompt guidance for progress/waits, safe polling and evidence-based review.
@@ -341,3 +341,9 @@ This release moves guidance out of `SKILL.md`. One real Nestor session ran with 
 `check_all.sh` passed on Linux 6.18.54.1-microsoft-standard-WSL2 with Python 3.14.4: 570 tests in 183.423 seconds, then 570 in 159.272 seconds with a symlinked TMPDIR, with package smoke checks (151 entries). New regressions are in `tests/test_refusal_messages.py`.
 
 One real Nestor session ran on 0.4.2.8 (`qwen3-6-coder-gefion`, Agent mode, thinking high, new workspace with a git repository): a Go MCP server for Harbor, in one mission of seven strict steps, 85 minutes and 33 million tokens. `finish` named three stale steps and the agent revalidated them with `start --revalidate`; it reached `done_verified`, a passing goal review and a certified `gate`. `go vet` and `go test -race` passed again when rerun by the reviewer. The agent ran `go mod init` before the mission, and dropped `.gitignore` from the commit to pass `gate`. The reviewer is the author's assistant, the sample is one run, and no session has run on 0.4.2.9.
+
+## Release 0.4.2.10 verification
+
+`check_all.sh` passed on Linux 6.18.54.1-microsoft-standard-WSL2 with Python 3.14.4: 577 tests in 175.761 seconds, then 577 in 140.861 seconds with a symlinked TMPDIR, with package smoke checks (152 entries). New regressions are in `tests/test_draft_in_mission.py`.
+
+One real Nestor session ran on 0.4.2.9 (`qwen3-6-coder-gefion`, Agent mode, thinking high, new git workspace): a Go MCP server for Jenkins, one mission of six strict steps, about 58 minutes of work and 25.6 million tokens. The host stopped once mid-step; asked to continue, the agent restored the active step from `status`. `start --revalidate` refreshed two stale steps, the mission reached `done_verified` with a passing goal review, and `go vet` and `go test -race` passed again when rerun by the reviewer. The agent did not commit, as the request asked for a report. Three of four code steps ended with unconfirmed red/green, which the final report did not mention, and the request carried two mission hints that the Harbor request had not. The reviewer is the author's assistant, the sample is one run, and no session has run on 0.4.2.10.
