@@ -1,7 +1,7 @@
 """A stale step after finish reopens alone, red names the scaffolding fix, and finish names unconfirmed red/green."""
 import json
 
-from test_draft_in_mission import DraftInMissionRoot as DraftBase
+from test_draft_in_mission import DraftFixture as DraftBase
 from test_stale_revalidation import Fixture, contract
 
 

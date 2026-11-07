@@ -53,6 +53,22 @@ states what is enforced, what is a heuristic and what is only an agent statement
 A strict mission stops before a push: keep the push out of the steps, then after `finish` and a passing
 `goal-review` commit, run `gate --commit SHA`, and push only if it exits 0. Read `references/evidence-recovery.md`
 when drafting, reconciling interruptions, or creating revisions.
+A filled-in code step, for a Go project; checks are exact argv arrays whose first item is the check kind:
+
+```json
+{"id": "client", "description": "HTTP client with typed errors", "depends_on": ["scaffold"],
+ "verify": [["exit0", "go", "test", "./..."]], "risk": "low", "needs_approval": false, "commands": [],
+ "acceptance_refs": ["AC-1"], "watch": [], "retry": "inspect",
+ "effects": {"reads": [], "writes": ["client/client.go", "client/client_test.go"], "network": "none",
+             "external_actions": [], "reversible": true},
+ "test_first": {"command": ["go", "test", "./..."], "test_paths": ["client/client_test.go"]}}
+```
+
+`network` is one of `none`, `self_hosted` or `external`. The `test_first` command must also appear as an
+`exit0` check, and `test_paths` must be listed in `writes` next to at least one file that is not a test.
+`watch` takes files, never directories. Name example configuration files without a `.env` suffix, such as
+`env.example`: hosts such as Nestor refuse to write `*.env` files, and a declared name you cannot write
+needs a whole revision.
 For that new mission run `validate`, then `init`; existing contracts must not be overwritten or
 weakened. New requirements need an explicit new mission revision (`revision-diff`, then
 `revise` into a separate destination). Existing schema-2 missions stay compatible. Use helper

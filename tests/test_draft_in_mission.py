@@ -16,7 +16,7 @@ TEST = ('import unittest\nfrom app import value\n\n\nclass T(unittest.TestCase):
 DRAFT = '.mission/draft-contract.json'
 
 
-class DraftInMissionRoot(unittest.TestCase):
+class DraftFixture(unittest.TestCase):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
@@ -55,6 +55,8 @@ class DraftInMissionRoot(unittest.TestCase):
         self.ok('finish')
         return self.ok('goal-review', '--verdict', 'pass', '--rationale', 'Requested behavior holds')
 
+
+class DraftInMissionRoot(DraftFixture):
     def test_a_draft_inside_the_mission_root_initializes_and_certifies(self):
         self.repository()
         self.ok('validate', '--contract', DRAFT)

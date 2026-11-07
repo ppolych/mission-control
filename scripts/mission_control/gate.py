@@ -31,6 +31,15 @@ def begin_mission(contract, state, workspace, root):
         return
     parent = json.loads(read_bounded(parent_path, MAX_STATE_BYTES)[0].decode('utf-8-sig'))
     state['mission_base'] = parent.get('mission_base', capture_base(workspace))
+    lineage = set(parent.get('lineage_writes', []))
+    parent_contract_path = root / 'lineage/parent-contract.json'
+    if parent_contract_path.exists():
+        parent_contract = json.loads(read_bounded(parent_contract_path, MAX_STATE_BYTES)[0].decode('utf-8-sig'))
+        for step in parent_contract.get('steps', []):
+            if parent.get('steps', {}).get(step['id'], {}).get('attempts', 0) > 0:
+                lineage.update(step.get('effects', {}).get('writes', []))
+    if lineage:
+        state['lineage_writes'] = sorted(lineage)
     writes = declared_writes(contract)
     kept = {name: record for name, record in parent.get('scope_observations', {}).items() if not covered(name, writes)}
     if kept:
@@ -149,11 +158,14 @@ def no_change_problems(contract, state, names, prefix):
     for step in contract['steps']:
         outcome = state['steps'].get(step['id'], {}).get('discipline_outcome', {}).get('outcome')
         (unchanged if outcome == 'no_change' else changed).update(step['effects']['writes'])
+    # A revision inherits writes whose work started in a parent mission under the same base.
+    changed.update(state.get('lineage_writes', []))
     paths = sorted(name for name in names if name.startswith(prefix) and covered(name[len(prefix):], unchanged)
                    and not covered(name[len(prefix):], changed))
     if paths:
         return [{'reason': 'no_change_step_changed_path', 'paths': paths, 'ownership': 'unverified',
-                 'detail': 'A step recorded no change, but these paths differ from the recorded base, so the work predates its verification.'}]
+                 'detail': 'A step recorded no change, but these paths differ from the recorded base, and no step of this '
+                           'mission or a parent revision started work on them, so the work predates its verification.'}]
     return []
 
 

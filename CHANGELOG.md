@@ -2,6 +2,14 @@
 
 Test results for each release are in [the validation record](references/operational-validation.md).
 
+## 0.4.2.12
+
+A real Nestor session on 0.4.2.11 built a Portainer MCP server in about 117 minutes and 45 million tokens, across four mission roots. Three contract mistakes surfaced only at `verify`, after the contract was frozen, and each needed a revision: a check whose `go` had been dropped (`["exit0", "build", "./..."]`), a `watch` on a directory, and a declared `config.example.env` that Nestor's file tool refuses to write. After the third revision every step was redone with `--already-satisfied`, so `gate` refused every file as work from before the mission and could not certify the commit. Drafting also took nine `validate` tries.
+
+- New strict drafts refuse an `exit0` check or `test_first` command whose program is a bare name not on `PATH`, and a `watch` entry that is a directory. Both are heuristics; frozen contracts are not rechecked.
+- A revision records the writes of every step a parent mission started, and `gate` no longer refuses those files under a `no_change` step. Files no mission in the chain started are still refused.
+- The mission guide shows a filled-in code step and says to name example configuration files without a `.env` suffix.
+
 ## 0.4.2.11
 
 A real Nestor session on 0.4.2.10 built a Keycloak MCP server in one mission: 37 minutes and 23.8 million tokens, with the draft contract written inside `.mission/` at minute 4.5 and no refused file writes. `gate` then found a `.gitignore` pattern that hid `cmd/`; after the fix, `start --revalidate` answered only "resume mission first", and `resume` reopened all six steps, so the agent re-verified, re-assessed and re-reviewed everything. `red` had refused its first step because `go.mod` already existed, and the final report again omitted three steps with unconfirmed red/green.

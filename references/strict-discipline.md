@@ -60,6 +60,15 @@ network effect or `reversible: false`, a check whose text exactly equals a decla
 rerun on every `verify`, so check the result with a read-only command. This is an exact-text heuristic: a
 reworded command is not detected, and frozen contracts are not rechecked.
 
+New strict drafts also refuse an `exit0` check or `test_first` command whose program is a bare name not on
+`PATH`, and a `watch` entry that is a directory or ends in `/`. Both would otherwise fail only at `verify`, after
+the contract is frozen. A program a step creates needs a path such as `./bin/tool`. The `PATH` lookup runs where
+`validate` runs, so a tool installed later is not seen.
+
+After `revise`, the new mission keeps its parent's base and records the writes of every step a parent mission
+started. A step redone with `--already-satisfied` then does not make `gate` refuse those files as work from
+before the mission; files no mission in the chain started are still refused.
+
 `test_paths` must be inside `effects.writes`, including an existing test the step should not change. Listing
 it does not require a change: once `red` has run, `verify` refuses a test file that changed without a
 `test-first-note`.

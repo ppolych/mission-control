@@ -66,8 +66,9 @@ class RedCommand(TestFirstBase):
         self.assert_not_red('passed')
 
     def test_missing_executable_is_not_red(self):
-        self.step['test_first']['command'] = ['definitely-not-installed-xyz']
-        self.step['verify'] = [['exit0', 'definitely-not-installed-xyz']]
+        # A bare missing name is refused at drafting; a path, or a tool removed later, reaches red.
+        self.step['test_first']['command'] = ['./definitely-not-installed-xyz']
+        self.step['verify'] = [['exit0', './definitely-not-installed-xyz']]
         self.begin()
         self.write_test()
         self.assert_not_red('could not run')

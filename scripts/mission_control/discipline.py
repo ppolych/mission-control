@@ -72,6 +72,24 @@ def validate_draft_fields(contract):
     elif is_strict(contract):
         for step in contract['steps']:
             validate_checks_repeat_no_external_action(step)
+            validate_programs_and_watch(step)
+
+
+def validate_programs_and_watch(step):
+    """Catch at drafting what verify would only find later, when the contract is frozen. A heuristic."""
+    import shutil
+    from pathlib import Path
+    commands = [check[1:] for check in step['verify'] if isinstance(check, list) and check[0] == 'exit0' and len(check) > 1]
+    if step.get('test_first', {}).get('command'):
+        commands.append(step['test_first']['command'])
+    for command in commands:
+        program = command[0]
+        if '/' not in program and shutil.which(program) is None:
+            raise ValueError(step['id'] + ": check program '" + program + "' is not on PATH; checks run argv exactly, "
+                             'for example ["exit0", "go", "test", "./..."], and a program a step creates needs a path such as ./bin/tool')
+    for name in step.get('watch', []):
+        if name.endswith('/') or Path(name).is_dir():
+            raise ValueError(step['id'] + ': watch takes files, not directories: ' + name + '; list the files, or leave watch empty')
 
 
 def validate_exemption(step):
@@ -196,6 +214,9 @@ def validate_discipline_state(state):
     validate_scope_state(state)
     if not isinstance(state.get('mission_base', {}), dict):
         raise ValueError('invalid mission base')
+    lineage = state.get('lineage_writes', [])
+    if not isinstance(lineage, list) or not all(isinstance(name, str) for name in lineage):
+        raise ValueError('invalid lineage writes')
     for entry in state['steps'].values():
         for key in ('discipline_outcome', 'first_effect_baseline', 'red'):
             if key in entry and not isinstance(entry[key], dict):
