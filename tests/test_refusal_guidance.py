@@ -89,3 +89,13 @@ class Guidance(DraftFixture):
                                  capture_output=True, text=True)
         self.assertEqual(refused.returncode, 2)
         self.assertTrue(re.search(r"templates/contract\.json.*mission-guide\.md", refused.stderr))
+
+    def test_research_guidance_forbids_a_whole_filesystem_search(self):
+        """Three real sessions lost time to hung commands; the last was a subagent's find / crawling /mnt/c."""
+        self.repository()
+        self.ok('init', '--contract', DRAFT, '--workspace', str(self.work))
+        brief = self.ok('brief', '--role', 'researcher', '--query', 'the auth crate').stdout
+        self.assertIn('Never search the whole filesystem with find /', brief)
+        self.assertIn('~/.cargo/registry/src', brief)
+        skill = (ROOT / 'SKILL.md').read_text(encoding='utf-8')
+        self.assertIn('Never search the whole filesystem with `find /`, and tell subagents so', skill)

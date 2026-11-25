@@ -208,6 +208,7 @@ does not look at the remote, so a person or script running `gate --commit` alone
 | Case | Behavior |
 |---|---|
 | Paths changed since the base | All must be declared writes, otherwise `outside_scope`. Never drop a needed file, such as `.gitignore`, to pass: report the result as not certified, or declare the path through `revise` |
+| Files under the mission root in the commit | `mission_root_in_commit`: no receipt covers them; keep the mission root out of commits, for example in `.git/info/exclude` |
 | Base is not an ancestor, as after a rebase | `base_not_ancestor`, with no fallback to a merge base |
 | Base object missing, as in a shallow clone | Exit 2 |
 | No recorded base | `no_base` |

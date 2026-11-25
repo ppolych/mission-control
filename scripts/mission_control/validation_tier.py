@@ -128,19 +128,27 @@ def unittest_counts(output):
     if not ran:
         return None
     tail = output[output.rindex('Ran ' + ran[-1]):]
-    failed = sum(int(n) for n in re.findall(r'(?:failures|errors)=(\d+)', tail))
+    failed = sum(int(n) for n in re.findall(r'(?<!expected )(?:failures|errors)=(\d+)', tail))
     skipped = sum(int(n) for n in re.findall(r'skipped=(\d+)', tail))
     return max(int(ran[-1]) - failed - skipped, 0), failed, skipped, 'tests'
 
 
 def tap_counts(output):
+    """node --test: TAP prints '# pass 3'; the spec reporter of newer Node prints 'ℹ pass 3'."""
     def last(word):
-        found = re.findall(r'^# ' + word + r' (\d+)$', output, re.M)
+        found = re.findall(r'^(?:#|\u2139) ' + word + r' (\d+)$', output, re.M)
         return int(found[-1]) if found else None
     passed, failed = last('pass'), last('fail')
     if passed is None and failed is None:
         return None
     return passed or 0, failed or 0, last('skipped') or 0, 'tests'
+
+
+def deno_counts(output):
+    lines = re.findall(r'^(?:ok|FAILED) \| (\d+) passed[^|]*\| (\d+) failed', output, re.M)
+    if not lines:
+        return None
+    return int(lines[-1][0]), int(lines[-1][1]), 0, 'tests'
 
 
 def maven_counts(output):
@@ -196,8 +204,10 @@ def parsers_for(argv):
         return (nextest_counts,) if rest[:1] == ['nextest'] else (cargo_counts,)
     if program in PYTHONS:
         return (unittest_counts,) if python_module(rest) == 'unittest' else (summary_line_counts,)
-    if program in ('pytest', 'py.test', 'jest', 'vitest', 'deno'):
+    if program in ('pytest', 'py.test', 'jest', 'vitest'):
         return (summary_line_counts,)
+    if program == 'deno':
+        return (deno_counts,)
     if program == 'node':
         return (tap_counts,)
     if program == 'mocha':

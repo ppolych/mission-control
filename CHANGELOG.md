@@ -2,6 +2,25 @@
 
 Test results for each release are in [the validation record](references/operational-validation.md).
 
+## 0.4.2.15
+
+Four independent reviewers searched the whole controller for bugs, each in one area, and reproduced every finding in a throwaway mission. They found eleven; two of them found the first one separately.
+
+- A stale completed step lost its checks-only revalidation once an approval or `block` came between `start --revalidate` and `verify`: the next `start` spent a new attempt, and with one attempt per step the mission could never finish. The step now stays marked for revalidation until `verify`.
+- After a revalidation or a changed evidence file, `next_action` kept suggesting `finish`, which refused. It now suggests the criterion review that went stale.
+- `gate` certified a submodule update hidden by `ignore = all`, and any file committed from the mission root. Git diffs now include submodules, and a commit carrying mission-root files is not certified (`mission_root_in_commit`); keep the mission root in `.git/info/exclude`.
+- The panel ignored review findings after the fiftieth, so a P0 could pass; a reply with more than 200 findings is now inconclusive. A skeptic vote counts only when the verdict is the last non-blank line.
+- `brief` with no declared writes sent the whole workspace's changes, secrets included; it now sends nothing.
+- `deno test` and Node's spec reporter are counted, and unittest's expected failures are no longer counted as failures.
+- A revision no longer copies its parent's whole lineage into its changes, and `evidence-audit` on a schema-2 mission refuses with a message.
+
+## 0.4.2.14
+
+In a Nestor Plan mode session, the agent sent five explore subagents in parallel, as the skill now suggests; four reported within twelve minutes. The fifth ran `find / -type d -name mogh_auth_client` to locate a Rust crate's source, and on WSL that search crawled the Windows drive for more than half an hour while the plan waited. It was the third session to lose time to a command that never returned, after a `curl` loop and a partial `git` clone. The controller runs no such commands, so this release can only guide the agent.
+
+- `SKILL.md` says never to search the whole filesystem with `find /`, to tell subagents so, and where dependency sources already are.
+- The researcher brief and the mission guide say the same, with the source locations for Rust, Go, JavaScript and Python.
+
 ## 0.4.2.13
 
 Five MCP servers built in Nestor with Mission Control all reached `done_verified` with a passing goal review, yet a read-only review scored them 3 to 7 out of 10 (mean 5.3): an auto-rollback that never fired, allowlists that could be bypassed, wrong API paths. The agent graded its own work, and its tests ran against mocks that shared its wrong assumptions. The OPNsense session also showed friction: a contract written in the wrong format after long research, `FAIL: file (check 0)` without the path, a loop through recovery refusals, and about 30 messages spent reading the controller's source.

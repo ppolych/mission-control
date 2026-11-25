@@ -16,7 +16,7 @@
 - [Performance measurement](#performance-measurement)
 
 Initial operational run: 2026-10-31, release **0.3.1**. Later release records
-are appended below; current release is **0.4.2.13**.
+are appended below; current release is **0.4.2.15**.
 No contract schema, default mode, approval, recovery or attempt-budget policy
 was changed. The additions are `metrics`, `handoff`, bounded `lessons-search`,
 and prompt guidance for progress/waits, safe polling and evidence-based review.
@@ -367,3 +367,13 @@ One real Nestor session ran on 0.4.2.11 (Qwen 3.8 27B, Agent mode, thinking norm
 Before release, an independent review of the change found two P1 defects (a panel on a non-strict contract was never validated; the same reply recorded three times counted as three votes), four P2 and five P3 defects; each is fixed and pinned by a test in `tests/test_panel_review_fixes.py`.
 
 The release responds to a read-only review of five MCP servers built in Nestor on 0.4.2.8 to 0.4.2.12, which scored 3 to 7 of 10 (mean 5.3) although every mission certified. No Nestor session has run on 0.4.2.13, and no use of Nestor's `subagent` tool with this skill has been observed yet.
+
+## Release 0.4.2.14 verification
+
+`check_all.sh` passed on Linux 6.18.58.1-microsoft-standard-WSL2 with Python 3.14.4: 641 tests in 172.028 seconds, then 641 in 154.028 seconds with a symlinked TMPDIR, with package smoke checks (167 entries). The change is guidance text in `SKILL.md`, the researcher brief and the mission guide, pinned by `test_research_guidance_forbids_a_whole_filesystem_search` in `tests/test_refusal_guidance.py`; no safety code changed, so the mutation check was not rerun.
+
+One real Nestor session (Plan mode, an on-premises reasoning model, a clone of an upstream Rust and React repository) sent five explore subagents in parallel; four reported within twelve minutes, and the fifth ran `find /` on WSL for more than thirty minutes. The parent session stayed near 29 thousand tokens while the subagents used about 2.4 million. No session has run on 0.4.2.14.
+
+## Release 0.4.2.15 verification
+
+`check_all.sh` passed on Linux 6.18.58.1-microsoft-standard-WSL2 with Python 3.14.4: 651 tests in 337.113 seconds, then 651 in 242.848 seconds with a symlinked TMPDIR, with package smoke checks (168 entries). `evals/mutation_check.py` caught 64 of 64 mutants, five of them new for this release's fixes. Eleven defects found by four area reviewers, each reproduced in a throwaway mission, are pinned in `tests/test_bug_hunt_fixes.py`; `test_refusal_messages.py` now finds `outside_scope` by reason, because the same commit also carries mission-root files. No Nestor session has run on 0.4.2.15.

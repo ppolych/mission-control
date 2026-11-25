@@ -53,10 +53,21 @@ def _open_step(contract, state, root):
     return None
 
 
+def _current_verdicts(contract, state):
+    """What finish will see: a review made stale by a revalidation or a changed evidence file no longer counts."""
+    from .coverage import coverage_report
+    try:
+        return {row['id']: row['status'] for row in coverage_report(contract, state)['criteria']}
+    except (ValueError, OSError):
+        return {key: value.get('verdict') for key, value in state.get('acceptance_reviews', {}).items()}
+
+
 def _review_step(contract, state, root):
-    reviews = state.get('acceptance_reviews', {})
-    for item in contract.get('acceptance', []) if contract['schema_version'] == 3 else []:
-        if reviews.get(item['id'], {}).get('verdict') != 'supported':
+    if contract['schema_version'] != 3:
+        return None
+    verdicts = _current_verdicts(contract, state)
+    for item in contract.get('acceptance', []):
+        if verdicts.get(item['id']) != 'supported':
             argv = ['criterion-review', '--criterion', item['id'], '--verdict', 'VERDICT', '--rationale', 'TEXT',
                     '--evidence-ref', 'check:STEP:INDEX']
             for kind in item.get('evidence_kinds', []):

@@ -46,6 +46,9 @@ def work_text(contract, state):
     workspace = state['workspace']
     base = state.get('mission_base', {})
     writes = sorted({name for step in contract['steps'] for name in step['effects']['writes']})
+    if not writes:
+        # An empty pathspec would mean the whole repository, secrets included; the panel judges declared files only.
+        return '(the contract declares no files to write, so there is no work to show)'
     parts, omitted, size = [], [], 0
     try:
         if base.get('status') == 'commit':
@@ -99,7 +102,9 @@ def researcher(contract, state, topic):
             + (topic or 'the external APIs, formats and tools this mission depends on') + '\n\n'
             'Use official documentation, published specifications such as OpenAPI files, and upstream source code or '
             'tests. Avoid blogs and answers from memory. Keep each command short, and stop a download or clone that '
-            'does not finish. Report each fact on its own line as:\nFACT: <the fact> | SOURCE: <URL or upstream path>\n'
+            'does not finish. Never search the whole filesystem with find /: on WSL it crawls the Windows drive for hours. '
+            'Dependency sources are already local: ~/.cargo/registry/src for Rust, ~/go/pkg/mod for Go, node_modules for '
+            'JavaScript and site-packages for Python. Report each fact on its own line as:\nFACT: <the fact> | SOURCE: <URL or upstream path>\n'
             'Mark anything you could not confirm from a source as UNCONFIRMED.\n')
 
 

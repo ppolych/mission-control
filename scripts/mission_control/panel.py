@@ -13,6 +13,7 @@ DEFAULT_SKEPTICS = 3
 BLOCKING_PRIORITY = 1
 BLOCKING_CONFIDENCE = 0.5
 MAX_REPLY_BYTES = 256 * 1024
+MAX_FINDINGS = 200
 VERDICT_LINE = re.compile(r'^\s*VERDICT:\s*(NOT_REFUTED|REFUTED)\b\s*(?:[-—:]+\s*(.*))?$', re.M)
 
 
@@ -63,10 +64,12 @@ def work_digest(contract, state):
 
 
 def parse_vote(text):
-    lines = VERDICT_LINE.findall(text)
-    if not lines:
+    """Only the last non-blank line votes: a verdict followed by second thoughts is not a vote."""
+    lines = [line for line in text.splitlines() if line.strip()]
+    match = VERDICT_LINE.fullmatch(lines[-1]) if lines else None
+    if not match:
         return {'verdict': 'inconclusive', 'gap': None}
-    verdict, gap = lines[-1]
+    verdict, gap = match.groups()
     return {'verdict': verdict.lower(), 'gap': (gap or '').strip()[:500] or None}
 
 
@@ -90,8 +93,10 @@ def parse_review(text):
     if not value or not isinstance(value.get('findings'), list) or value.get('overall_correctness') not in (
             'patch is correct', 'patch is incorrect'):
         return {'status': 'inconclusive', 'findings': []}
+    if len(value['findings']) > MAX_FINDINGS:
+        return {'status': 'inconclusive', 'findings': []}
     findings = []
-    for item in value['findings'][:50]:
+    for item in value['findings']:
         if not isinstance(item, dict):
             return {'status': 'inconclusive', 'findings': []}
         priority, confidence = item.get('priority'), item.get('confidence_score')

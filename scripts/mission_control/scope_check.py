@@ -57,7 +57,7 @@ def snapshot(workspace, root):
 
 
 def committed_paths(workspace, before, after, prefix):
-    names = null_separated(run_git(workspace, 'diff', '--name-only', '-z', '--no-renames', before, after, '--', '.'))
+    names = null_separated(run_git(workspace, 'diff', '--name-only', '-z', '--no-renames', '--ignore-submodules=none', before, after, '--', '.'))
     return [name[len(prefix):] if name.startswith(prefix) else name for name in names]
 
 

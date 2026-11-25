@@ -2,14 +2,14 @@
 name: mission-control
 description: Orchestrate goals with durable mission state, evidence-based verification, bounded recovery, and explicit outcomes. Use for substantial multi-step, controlled, autonomous, or multi-session work, and whenever the user asks for this skill by name, however small or urgent. Otherwise exclude simple edits and quick questions.
 metadata:
-  version: "0.4.2.13"
+  version: "0.4.2.15"
   author: "Panos Polychronis"
   email: "ppolych@netcompany.com"
 ---
 
 # Mission Control
 
-Version 0.4.2.13. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
+Version 0.4.2.15. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
 or macOS. For WSL paths and setup, read [WSL guidance](references/wsl.md).
 Preserve the user's scope, existing authorization, and host permissions.
 
@@ -40,7 +40,8 @@ If you will not use the mission, say so and why before the first project change.
 ## Command path
 
 Set `SKILL` to this skill's absolute directory. If the host gives a Windows path and Bash runs in WSL, use
-`SKILL=$(wslpath -u 'C:\path\to\skill')`. Never search with `find /`. Hosts such as Nestor refuse file tools outside
+`SKILL=$(wslpath -u 'C:\path\to\skill')`. Never search the whole filesystem with `find /`, and tell subagents so: on WSL it
+crawls the Windows drive for hours. Dependency sources are in `~/.cargo/registry/src`, `~/go/pkg/mod` or `node_modules`. Hosts such as Nestor refuse file tools outside
 the workspace, so read skill files with `cat` through Bash, and write every draft contract inside the mission root. Every command takes `--mission PATH`
 when the mission root is not `.mission`; `--help` lists all commands and flags.
 

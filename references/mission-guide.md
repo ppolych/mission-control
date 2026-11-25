@@ -51,7 +51,8 @@ policy. The template sets `discipline: strict`: a step that writes declares
 using the `references/development-method.md`; `references/strict-discipline.md`
 states what is enforced, what is a heuristic and what is only an agent statement.
 A strict mission stops before a push: keep the push out of the steps, then after `finish` and a passing
-`goal-review` commit, run `gate --commit SHA`, and push only if it exits 0. Read `references/evidence-recovery.md`
+`goal-review` commit, run `gate --commit SHA`, and push only if it exits 0. Keep the mission root out of git before
+the first commit, for example with `.mission/` in `.git/info/exclude`: `gate` refuses a commit that carries it. Read `references/evidence-recovery.md`
 when drafting, reconciling interruptions, or creating revisions.
 A filled-in code step, for a Go project; checks are exact argv arrays whose first item is the check kind:
 
@@ -74,6 +75,9 @@ command that ran no tests. Use `["not_grep", "PATTERN", "path"]` to prove an old
 against, base fixtures and expected shapes on official sources, such as the service's published OpenAPI file or
 upstream tests, and record them with `--evidence-kind source`. For long research, hand it to an explore subagent
 with `brief --role researcher --query TOPIC` and keep only its facts; read the template again just before drafting.
+Any prompt you write for a subagent should say the same as that brief: keep commands short, stop one that does not
+finish, and never search the whole filesystem with `find /`, which on WSL crawls the Windows drive for hours. Look for
+dependency sources where they already are: `~/.cargo/registry/src`, `~/go/pkg/mod`, `node_modules` or `site-packages`.
 Decide everything before `init`: it refuses template text starting with `Replace with`. Details:
 `references/subagents.md`.
 For that new mission run `validate`, then `init`; existing contracts must not be overwritten or

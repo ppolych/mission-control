@@ -139,7 +139,7 @@ def pushed_range_problems(contract, state, workspace, commit, prefix, remote_sha
     if not remote_sha.strip('0'):
         if not text(run_git(workspace, 'for-each-ref', '--count=1', 'refs/remotes')):
             empty = text(run_git(workspace, 'hash-object', '-t', 'tree', '--stdin'))
-            names = null_separated(run_git(workspace, 'diff', '--name-only', '-z', '--no-renames', '--no-ext-diff', empty, commit))
+            names = null_separated(run_git(workspace, 'diff', '--name-only', '-z', '--no-renames', '--ignore-submodules=none', '--no-ext-diff', empty, commit))
             return no_change_problems(contract, state, names, prefix)
         if text(run_git(workspace, 'for-each-ref', '--count=1', '--contains', start, 'refs/remotes')):
             return []
@@ -181,15 +181,21 @@ def range_problems(contract, state, workspace, commit, prefix, root):
         start = text(run_git(workspace, 'hash-object', '-t', 'tree', '--stdin'))
     else:
         return [{'reason': 'no_base', 'detail': 'No starting commit was recorded for this mission.'}]
-    names = null_separated(run_git(workspace, 'diff', '--name-only', '-z', '--no-renames', '--no-ext-diff', start, commit))
+    names = null_separated(run_git(workspace, 'diff', '--name-only', '-z', '--no-renames', '--ignore-submodules=none', '--no-ext-diff', start, commit))
     writes = declared_writes(contract)
     mission = mission_relative(root, workspace)
     problems = no_change_problems(contract, state, names, prefix)
-    outside = []
+    outside, in_mission = [], []
     for name in names:
         relative = name[len(prefix):] if name.startswith(prefix) else None
-        if relative is None or not (covered(relative, writes) or excluded(relative, mission)):
+        if relative is not None and excluded(relative, mission):
+            in_mission.append(name)
+        elif relative is None or not covered(relative, writes):
             outside.append(name)
+    if in_mission:
+        problems.append({'reason': 'mission_root_in_commit', 'paths': sorted(in_mission),
+                         'detail': 'The commit carries files from the mission root, which no receipt covers. Keep the '
+                                   'mission root out of commits, for example in .git/info/exclude, and commit again.'})
     if outside:
         problems.append({'reason': 'outside_scope', 'paths': sorted(outside), 'ownership': 'unverified',
                          'detail': 'Paths changed since the recorded base are not declared writes; who changed them is unknown. '

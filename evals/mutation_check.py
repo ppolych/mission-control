@@ -71,6 +71,13 @@ MUTANTS = (
     ('go_list_counts_tests', 'validation_tier.py', "return BUILD_ONLY if program_name(args) == 'go' and runs_no_go_tests(args) else ASSERTIONS", 'return ASSERTIONS'),
     ('panel_enforce_ignored', 'panel.py', "    if result['mode'] == 'enforce':\n        raise ValueError(text)", "    if False:\n        raise ValueError(text)"),
     ('controller_change_ignored', 'controller_identity.py', "    if recorded['engine_fingerprint'] == current['engine_fingerprint']:\n        return", "    if True:\n        return"),
+    ('stale_revalidation_unmarked', 'lifecycle_start.py', "        entry['needs_revalidation'] = True\n    elif", '        pass\n    elif'),
+    ('next_action_trusts_stored_verdicts', 'next_action.py', "        return {row['id']: row['status'] for row in coverage_report(contract, state)['criteria']}",
+     "        return {key: value.get('verdict') for key, value in state.get('acceptance_reviews', {}).items()}"),
+    ('gate_ignores_submodules', 'gate.py', "'--ignore-submodules=none', '--no-ext-diff', start, commit))", "'--no-ext-diff', start, commit))"),
+    ('gate_allows_mission_root', 'gate.py', '    if in_mission:\n', '    if False:\n'),
+    ('verdict_anywhere_counts', 'panel.py', "    match = VERDICT_LINE.fullmatch(lines[-1]) if lines else None",
+     "    match = ([VERDICT_LINE.fullmatch(line) for line in lines if VERDICT_LINE.fullmatch(line)] or [None])[-1]"),
     ('repeat_without_lock', 'cli_aux.py', "with persistent_lock(path.with_name(path.name + '.lock'), wait=REPEAT_LOCK_WAIT_SECONDS):", 'if True:'),
 )
 # A second identical check guards these, so one removal changes no behavior.

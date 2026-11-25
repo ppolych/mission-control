@@ -59,6 +59,6 @@ class GateOutsideScope(GateBase):
         self.mission_done()
         self.write('.gitignore')
         report = self.gate(self.commit(), code=1)
-        detail = report['not_certified'][0]['detail']
+        detail = next(item for item in report['not_certified'] if item['reason'] == 'outside_scope')['detail']
         self.assertIn('Do not drop a needed file to pass', detail)
         self.assertIn('revise', detail)

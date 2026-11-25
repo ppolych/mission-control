@@ -35,6 +35,8 @@ def start_step(contract, state, step, entry, args, path):
         from .coverage import verification_is_current
         if verification_is_current(step, state):
             raise ValueError('verification is current; nothing to revalidate')
+        # Keep it a checks-only revalidation through an approval request, approve or block; verify clears it.
+        entry['needs_revalidation'] = True
     elif args.revalidate and not entry.get('needs_revalidation'):
         raise ValueError('no interrupted or completed work to revalidate')
     if entry.get('needs_revalidation') and not args.revalidate:

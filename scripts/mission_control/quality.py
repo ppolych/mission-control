@@ -9,6 +9,7 @@ def evidence_kinds(value):
 
 
 def evidence_audit(contract,state):
+    if contract['schema_version']!=3:raise ValueError('evidence-audit requires schema 3')
     from .coverage import coverage_report
     from .traceability import traceability_report
     from .contract_index import requirement_steps
