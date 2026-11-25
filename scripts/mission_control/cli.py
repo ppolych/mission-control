@@ -5,7 +5,7 @@ from pathlib import Path
 from .settings import VERSION, MAX_STATE_BYTES
 
 READ_ONLY_COMMANDS = ('status', 'history', 'metrics', 'handoff', 'coverage', 'recovery',
-                      'diagnose', 'evidence-audit', 'revision-diff', 'gate')
+                      'diagnose', 'evidence-audit', 'revision-diff', 'gate', 'brief')
 STEP_COMMANDS = ('start', 'verify', 'block', 'assess', 'approve', 'deny', 'recovery', 'recover', 'red', 'test-first-note')
 
 
@@ -20,6 +20,10 @@ def run_report(contract, state, args, root):
         code, report = gate_report(contract, state, args.commit, root, args.remote_sha)
         print(json.dumps(report, indent=2))
         return code
+    if command == 'brief':
+        from .brief import brief
+        print(brief(contract, state, args))
+        return 0
     if command == 'evidence-audit':
         from .quality import evidence_audit
         validate_approval_workspace(state)
@@ -89,6 +93,14 @@ def run_transition(contract, state, args, root, path):
     elif command == 'recover':
         from .recovery import reconcile_recovery
         reconcile_recovery(contract, state, transitions.find_step(contract, args.step), args)
+    elif command in ('skeptic-record', 'review-record'):
+        from .panel import record
+        validate_approval_workspace(state)
+        recorded = record(contract, state, args)
+        print(json.dumps({key: recorded[key] for key in recorded if key not in ('reply_digest', 'work_digest')}))
+    elif command == 'controller-adopt':
+        from .controller_identity import adopt
+        adopt(state, args)
     elif command == 'scope-note':
         from .scope_check import record_note
         record_note(contract, state, args)
@@ -144,10 +156,14 @@ def run_mission_command(args, root):
             proposed = json.loads(Path(args.contract).read_text(encoding='utf-8-sig'))
             validate(proposed)
             validate_known_fields(proposed)
+            from .discipline import require_decided
+            require_decided(proposed)
             preflight_init(proposed, args, root)
         root.mkdir(parents=True, exist_ok=True)
     elif not root.is_dir():
-        raise ValueError('mission directory does not exist: ' + str(root))
+        raise ValueError('mission directory does not exist: ' + str(root) + '; to start a mission, read the skill\'s '
+                         'templates/contract.json and references/mission-guide.md, write ' + str(root / 'draft-contract.json')
+                         + ', then validate and init')
     # Checkpoints are replaced atomically, so reports need no lock and stay usable during verify.
     if command in READ_ONLY_COMMANDS:
         require_regular_lock_entry(root / '.lock')
@@ -160,11 +176,13 @@ def run_mission_command(args, root):
         validate(contract)
         if command == 'init' and args.contract:
             validate_known_fields(contract)
+            from .discipline import require_decided
+            require_decided(contract)
         path = root / 'state/progress.json'
         if command == 'init' and os.path.lexists(path):
             raise ValueError('already initialized or checkpoint entry requires recovery')
         if command != 'init' and not path.exists():
-            raise ValueError('initialize mission first')
+            raise ValueError('initialize mission first: validate --contract ' + str(root / 'draft-contract.json') + ', then init')
         if path.exists():
             state = json.loads(read_bounded(path, MAX_STATE_BYTES)[0].decode('utf-8-sig'))
         else:
@@ -176,6 +194,9 @@ def run_mission_command(args, root):
             raise ValueError('--step required')
         if command in READ_ONLY_COMMANDS:
             return run_report(contract, state, args, root)
+        if command not in ('init', 'controller-adopt'):
+            from .controller_identity import require_unchanged
+            require_unchanged(state)
         return run_transition(contract, state, args, root, path)
 
 

@@ -14,7 +14,7 @@ def start_step(contract, state, step, entry, args, path):
     if schema3:
         validate_approval_workspace(state)
         if entry.get('recovery_required'):
-            raise ValueError('inspect recovery report and reconcile before retry or revalidation')
+            raise ValueError(recovery_needed(step))
     active = any(value.get('status') == 'in_progress' for value in state['steps'].values())
     dependency_open = any(state['steps'].get(name, {}).get('status') != 'completed' for name in step.get('depends_on', []))
     if entry.get('approval_denied'):
@@ -101,3 +101,9 @@ def reopen_finished_mission(step, state):
     if 'goal_review' in state:
         state.setdefault('goal_review_history', []).append(state.pop('goal_review'))
     state['stop_reason'] = None
+
+
+def recovery_needed(step):
+    return ('interrupted work needs reconciliation before retry or revalidation: recovery --step ' + step['id']
+            + ' shows the report and its digest, then recover --step ' + step['id'] + ' --digest DIGEST --resolution '
+            'completed|not_applied|applied_incorrect|partial|unknown --rationale TEXT (references/evidence-recovery.md)')

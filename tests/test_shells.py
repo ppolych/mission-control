@@ -8,6 +8,8 @@ import subprocess
 import tempfile
 import unittest
 
+from decided_template import decided
+
 ROOT = Path(__file__).resolve().parents[1]
 SHELLS = ('bash', 'zsh')
 PASTED_DOCUMENTS = ('SKILL.md', 'README.md')
@@ -50,7 +52,7 @@ class ShellBase(unittest.TestCase):
         shutil.copyfile(ROOT / 'VERSION', self.skill / 'VERSION')
         self.workspace = self.root / 'work space résumé'
         self.workspace.mkdir()
-        shutil.copyfile(ROOT / 'templates/contract.json', self.workspace / 'contract.json')
+        (self.workspace / 'contract.json').write_text(decided('contract.json'), encoding='utf-8')
 
     def shell(self, name):
         path = shutil.which(name)

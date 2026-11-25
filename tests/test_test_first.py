@@ -5,6 +5,7 @@ import unittest
 
 from strict_fixture import StrictFixture
 
+UNCOUNTED = 'A plain script fixture prints no runner summary'
 COMMAND = ['python3', '-B', 'check_app.py']
 PASSING = "import app\nassert app.VALUE == 2, 'AssertionError: wrong value'\n"
 
@@ -15,7 +16,7 @@ class TestFirstBase(StrictFixture):
         del self.step['test_first_exempt']
         self.step['effects']['writes'] = ['app.py', 'check_app.py']
         self.step['verify'] = [['exit0', *COMMAND]]
-        self.step['test_first'] = {'command': COMMAND, 'failure_matches': 'wrong value', 'test_paths': ['check_app.py']}
+        self.step['test_first'] = {'command': COMMAND, 'failure_matches': 'wrong value', 'test_paths': ['check_app.py'], 'uncounted_reason': UNCOUNTED}
         self.step['verify_timeout'] = 10
 
     def begin(self):
@@ -115,7 +116,7 @@ class RedCommand(TestFirstBase):
 
     def test_output_larger_than_a_pipe_does_not_block(self):
         command = ['python3', '-c', "import sys;sys.stdout.write('x'*500000);sys.exit(1)"]
-        self.step['test_first'] = {'command': command, 'test_paths': ['check_app.py']}
+        self.step['test_first'] = {'command': command, 'test_paths': ['check_app.py'], 'uncounted_reason': UNCOUNTED}
         self.step['verify'] = [['exit0', *command]]
         self.begin()
         self.write_test()
@@ -189,7 +190,7 @@ class VerifyAfterRed(TestFirstBase):
     def test_unchanged_implementation_since_red_is_refused(self):
         script = Path(self.root / 'flag')
         command = ['test', '-e', str(script)]
-        self.step['test_first'] = {'command': command, 'test_paths': ['check_app.py']}
+        self.step['test_first'] = {'command': command, 'test_paths': ['check_app.py'], 'uncounted_reason': UNCOUNTED}
         self.step['verify'] = [['exit0', *command]]
         self.begin()
         self.write_test()
@@ -267,7 +268,7 @@ class DraftShape(TestFirstBase):
                 value = dict(self.step['test_first'], **change)
                 self.step['test_first'] = value
                 self.assert_refused()
-                self.step['test_first'] = {'command': COMMAND, 'test_paths': ['check_app.py']}
+                self.step['test_first'] = {'command': COMMAND, 'test_paths': ['check_app.py'], 'uncounted_reason': UNCOUNTED}
 
     def test_needs_strict(self):
         del self.data['discipline']

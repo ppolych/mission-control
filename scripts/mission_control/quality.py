@@ -4,7 +4,7 @@ import datetime
 def evidence_kinds(value):
     from .contract import text_list
     text_list(value,'evidence kinds')
-    if set(value)-{'existence','content','behavior','integration','manual'}:raise ValueError('unknown evidence kind')
+    if set(value)-{'existence','content','behavior','integration','manual','source'}:raise ValueError('unknown evidence kind')
     return value
 
 

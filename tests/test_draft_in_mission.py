@@ -6,6 +6,8 @@ import subprocess
 import tempfile
 import unittest
 
+from decided_template import decided
+
 ROOT = Path(__file__).resolve().parents[1]
 CLI = str(ROOT / 'scripts/mission.py')
 SKILL = (ROOT / 'SKILL.md').read_text(encoding='utf-8')
@@ -46,7 +48,7 @@ class DraftFixture(unittest.TestCase):
         self.git('add', '.')
         self.git('commit', '-q', '-m', 'base')
         (self.work / '.mission').mkdir()
-        (self.work / DRAFT).write_bytes((ROOT / 'templates/small-fix-contract.json').read_bytes())
+        (self.work / DRAFT).write_text(decided('small-fix-contract.json'), encoding='utf-8')
 
     def finish(self):
         self.ok('verify', '--step', 'fix')
@@ -76,7 +78,7 @@ class DraftInMissionRoot(DraftFixture):
         (self.work / DRAFT).write_text(json.dumps({'schema_version': 3}), encoding='utf-8')
         self.assertEqual(self.call('init', '--contract', DRAFT, '--workspace', str(self.work)).returncode, 2)
         self.assertFalse((self.work / '.mission/state').exists())
-        (self.work / DRAFT).write_bytes((ROOT / 'templates/small-fix-contract.json').read_bytes())
+        (self.work / DRAFT).write_text(decided('small-fix-contract.json'), encoding='utf-8')
         self.ok('init', '--contract', DRAFT, '--workspace', str(self.work))
 
     def test_the_final_advisory_names_unconfirmed_red_green(self):

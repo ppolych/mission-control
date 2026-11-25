@@ -77,6 +77,24 @@ def _stale_after_finish(contract, state, root):
                    'finish and goal review.', root, stale[0])
 
 
+def _panel_step(contract, state, root):
+    from .panel import evaluate
+    result = evaluate(contract, state)
+    if not result or result['satisfied']:
+        return None
+    needs = '; '.join(result['missing'])
+    if result['current_votes'] < result['required_votes']:
+        role, note = 'skeptic', ''
+    elif any('review' in text or 'finding' in text for text in result['missing']):
+        role, note = 'reviewer', ''
+    else:
+        role, note = 'skeptic', 'Fix what the refuting votes name first; any change makes the old votes stale. '
+    command = 'skeptic-record' if role == 'skeptic' else 'review-record'
+    return _report('acceptance_panel', ['brief', '--role', role],
+                   note + 'Give the brief to an explore subagent, save its whole reply verbatim under .mission/replies/, then ' + command
+                   + ' --content THAT_FILE. Panel needs: ' + needs + '.', root)
+
+
 def next_action(contract, state, root=None):
     from .reports import goal_review_status
     stop = state.get('stop_reason')
@@ -85,6 +103,9 @@ def next_action(contract, state, root=None):
         if stale:
             return stale
         if goal_review_status(state) == 'missing':
+            panel = _panel_step(contract, state, root)
+            if panel:
+                return panel
             return _report('goal_review', ['goal-review', '--verdict', 'VERDICT', '--rationale', 'TEXT'],
                            'Compare the combined outcome with the original goal.', root)
         open_paths = sorted(name for name, record in state.get('scope_observations', {}).items() if record.get('status') == 'open')

@@ -57,6 +57,10 @@ def init_mission(contract, state, args, root):
     state['contract_hash'] = digest(contract)
     state['workspace'] = str(workspace)
     state['approved_steps'] = {}
+    if contract['schema_version'] == 3:
+        from .guidance import installation_identity
+        identity = installation_identity()
+        state['controller'] = {'version': identity['version'], 'engine_fingerprint': identity['engine_fingerprint']}
     from .discipline import is_strict
     if is_strict(contract):
         from .gate import begin_mission

@@ -57,11 +57,11 @@ A filled-in code step, for a Go project; checks are exact argv arrays whose firs
 
 ```json
 {"id": "client", "description": "HTTP client with typed errors", "depends_on": ["scaffold"],
- "verify": [["exit0", "go", "test", "./..."]], "risk": "low", "needs_approval": false, "commands": [],
+ "verify": [["exit0", "go", "test", "-v", "./..."]], "risk": "low", "needs_approval": false, "commands": [],
  "acceptance_refs": ["AC-1"], "watch": [], "retry": "inspect",
  "effects": {"reads": [], "writes": ["client/client.go", "client/client_test.go"], "network": "none",
              "external_actions": [], "reversible": true},
- "test_first": {"command": ["go", "test", "./..."], "test_paths": ["client/client_test.go"]}}
+ "test_first": {"command": ["go", "test", "-v", "./..."], "test_paths": ["client/client_test.go"]}}
 ```
 
 `network` is one of `none`, `self_hosted` or `external`. The `test_first` command must also appear as an
@@ -69,6 +69,13 @@ A filled-in code step, for a Go project; checks are exact argv arrays whose firs
 `watch` takes files, never directories. Name example configuration files without a `.env` suffix, such as
 `env.example`: hosts such as Nestor refuse to write `*.env` files, and a declared name you cannot write
 needs a whole revision.
+A Go `test_first` command needs `-v` or `-json`, so `verify` counts the tests that ran; it fails a `test_first`
+command that ran no tests. Use `["not_grep", "PATTERN", "path"]` to prove an old call or parameter is gone. When there is no live service to test
+against, base fixtures and expected shapes on official sources, such as the service's published OpenAPI file or
+upstream tests, and record them with `--evidence-kind source`. For long research, hand it to an explore subagent
+with `brief --role researcher --query TOPIC` and keep only its facts; read the template again just before drafting.
+Decide everything before `init`: it refuses template text starting with `Replace with`. Details:
+`references/subagents.md`.
 For that new mission run `validate`, then `init`; existing contracts must not be overwritten or
 weakened. New requirements need an explicit new mission revision (`revision-diff`, then
 `revise` into a separate destination). Existing schema-2 missions stay compatible. Use helper

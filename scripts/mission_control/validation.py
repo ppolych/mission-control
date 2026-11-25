@@ -7,19 +7,20 @@ def check_args(check):
         raise ValueError('check must be a nonempty string argv array')
     if any('\x00' in arg for arg in check):raise ValueError('check arguments cannot contain NUL')
     kind,*args=check
-    arity={'file':1,'not_file':1,'grep':2,'exec':1}
+    arity={'file':1,'not_file':1,'grep':2,'not_grep':2,'exec':1}
     if kind not in (*arity,'exit0','test'):raise ValueError('unknown check: '+kind)
     if kind in arity and len(args)!=arity[kind]:raise ValueError('invalid check arity: '+kind)
     if kind in ('exit0','test') and not args:raise ValueError('missing command or expression')
     if kind=='exit0' and not args[0]:raise ValueError('empty executable')
-    if kind in ('file','not_file','grep') and not args[-1]:raise ValueError('empty filesystem path')
+    if kind in ('file','not_file','grep','not_grep') and not args[-1]:raise ValueError('empty filesystem path')
 
 
 def validate(c):
     from .approvals import validate_policy
     from .contract import validate_advanced
     if not isinstance(c,dict) or type(c.get('schema_version')) is not int or c['schema_version'] not in (2,3):
-        raise ValueError('expected schema_version 2 or 3 object; migrate legacy contracts')
+        raise ValueError('expected schema_version 2 or 3 object; migrate legacy contracts. A new contract starts from the skill\'s '
+                         'templates/contract.json; references/mission-guide.md shows a filled-in step')
     if not isinstance(c.get('mission'),str) or not c['mission'].strip():raise ValueError('mission required')
     steps=c.get('steps')
     if not isinstance(steps,list) or not steps:raise ValueError('steps must be nonempty array')
@@ -64,6 +65,8 @@ def validate(c):
         raise ValueError('constraints must be string array')
     validate_advanced(c)
     from .discipline import validate_discipline
+    from .panel import validate_panel
+    validate_panel(c)
     validate_discipline(c)
 
 

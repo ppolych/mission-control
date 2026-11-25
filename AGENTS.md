@@ -31,7 +31,8 @@ Where the code lives in `scripts/mission_control/`:
 | Lifecycle transitions and rules | `transitions.py`, `lifecycle_start.py`, `lifecycle_verify.py`, `lifecycle_stop.py`, `lifecycle_rules.py` |
 | Persistence and locks | `fsio.py`, `storage.py`, `publication.py`, `journal.py`, `store.py` |
 | Controlled mode, recovery, budgets | `approvals.py`, `recovery.py`, `budgets.py` |
-| Running checks, file evidence | `checks.py`, `processes.py`, `observations.py`, `coverage.py` |
+| Running checks, file evidence | `checks.py`, `validation_tier.py`, `processes.py`, `observations.py`, `coverage.py` |
+| Independent review, controller identity | `panel.py`, `brief.py`, `controller_identity.py` |
 | Read-only reports | `reports.py`, `compact_handoff.py`, `guidance.py`, `next_action.py`, `quality.py`, `traceability.py` |
 | Advisory helpers | `lessons.py`, `ranking.py`, `impact.py`, `services.py`, `cache.py` |
 
@@ -46,7 +47,7 @@ Where the code lives in `scripts/mission_control/`:
 
 ## Project Structure & Module Organization
 
-Mission Control 0.4.2.12 is a Nestor orchestration skill with a Python core and Bash entrypoints.
+Mission Control 0.4.2.13 is a Nestor orchestration skill with a Python core and Bash entrypoints.
 
 - `VERSION` is the canonical release; keep skill metadata consistent. Contract schemas 2 and 3 are separate from the release version.
 - `SKILL.md` is the concise agent entrypoint; workflow details belong in `references/`.
@@ -165,7 +166,7 @@ Use imperative subjects; describe behavior, validation, and limitations. Exclude
 
 ## Operational Helpers
 
-Version is 0.4.2.12. Every committed change gets the next 0.4.2.x, by explicit author instruction. Keep VERSION, skill metadata
+Version is 0.4.2.13. Every committed change gets the next 0.4.2.x, by explicit author instruction. Keep VERSION, skill metadata
 and current documentation consistent. Keep metrics/handoff/search/impact read-only and all helpers dependency-free.
 Store publication and service observations may update only explicitly selected
 auxiliary files under persistent locks; they grant no lifecycle permissions. Search only
@@ -299,3 +300,7 @@ verification and refuses network, external or irreversible effects. Metadata rec
 only to declared writes and file evidence refs; watched inputs stay exact-hash because
 they bind approvals. `done_verified` keeps its timing for compatibility: expose a
 missing review through `goal_review_status` instead of moving the label.
+
+## Independent Review and Counted Tests
+
+Details: references/subagents.md. Regressions: tests/test_validation_tier.py, test_acceptance_panel.py, test_controller_identity.py, test_check_kinds.py, test_decided_drafts.py and test_refusal_guidance.py. Keep these true: the argv decides a check's tier and output only refines it, so text a command prints can never promote it; a test runner whose summary cannot be read is `unknown` and never a pass; the counted-tests rule binds only strict missions whose state records `controller`, so missions initialized by older releases keep their behavior. Panel replies are parsed by the controller, an unreadable reply is inconclusive, every record is bound to the content of the declared writes, and `observe` never refuses. The controller cannot prove a reply came from an independent agent: records are claims. The controller fingerprint is a tripwire with a recorded acknowledgment (`controller-adopt`), not protection. `brief` is read-only and must not carry the parent agent's conclusions.

@@ -7,6 +7,8 @@ import subprocess
 import tempfile
 import unittest
 
+from decided_template import decided
+
 ROOT = Path(__file__).resolve().parents[1]
 CLI = str(ROOT / 'scripts/mission.py')
 SKILL = (ROOT / 'SKILL.md').read_text(encoding='utf-8')
@@ -44,7 +46,7 @@ class ShortPath(unittest.TestCase):
         self.git('add', '.')
         self.git('commit', '-q', '-m', 'base')
         contract = str(self.root / 'contract.json')
-        Path(contract).write_bytes((ROOT / 'templates/small-fix-contract.json').read_bytes())
+        Path(contract).write_text(decided('small-fix-contract.json'), encoding='utf-8')
         self.mission('validate', '--contract', contract)
         self.mission('init', '--contract', contract, '--workspace', str(self.work))
         self.mission('start', '--step', 'fix')
@@ -77,7 +79,7 @@ class ShortPath(unittest.TestCase):
         self.git('add', '.')
         self.git('commit', '-q', '-m', 'base')
         contract = str(self.root / 'contract.json')
-        Path(contract).write_bytes((ROOT / 'templates/small-fix-contract.json').read_bytes())
+        Path(contract).write_text(decided('small-fix-contract.json'), encoding='utf-8')
         self.mission('init', '--contract', contract, '--workspace', str(self.work))
         self.mission('start', '--step', 'fix')
         self.mission('red', '--step', 'fix')
@@ -92,7 +94,7 @@ class ShortPath(unittest.TestCase):
         (self.work / 'test_app.py').write_text(TEST, encoding='utf-8')
         self.git('add', '.')
         self.git('commit', '-q', '-m', 'base')
-        document = json.loads((ROOT / 'templates/small-fix-contract.json').read_text(encoding='utf-8'))
+        document = json.loads(decided('small-fix-contract.json'))
         document['steps'][0]['test_first']['failure_matches'] = 'AssertionError'
         contract = self.root / 'contract.json'
         contract.write_text(json.dumps(document), encoding='utf-8')

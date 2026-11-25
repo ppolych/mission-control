@@ -20,8 +20,11 @@ def validate_test_first(step):
     value = step['test_first']
     if 'test_first_exempt' in step:
         raise ValueError(label + 'and test_first_exempt cannot both be declared')
-    if not isinstance(value, dict) or not {'command', 'test_paths'} <= set(value) or set(value) - {'command', 'test_paths', 'failure_matches'}:
-        raise ValueError(label + 'needs command and test_paths, with optional failure_matches')
+    if (not isinstance(value, dict) or not {'command', 'test_paths'} <= set(value)
+            or set(value) - {'command', 'test_paths', 'failure_matches', 'uncounted_reason'}):
+        raise ValueError(label + 'needs command and test_paths, with optional failure_matches and uncounted_reason')
+    if 'uncounted_reason' in value and not (isinstance(value['uncounted_reason'], str) and value['uncounted_reason'].strip()):
+        raise ValueError(label + 'uncounted_reason must be a nonblank reason why the runner\'s tests cannot be counted')
     command = value['command']
     try:
         check_args(['exit0', *command] if isinstance(command, list) else None)
@@ -115,9 +118,10 @@ def record_note(contract, step, entry, args):
         raise ValueError('test-first-note requires discipline: strict and a step declaring test_first')
     if entry.get('status') != 'in_progress':
         raise ValueError('test-first-note requires the active step')
-    if not nonblank(args.reason):
-        raise ValueError('test-first-note requires a nonblank --reason')
-    entry.setdefault('test_first_notes', []).append({'reason': args.reason, 'timestamp': now()})
+    reason = args.reason if nonblank(args.reason) else args.rationale
+    if not nonblank(reason):
+        raise ValueError('test-first-note requires a nonblank --reason (--rationale is accepted too)')
+    entry.setdefault('test_first_notes', []).append({'reason': reason, 'timestamp': now()})
 
 
 def red_green_status(step, entry, workspace):

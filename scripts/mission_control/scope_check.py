@@ -140,10 +140,11 @@ def record_note(contract, state, args):
     record = state.get('scope_observations', {}).get(args.path)
     if record is None:
         raise ValueError('scope-note applies only to an observed path; see the scope report')
-    if args.disposition not in DISPOSITIONS or not nonblank(args.rationale):
-        raise ValueError('scope-note requires --disposition mine|not_mine|unknown and a nonblank --rationale')
+    rationale = args.rationale if nonblank(args.rationale) else args.reason
+    if args.disposition not in DISPOSITIONS or not nonblank(rationale):
+        raise ValueError('scope-note requires --disposition mine|not_mine|unknown and a nonblank --rationale (--reason is accepted too)')
     current = path_digest(state['workspace'], args.path)
-    record['notes'].append({'disposition': args.disposition, 'rationale': args.rationale, 'digest': current,
+    record['notes'].append({'disposition': args.disposition, 'rationale': rationale, 'digest': current,
                             'timestamp': now(), 'kind': 'recorded statement, not proof'})
     record.update(status=DISPOSITIONS[args.disposition], digest=current)
 

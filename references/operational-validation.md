@@ -16,7 +16,7 @@
 - [Performance measurement](#performance-measurement)
 
 Initial operational run: 2026-10-31, release **0.3.1**. Later release records
-are appended below; current release is **0.4.2.12**.
+are appended below; current release is **0.4.2.13**.
 No contract schema, default mode, approval, recovery or attempt-budget policy
 was changed. The additions are `metrics`, `handoff`, bounded `lessons-search`,
 and prompt guidance for progress/waits, safe polling and evidence-based review.
@@ -359,3 +359,11 @@ One real Nestor session ran on 0.4.2.10 (Qwen 3.8 27B, id `qwen3-6-coder-gefion`
 `check_all.sh` passed on Linux 6.18.54.1-microsoft-standard-WSL2 with Python 3.14.4: 591 tests in 186.603 seconds, then 591 in 163.896 seconds with a symlinked TMPDIR, with package smoke checks (154 entries). New regressions are in `tests/test_draft_checks.py`; `test_missing_executable_is_not_red` now names its missing program by path, since a bare missing name is refused at drafting.
 
 One real Nestor session ran on 0.4.2.11 (Qwen 3.8 27B, Agent mode, thinking normal, new git workspace, no mission hints in the request): a Go MCP server for Portainer, about 117 minutes and 45.1 million tokens across four mission roots. Three contract mistakes surfaced only at `verify` and each needed a revision: a check missing its `go` program, a `watch` on a directory, and a declared `.env` file the host refused to write; the agent did not bypass that guard. After the revisions `gate` could not certify commit 63f8a1a (`no_change_step_changed_path`), which the final report stated. `go vet` and `go test -race` passed again when rerun by the reviewer. The reviewer is the author's assistant, the sample is one run, and no session has run on 0.4.2.12.
+
+## Release 0.4.2.13 verification
+
+`check_all.sh` passed on Linux 6.18.58.1-microsoft-standard-WSL2 with Python 3.14.4: 640 tests in 179.141 seconds, then 640 in 159.676 seconds with a symlinked TMPDIR, with package smoke checks (167 entries). `evals/mutation_check.py` caught 59 of 59 mutants, including twelve new ones for counted tests, the acceptance panel and the controller tripwire. New regressions are in `tests/test_validation_tier.py`, `test_acceptance_panel.py`, `test_panel_review_fixes.py`, `test_controller_identity.py`, `test_check_kinds.py`, `test_decided_drafts.py` and `test_refusal_guidance.py`; fixtures that run plain scripts as `test_first` now declare `uncounted_reason`, and fixtures built from templates fill in their placeholder text.
+
+Before release, an independent review of the change found two P1 defects (a panel on a non-strict contract was never validated; the same reply recorded three times counted as three votes), four P2 and five P3 defects; each is fixed and pinned by a test in `tests/test_panel_review_fixes.py`.
+
+The release responds to a read-only review of five MCP servers built in Nestor on 0.4.2.8 to 0.4.2.12, which scored 3 to 7 of 10 (mean 5.3) although every mission certified. No Nestor session has run on 0.4.2.13, and no use of Nestor's `subagent` tool with this skill has been observed yet.

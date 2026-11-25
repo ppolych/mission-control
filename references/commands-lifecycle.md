@@ -19,7 +19,12 @@ The command list, contract format, checks, initialization, goal review and migra
 
 `red --step STEP`, `test-first-note --step STEP --reason TEXT`, `verify --already-satisfied --rationale TEXT` and
 `scope-note --path P --disposition D --rationale TEXT` apply to contracts with `discipline: strict`. Their rules
-are in the strict discipline reference.
+are in the strict discipline reference. `test-first-note` also accepts `--rationale`, and `scope-note` also accepts `--reason`.
+
+`brief --role researcher|tester|skeptic|reviewer [--step ID] [--query TOPIC]` prints a prompt for a subagent and changes
+nothing; `skeptic-record --content FILE` and `review-record --content FILE` record a subagent's reply for a contract
+with `acceptance_panel`; `controller-adopt --rationale TEXT` acknowledges a controller the user changed during the
+mission. The subagents reference has their rules.
 
 ## Command list
 
@@ -72,7 +77,8 @@ prevents accidental requirement changes. A nonblocking Unix lock serializes muta
 CLI operations; reports read without it. Checkpoints use same-directory atomic replacement. JSON is the
 canonical evidence record; `status` supplies the readable summary.
 
-Shell wrappers retain `file`, `not_file`, `exit0`, `exec`, `test`, and `grep`.
+Shell wrappers retain `file`, `not_file`, `exit0`, `exec`, `test`, `grep` and `not_grep`. `not_grep PATTERN PATH` passes
+when the pattern is absent; a missing file is an error.
 In the standalone wrapper, separate checks with `--`. To pass literal `--`
 arguments, use `verify.sh --single TYPE ARGS...`: every token after `--single`
 belongs to one exact check, with no separator parsing. For example:
@@ -175,7 +181,7 @@ these fields must not contain secrets.
 
 ## Input and recovery validation
 
-Command argv strings cannot contain NUL bytes. The `file`, `not_file`, and `grep`
+Command argv strings cannot contain NUL bytes. The `file`, `not_file`, `grep` and `not_grep`
 filesystem path arguments cannot be empty; an empty string is never shorthand
 for the workspace directory. Assessments require nonblank
 rationale. Checkpoint structure, step identifiers/statuses, counters, mappings,

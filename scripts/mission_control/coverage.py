@@ -87,6 +87,7 @@ def record_criterion_review(contract, state, args):
         missing=' '.join('--evidence-kind '+kind for kind in sorted(set(required)-set(kinds)))
         raise ValueError('missing required evidence kind declarations: '+args.criterion+' requires '+missing)
     mapped = {step['id'] for step in contract['steps'] if args.criterion in step.get('acceptance_refs', [])}
+    example = 'check:' + (sorted(mapped)[0] if mapped else 'STEP') + ':0'
     if args.verdict == 'supported':
         from .discipline import require_automated_evidence
         require_automated_evidence(contract, {step['id']: step for step in contract['steps'] if step['id'] in mapped}, kinds, refs)
@@ -95,20 +96,31 @@ def record_criterion_review(contract, state, args):
         if open_steps:
             raise ValueError('supported requires completed mapped steps; mapped steps not completed: ' + ', '.join(open_steps))
         if not refs:
-            raise ValueError('supported needs --evidence-ref check:STEP:INDEX or file:PATH')
+            raise ValueError('supported needs --evidence-ref check:STEP:INDEX or file:PATH, for example --evidence-ref '
+                             + example + ' for the first check of a mapped step (references/mission-guide.md)')
         if any(not verification_is_current(step, state) for step in contract['steps'] if step['id'] in mapped):
             raise ValueError('verification artifact evidence is missing or stale; ' + revalidation_hint(contract, state))
+    if 'source' in kinds and not any(ref.startswith('source:') for ref in refs):
+        raise ValueError('source evidence needs --evidence-ref source:URL naming the official page, specification or '
+                         'upstream file the fact comes from')
     for ref in refs:
-        if ref.startswith('file:'):
+        if ref.startswith('source:'):
+            import re
+            if not re.fullmatch(r'source:https?://[^\s]+', ref):
+                raise ValueError('source evidence must be source:https://... naming where the fact comes from')
+        elif ref.startswith('file:'):
             value = observe_artifact(state['workspace'], ref[5:])
             if value['status'] != 'present':raise ValueError('evidence file is not readable and present')
         elif ref.startswith('check:'):
             parts = ref[6:].rsplit(':', 1)
-            if len(parts) != 2 or parts[0] not in mapped or not parts[1].isdigit():raise ValueError('invalid check evidence reference')
+            if len(parts) != 2 or parts[0] not in mapped or not parts[1].isdigit():
+                raise ValueError('invalid check evidence reference ' + ref + '; use check:STEP:INDEX with a step mapped to '
+                                 + args.criterion + ' (' + ', '.join(sorted(mapped)) + ') and a zero-based check index')
             if not any(e.get('check') == int(parts[1]) and e.get('code') == 0
                        for e in state['steps'].get(parts[0], {}).get('evidence', [])):
                 raise ValueError('evidence reference does not name a passed check')
-        else:raise ValueError('evidence refs must be file:RELATIVE_PATH or check:STEP:INDEX')
+        else:raise ValueError('evidence refs must be file:RELATIVE_PATH, check:STEP:INDEX or source:URL, for example file:README.md or '
+                              + example)
     basis = coverage_basis(contract, state, args.criterion, refs)
     if args.verdict == 'supported':readable_observations(basis['artifacts'])
     state.setdefault('acceptance_reviews', {})[args.criterion] = {

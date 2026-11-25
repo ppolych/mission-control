@@ -48,7 +48,7 @@ class DraftChecks(DraftBase):
         self.assertIn('watch takes files, not directories: later/', refused.stderr)
 
     def test_the_guide_shows_a_filled_in_step_and_warns_about_env_files(self):
-        self.assertIn('"verify": [["exit0", "go", "test", "./..."]]', GUIDE)
+        self.assertIn('"verify": [["exit0", "go", "test", "-v", "./..."]]', GUIDE)
         self.assertIn('env.example', GUIDE)
 
 

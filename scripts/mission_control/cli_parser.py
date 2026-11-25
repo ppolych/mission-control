@@ -6,7 +6,9 @@ COMMAND_GROUPS = (
     ('Lifecycle', ('validate', 'init', 'start', 'red', 'test-first-note', 'assess', 'verify', 'block', 'stop', 'resume',
                    'criterion-review', 'finish', 'goal-review')),
     ('Controlled mode', ('approve', 'deny')),
-    ('Recovery and revision', ('recovery', 'recover', 'revision-diff', 'revise', 'migrate', 'scope-note')),
+    ('Acceptance panel', ('brief', 'skeptic-record', 'review-record')),
+    ('Recovery and revision', ('recovery', 'recover', 'revision-diff', 'revise', 'migrate', 'scope-note',
+                               'controller-adopt')),
     ('Read-only reports', ('status', 'history', 'coverage', 'metrics', 'handoff', 'evidence-audit',
                            'diagnose', 'gate', 'impact', 'lessons-search', 'lesson-audit', 'store-read',
                            'service-status')),
@@ -68,6 +70,7 @@ FLAGS = (
     ('--redacted', {'action': 'store_true', 'help': 'assert the cached report holds no raw payloads'}),
     ('--max-age', {'type': int, 'default': 86400, 'help': 'cache age limit in seconds'}),
     ('--compact', {'action': 'store_true', 'help': 'handoff only: at most five step rows'}),
+    ('--role', {'choices': ['researcher', 'tester', 'skeptic', 'reviewer'], 'help': 'brief: the subagent role to write a prompt for'}),
 )
 
 
@@ -90,6 +93,8 @@ def build_parser():
 
 
 def reject_misplaced_flags(args):
+    if args.role and args.command != 'brief':
+        raise ValueError('--role is only for brief')
     if args.compact and args.command != 'handoff':
         raise ValueError('--compact is only for handoff')
     if args.already_satisfied and args.command != 'verify':

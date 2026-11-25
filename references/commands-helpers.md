@@ -56,7 +56,7 @@ Cache publication refuses output or lock paths that alias declared inputs, the d
 
 ## Declared artifact containment (schema 3)
 
-Optional mission-level `"allowed_paths": ["out", "build"]` restricts declared artifacts to workspace-relative prefixes. When a contract declares allowed_paths, every step artifact path must stay inside it: `file`/`not_file`/`grep` check paths, `effects.reads`, `effects.writes` and `watch`. Prefixes match path components: `out/result` is allowed, `outside/result` is not. Prefix paths themselves are included.
+Optional mission-level `"allowed_paths": ["out", "build"]` restricts declared artifacts to workspace-relative prefixes. When a contract declares allowed_paths, every step artifact path must stay inside it: `file`/`not_file`/`grep`/`not_grep` check paths, `effects.reads`, `effects.writes` and `watch`. Prefixes match path components: `out/result` is allowed, `outside/result` is not. Prefix paths themselves are included.
 
 Omitting the field preserves existing behavior. `["."]` permits the whole workspace. An explicitly declared list must be nonempty, contain unique nonblank strings and use relative paths without parent traversal; `.` is supported as the whole-workspace prefix. Declared artifact paths also reject absolute paths and parent traversal, even with `["."]`.
 

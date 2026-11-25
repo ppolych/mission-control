@@ -73,6 +73,7 @@ def validate_draft_fields(contract):
         for step in contract['steps']:
             validate_checks_repeat_no_external_action(step)
             validate_programs_and_watch(step)
+            validate_counted_runner(step)
 
 
 def validate_programs_and_watch(step):
@@ -90,6 +91,46 @@ def validate_programs_and_watch(step):
     for name in step.get('watch', []):
         if name.endswith('/') or Path(name).is_dir():
             raise ValueError(step['id'] + ': watch takes files, not directories: ' + name + '; list the files, or leave watch empty')
+
+
+PLACEHOLDER_PREFIX = 'Replace with'
+
+
+def validate_decided(contract):
+    """A draft still holding template text is not decided yet; the agent fills it before init."""
+    texts = [('mission', contract['mission'])]
+    texts += [(step['id'] + '.description', step.get('description', '')) for step in contract['steps']]
+    texts += [(item.get('id', '?') + '.description', item.get('description', '')) for item in contract.get('acceptance', [])
+              if isinstance(item, dict)]
+    texts += [(step['id'] + '.test_first_exempt.reason', step.get('test_first_exempt', {}).get('reason', ''))
+              for step in contract['steps'] if isinstance(step.get('test_first_exempt'), dict)]
+    open_fields = [name for name, text in texts if isinstance(text, str) and text.strip().startswith(PLACEHOLDER_PREFIX)]
+    if open_fields:
+        raise ValueError('template text is still in ' + ', '.join(open_fields) + '; write the decided content '
+                         'before init, so nothing is left for the implementer to decide')
+
+
+def require_decided(contract):
+    """init and revise freeze a contract, so a strict one must hold no template text."""
+    if is_strict(contract):
+        validate_decided(contract)
+
+
+def validate_counted_runner(step):
+    """verify must be able to count the tests a test_first command ran; say so at drafting, not after the work."""
+    from .validation_tier import RUNNER_EXAMPLES, go_counts_tests, is_test_runner, program_name
+    value = step.get('test_first')
+    if not value or 'uncounted_reason' in value:
+        return
+    command = value['command']
+    if is_test_runner(command) and program_name(command) == 'go' and not go_counts_tests(command[2:]):
+        raise ValueError(step['id'] + ': test_first command ' + shlex.join(command) + ' needs -v or -json, so verify can count '
+                         'the tests that ran rather than packages, for example ["go", "test", "-v", "./..."]')
+    if is_test_runner(command):
+        return
+    raise ValueError(step['id'] + ': test_first command ' + shlex.join(value['command']) + ' is not a test runner whose tests verify '
+                     'can count, so a pass could mean no test ran; call one directly, for example ' + RUNNER_EXAMPLES
+                     + ', or add test_first.uncounted_reason, which the final report names')
 
 
 def validate_exemption(step):
@@ -192,8 +233,9 @@ def require_automated_evidence(contract, step_by_id, kinds, refs):
             checks = step_by_id[identifier]['verify'] if identifier in step_by_id else []
             if index.isdigit() and int(index) < len(checks) and isinstance(checks[int(index)], list):
                 return
-    raise ValueError('behavior or integration evidence needs a check:STEP:INDEX reference to an automated check; '
-                     'an assessment or file reference is not automated evidence')
+    example = 'check:' + (sorted(step_by_id)[0] if step_by_id else 'STEP') + ':0'
+    raise ValueError('behavior or integration evidence needs a check:STEP:INDEX reference to an automated check, '
+                     'for example --evidence-ref ' + example + '; an assessment or file reference is not automated evidence')
 
 
 def print_outcome(entry):
@@ -214,6 +256,16 @@ def validate_discipline_state(state):
     validate_scope_state(state)
     if not isinstance(state.get('mission_base', {}), dict):
         raise ValueError('invalid mission base')
+    if 'controller' in state:
+        controller = state['controller']
+        if not isinstance(controller, dict) or not all(nonblank(controller.get(key)) for key in ('version', 'engine_fingerprint')):
+            raise ValueError('invalid controller record')
+    if 'acceptance_panel' in state:
+        from .panel import validate_records
+        validate_records(state['acceptance_panel'])
+    history = state.get('controller_history', [])
+    if not isinstance(history, list) or not all(isinstance(item, dict) and nonblank(item.get('rationale')) for item in history):
+        raise ValueError('invalid controller history')
     lineage = state.get('lineage_writes', [])
     if not isinstance(lineage, list) or not all(isinstance(name, str) for name in lineage):
         raise ValueError('invalid lineage writes')

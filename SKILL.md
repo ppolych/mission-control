@@ -2,14 +2,14 @@
 name: mission-control
 description: Orchestrate goals with durable mission state, evidence-based verification, bounded recovery, and explicit outcomes. Use for substantial multi-step, controlled, autonomous, or multi-session work, and whenever the user asks for this skill by name, however small or urgent. Otherwise exclude simple edits and quick questions.
 metadata:
-  version: "0.4.2.12"
+  version: "0.4.2.13"
   author: "Panos Polychronis"
   email: "ppolych@netcompany.com"
 ---
 
 # Mission Control
 
-Version 0.4.2.12. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
+Version 0.4.2.13. Requires Python 3.11+, Bash, and Unix locking on Linux, WSL2,
 or macOS. For WSL paths and setup, read [WSL guidance](references/wsl.md).
 Preserve the user's scope, existing authorization, and host permissions.
 
@@ -100,7 +100,7 @@ run `python3 "$M" gate --commit SHA`, and push only on exit 0.
 
 For anything beyond one small change, read the [mission guide](references/mission-guide.md) first. Inspect the workspace,
 then self-answer [the draft template](templates/draft-contract.md) and present a COMPLETE contract from
-[the template](templates/contract.json); ask only for genuinely consequential missing requirements. Run `validate`, then
+[the template](templates/contract.json), read again just before drafting; ask only for genuinely consequential missing requirements. Run `validate`, then
 `init`. Never overwrite or weaken an existing contract: new requirements need `revision-diff`, then `revise` into a separate
 destination. Existing schema-2 missions stay compatible. A strict mission stops before a push: keep the push out of the
 steps, then after `finish` and a passing `goal-review` commit, run `gate --commit SHA`, and push only if it exits 0. Never remove
@@ -111,7 +111,9 @@ a needed file to make `gate` pass; report what it refused instead.
 Use `mode: controlled` for interactive/sensitive work and `autonomous` for sandboxed/CI work (the default). Neither creates a
 sandbox, and both preserve host permissions.
 
-Run `start → work → assess/verify → recover → finish`, one active step at a time.
+Run `start → work → assess/verify → recover → finish`, one active step at a time. Only you run `mission.py`
+commands that change state; [subagents](references/subagents.md) only read. Never edit this skill during a mission: report
+a refusal that looks wrong to the user.
 In controlled mode, `needs_approval: true` OR `risk: high` requires a gate BEFORE
 work, including verification. Declare a nonblank description and exact work
 `commands` argv arrays (`[]` for no commands). On `start` exit 3, pause and show
@@ -142,6 +144,8 @@ first step with `test_first_exempt`.
 
 After `finish`, re-read the ORIGINAL user goal and constraints, inspect the
 combined artifacts, and verify that the completed steps together answer it.
+With `acceptance_panel`, first give `brief --role skeptic` and `brief --role reviewer` to explore subagents and record
+each whole reply, saved verbatim under `.mission/replies/`, with `skeptic-record` or `review-record --content FILE`.
 Record the assessment with `goal-review --verdict pass|fail --rationale TEXT`,
 citing artifact/check evidence and any remaining gap. Step completion alone is
 insufficient. If the goal is unmet or uncertain, record `fail`, which changes
@@ -173,6 +177,7 @@ Read only the file a task needs. Each one is linked from here directly.
 | `discipline: strict`, `red`, `scope-note`, `gate`, pre-push hook | [strict discipline](references/strict-discipline.md) |
 | Splitting steps, choosing tests, review in proportion to risk | [development method](references/development-method.md) |
 | Drafting detail, running rules, lessons, stores, install paths | [mission guide](references/mission-guide.md) |
+| Subagents, `brief`, the acceptance panel, counted tests | [subagents](references/subagents.md) |
 | Starting safely before project changes | [controller activation](references/controller-activation.md) |
 | Drafting, final review, lessons | [agent workflow](references/agentic-workflow.md) |
 | Mission selection, briefs, decisions | [execution context](references/execution-context.md) |

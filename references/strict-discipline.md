@@ -65,6 +65,11 @@ New strict drafts also refuse an `exit0` check or `test_first` command whose pro
 the contract is frozen. A program a step creates needs a path such as `./bin/tool`. The `PATH` lookup runs where
 `validate` runs, so a tool installed later is not seen.
 
+New strict drafts also refuse a `test_first` command that is not a test runner whose tests `verify` can count,
+unless `test_first.uncounted_reason` says why; in missions whose `status` records a `controller`, `verify` fails
+a `test_first` command that passed but ran no tests. `init` and `revise` refuse template text starting with
+`Replace with`. The subagents reference, `references/subagents.md`, has the runner list and the tiers.
+
 After `revise`, the new mission keeps its parent's base and records the writes of every step a parent mission
 started. A step redone with `--already-satisfied` then does not make `gate` refuse those files as work from
 before the mission; files no mission in the chain started are still refused.

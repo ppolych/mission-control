@@ -2,6 +2,17 @@
 
 Test results for each release are in [the validation record](references/operational-validation.md).
 
+## 0.4.2.13
+
+Five MCP servers built in Nestor with Mission Control all reached `done_verified` with a passing goal review, yet a read-only review scored them 3 to 7 out of 10 (mean 5.3): an auto-rollback that never fired, allowlists that could be bypassed, wrong API paths. The agent graded its own work, and its tests ran against mocks that shared its wrong assumptions. The OPNsense session also showed friction: a contract written in the wrong format after long research, `FAIL: file (check 0)` without the path, a loop through recovery refusals, and about 30 messages spent reading the controller's source.
+
+- Verify grades what each check proved: `inspection`, `build_only`, `assertions_executed` or `unknown`. The argv decides the tier and the output only refines it. In strict missions initialized by this release, a `test_first` command that passed but ran no tests, or whose summary could not be read, fails verify. Drafting refuses a `test_first` command that is not a recognized runner unless `test_first.uncounted_reason` says why, and the final report names those steps.
+- An optional `acceptance_panel` (`observe` or `enforce`) asks for skeptic votes and a bug review from subagents. `brief --role researcher|tester|skeptic|reviewer` prints a self-contained prompt for Nestor's `subagent` tool; `skeptic-record` and `review-record` parse the reply, bind it to the current content of the declared writes, and count an unreadable reply as inconclusive. In `enforce`, a passing goal review needs a majority of `NOT_REFUTED` votes and no open P0/P1 finding.
+- `init` records the controller's fingerprint. If the controller changes mid-mission, commands that change state refuse until `controller-adopt --rationale TEXT` records why. This is a tripwire, not protection.
+- New `not_grep` check; new `source` evidence kind with `source:URL` references; `init` and `revise` refuse strict contracts that still hold template text.
+- Refusals name the missing path and a similar undeclared file, the exact recovery commands, the current recovery digest and evidence-reference examples. `test-first-note` accepts `--rationale` and `scope-note` accepts `--reason`. A missing mission or contract format points at the template.
+- New `references/subagents.md`; `SKILL.md` says only the agent changes mission state and never edits the skill during a mission.
+
 ## 0.4.2.12
 
 A real Nestor session on 0.4.2.11 built a Portainer MCP server in about 117 minutes and 45 million tokens, across four mission roots. Three contract mistakes surfaced only at `verify`, after the contract was frozen, and each needed a revision: a check whose `go` had been dropped (`["exit0", "build", "./..."]`), a `watch` on a directory, and a declared `config.example.env` that Nestor's file tool refuses to write. After the third revision every step was redone with `--already-satisfied`, so `gate` refused every file as work from before the mission and could not certify the commit. Drafting also took nine `validate` tries.

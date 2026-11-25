@@ -40,7 +40,9 @@ def reconcile_recovery(contract, state, step, args):
         raise ValueError('recover requires interrupted work awaiting reconciliation')
     if any(e.get('status') == 'in_progress' for e in state['steps'].values()):raise ValueError('another step active')
     report = recovery_report(contract, state, step)
-    if args.digest != report['digest']:raise ValueError('recovery report changed; inspect and use the current digest')
+    if args.digest != report['digest']:
+        raise ValueError('recovery report changed (files changed since it was read); inspect recovery --step ' + step['id']
+                         + ' again, then use its current digest: ' + report['digest'])
     if not args.rationale or not args.rationale.strip():raise ValueError('recovery needs an evidence-linked rationale')
     if args.resolution == 'applied_incorrect':
         # Only a failure of the latest attempt counts; older failures describe older work.

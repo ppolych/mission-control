@@ -49,7 +49,8 @@ class TemplateFlow(unittest.TestCase):
         step = contract['steps'][0]
         del step['test_first_exempt']
         step.update(verify=[['exit0', *command]],
-                    test_first={'command': command, 'failure_matches': 'wrong value', 'test_paths': ['check_app.py']})
+                    test_first={'command': command, 'failure_matches': 'wrong value', 'test_paths': ['check_app.py'],
+                                'uncounted_reason': 'A plain script fixture prints no runner summary'})
         step['effects']['writes'] = ['app.py', 'check_app.py']
         (self.work / 'contract.json').write_text(json.dumps(contract), encoding='utf-8')
         self.mission('validate', '--contract', 'contract.json')

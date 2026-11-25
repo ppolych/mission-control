@@ -40,7 +40,8 @@ not add an implicit execution retry or alter inspect/approval/budget rules.
   generation. Inspect all_sufficient and criteria.
 - `criterion-review ... --evidence-kind KIND` (repeatable): required when an
   acceptance item opts into evidence_kinds. Kinds: existence/content/behavior/
-  integration/manual. Labels require real inspection; they are not proof.
+  integration/manual/source. Labels require real inspection; they are not proof.
+  `source` needs `--evidence-ref source:https://...` naming where the fact comes from.
 - `diagnose`: recorded-fact failure classes and recovery-first next checks.
 - `lesson-audit --record FILE [--as-of ISO]`: advisory validity/age/contradictions.
 

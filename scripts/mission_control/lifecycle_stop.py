@@ -35,6 +35,11 @@ def print_unconfirmed(state):
     if names:
         print('Report in the final message: red/green unconfirmed for ' + ', '.join(names)
               + '; status shows each test_first_notes reason.')
+    uncounted = [name for name, entry in state['steps'].items()
+                 if ((entry.get('discipline_outcome') or {}).get('tests') or {}).get('tier') == 'uncounted']
+    if uncounted:
+        print('Report in the final message: tests were not counted for ' + ', '.join(uncounted)
+              + '; status shows each uncounted_reason.')
 
 
 def record_goal_review(contract, state, args):
@@ -50,6 +55,8 @@ def record_goal_review(contract, state, args):
         validate_approval_workspace(state)
         if not coverage_report(contract, state)['all_supported']:
             raise ValueError('acceptance evidence changed; cannot record a passing goal review')
+        from .panel import require_for_pass
+        require_for_pass(contract, state)
     if 'goal_review' in state:
         state.setdefault('goal_review_history', []).append(state['goal_review'])
     state['goal_review'] = {'verdict': args.verdict, 'rationale': args.rationale, 'timestamp': now(),
